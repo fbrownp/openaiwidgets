@@ -1,21 +1,18 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 import { Dashboard } from './Dashboard';
 
-// Auto-mount when the script loads
-const rootId = 'barplot-root';
-const rootElement = document.getElementById(rootId);
+const rootElement = document.getElementById('barplot-root');
 
-if (rootElement) {
-    console.log(`Mounting dashboard to #${rootId}`);
-    ReactDOM.createRoot(rootElement).render(
-        <React.StrictMode>
-            <Dashboard />
-        </React.StrictMode>
-    );
-} else {
-    console.error(`Root element #${rootId} not found!`);
+if (!rootElement) {
+    throw new Error('Missing barplot-root element');
 }
 
-// Export for programmatic usage
-export default Dashboard;
+console.log('Mounting Dashboard...');
+createRoot(rootElement).render(
+    <React.StrictMode>
+        <Dashboard />
+    </React.StrictMode>
+);
+
+export { Dashboard };

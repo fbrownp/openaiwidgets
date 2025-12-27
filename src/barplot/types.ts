@@ -1,3 +1,4 @@
+// Existing types...
 export type MetricOption = {
     label: string;
     value: string;
@@ -60,3 +61,39 @@ export type CandlestickDataRow = {
     low: number;
     close: number;
 };
+
+// ADD THESE NEW TYPES FOR OPENAI INTEGRATION
+export type UnknownObject = Record<string, unknown>;
+
+export type DisplayMode = 'compact' | 'expanded' | 'full';
+
+export const SET_GLOBALS_EVENT_TYPE = 'openai:setGlobals' as const;
+
+export type SetGlobalsEvent = CustomEvent<{
+    globals: Partial<OpenAiGlobals>;
+}>;
+
+export type OpenAiGlobals = {
+    toolOutput: unknown;
+    toolResponseMetadata: unknown;
+    widgetState: unknown;
+    maxHeight: number | null;
+    displayMode: DisplayMode | null;
+};
+
+declare global {
+    interface Window {
+        openai?: {
+            toolOutput?: unknown;
+            toolResponseMetadata?: unknown;
+            widgetState?: unknown;
+            maxHeight?: number | null;
+            displayMode?: DisplayMode | null;
+            setWidgetState?: (state: UnknownObject) => Promise<void>;
+        };
+    }
+
+    interface WindowEventMap {
+        [SET_GLOBALS_EVENT_TYPE]: SetGlobalsEvent;
+    }
+}

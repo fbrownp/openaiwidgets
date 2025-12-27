@@ -1,279 +1,334 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { CandlestickChart } from './CandlestickChart';
 import { DropdownFilter } from './DropdownFilter';
 import { EnhancedBarplot } from './EnhancedBarplot';
+import { buildFilterConfigs, parseGPTOutput } from './gpt-adapter';
+import { GPTDashboardData, GPTRawOutput } from './gpt-types';
 import { HorizontalBarplot } from './HorizontalBarplot';
-import { CandlestickDataRow, DataRow, FilterConfig } from './types';
+import { FilterConfig, MetricOption } from './types';
 import { WidgetCard } from './WidgetCard';
 
-// Sample data with extended fields
-const sampleData: DataRow[] = [
-    { period: "1992", year: 1992, region: "Metropolitana", revenue: 50, units: 20, profit: 15 },
-    { period: "1994", year: 1994, region: "O'Higgins", revenue: 120, units: 45, profit: 35 },
-    { period: "1996", year: 1996, region: "Biobío", revenue: 280, units: 95, profit: 85 },
-    { period: "1998", year: 1998, region: "Los Lagos", revenue: 720, units: 240, profit: 215 },
-    { period: "2000", year: 2000, region: "Metropolitana", revenue: 850, units: 290, profit: 255 },
-    { period: "2002", year: 2002, region: "Valparaíso", revenue: 920, units: 315, profit: 275 },
-    { period: "2004", year: 2004, region: "Metropolitana", revenue: 980, units: 335, profit: 295 },
-    { period: "2006", year: 2006, region: "Araucanía", revenue: 1250, units: 425, profit: 375 },
-    { period: "2008", year: 2008, region: "Metropolitana", revenue: 1350, units: 460, profit: 405 },
-    { period: "2010", year: 2010, region: "O'Higgins", revenue: 1280, units: 435, profit: 385 },
-    { period: "2012", year: 2012, region: "Biobío", revenue: 1420, units: 485, profit: 425 },
-    { period: "2014", year: 2014, region: "Los Lagos", revenue: 1180, units: 400, profit: 355 },
-    { period: "2016", year: 2016, region: "Metropolitana", revenue: 520, units: 175, profit: 155 },
-    { period: "2018", year: 2018, region: "Valparaíso", revenue: 580, units: 195, profit: 175 },
-    { period: "2020", year: 2020, region: "Araucanía", revenue: 680, units: 230, profit: 205 },
-    { period: "2022", year: 2022, region: "Metropolitana", revenue: 420, units: 140, profit: 125 },
-    { period: "2024", year: 2024, region: "O'Higgins", revenue: 380, units: 125, profit: 115 },
-];
+// Import hooks from parent directory
+import { useOpenAiGlobal } from '../use-openai-global';
+import { useWidgetState } from '../use-widget-state';
 
-const regionData: DataRow[] = [
-    { period: "Metropolitana", year: 2024, region: "Metropolitana", revenue: 4200, units: 1450, profit: 1260 },
-    { period: "Los Lagos", year: 2024, region: "Los Lagos", revenue: 3800, units: 1300, profit: 1140 },
-    { period: "O'Higgins", year: 2024, region: "O'Higgins", revenue: 2950, units: 1010, profit: 885 },
-    { period: "Biobío", year: 2024, region: "Biobío", revenue: 2850, units: 975, profit: 855 },
-    { period: "Valparaíso", year: 2024, region: "Valparaíso", revenue: 2680, units: 915, profit: 804 },
-    { period: "Araucanía", year: 2024, region: "Araucanía", revenue: 2450, units: 835, profit: 735 },
-    { period: "Maule", year: 2024, region: "Maule", revenue: 2280, units: 780, profit: 684 },
-    { period: "Coquimbo", year: 2024, region: "Coquimbo", revenue: 2150, units: 735, profit: 645 },
-    { period: "Atacama", year: 2024, region: "Atacama", revenue: 1980, units: 675, profit: 594 },
-    { period: "Ñuble", year: 2024, region: "Ñuble", revenue: 1850, units: 630, profit: 555 },
-    { period: "Arica y P.", year: 2024, region: "Arica y Parinacota", revenue: 1720, units: 585, profit: 516 },
-    { period: "Tarapacá", year: 2024, region: "Tarapacá", revenue: 1650, units: 560, profit: 495 },
-    { period: "Antofagasta", year: 2024, region: "Antofagasta", revenue: 1580, units: 540, profit: 474 },
-    { period: "La Araucanía", year: 2024, region: "La Araucanía", revenue: 1420, units: 485, profit: 426 },
-    { period: "Los Ríos", year: 2024, region: "Los Ríos", revenue: 1320, units: 450, profit: 396 },
-    { period: "Aysén", year: 2024, region: "Aysén", revenue: 1180, units: 400, profit: 354 },
-    { period: "Magallanes", year: 2024, region: "Magallanes", revenue: 980, units: 335, profit: 294 },
-];
+const createDefaultDashboardState = (): GPTDashboardData => ({
+    activeView: 'proyectos',
+    widgets: {
+        totalProjects: 0,
+        totalJobs: 0,
+        sumInvestment: "MMU$0",
+        sumJobs: "0",
+        topSector: "N/A",
+        topSectorPercentage: "0"
+    },
+    filters: {
+        nivelInversion: ["alto", "medio", "bajo"],
+        estado: ["ejecucion", "aprobado", "evaluacion"],
+        sectorProductivo: ["industria", "comercio", "servicios"],
+        formasPresentacion: ["proyecto", "empleo"],
+        regiones: []
+    },
+    charts: {
+        timeSeriesData: [],
+        regionData: [],
+        candlestickData: []
+    }
+});
 
-const candlestickData: CandlestickDataRow[] = [
-    { period: "1992", year: 1992, open: 40, high: 65, low: 35, close: 50 },
-    { period: "1994", year: 1994, open: 50, high: 140, low: 48, close: 120 },
-    { period: "1996", year: 1996, open: 120, high: 300, low: 115, close: 280 },
-    { period: "1998", year: 1998, open: 280, high: 750, low: 270, close: 720 },
-    { period: "2000", year: 2000, open: 720, high: 880, low: 700, close: 850 },
-    { period: "2002", year: 2002, open: 850, high: 950, low: 830, close: 920 },
-    { period: "2004", year: 2004, open: 920, high: 1020, low: 900, close: 980 },
-    { period: "2006", year: 2006, open: 980, high: 1300, low: 960, close: 1250 },
-    { period: "2008", year: 2008, open: 1250, high: 1400, low: 1200, close: 1350 },
-    { period: "2010", year: 2010, open: 1350, high: 1380, low: 1200, close: 1280 },
-    { period: "2012", year: 2012, open: 1280, high: 1480, low: 1250, close: 1420 },
-    { period: "2014", year: 2014, open: 1420, high: 1450, low: 1100, close: 1180 },
-    { period: "2016", year: 2016, open: 1180, high: 1200, low: 480, close: 520 },
-    { period: "2018", year: 2018, open: 520, high: 620, low: 500, close: 580 },
-    { period: "2020", year: 2020, open: 580, high: 720, low: 560, close: 680 },
-    { period: "2022", year: 2022, open: 680, high: 700, low: 380, close: 420 },
-    { period: "2024", year: 2024, open: 420, high: 450, low: 350, close: 380 },
-];
+export function Dashboard() {
+    // Hook into OpenAI global state using existing hooks
+    const toolOutput = useOpenAiGlobal('toolOutput') as GPTRawOutput | null;
+    const toolResponseMetadata = useOpenAiGlobal('toolResponseMetadata');
+    const widgetStateFromGlobal = useOpenAiGlobal('widgetState') as GPTDashboardData | null;
 
-export const Dashboard: React.FC = () => {
-    const [activeView, setActiveView] = useState<'proyectos' | 'empleo'>('proyectos');
+    // Local widget state management using existing hook
+    const [dashboardState, setDashboardState] = useWidgetState<GPTDashboardData>(
+        createDefaultDashboardState
+    );
 
-    // Automatically set metric based on active view
-    const selectedMetric = activeView === 'proyectos' ? 'revenue' : 'units';
+    const lastToolOutputRef = useRef<string>("__tool_output_unset__");
 
-    const handleViewChange = (view: 'proyectos' | 'empleo') => {
-        setActiveView(view);
-    };
-    const [filters, setFilters] = useState<FilterConfig[]>([
-        {
-            label: "Forma de presentación",
-            options: [
-                { label: "Proyecto", value: "proyecto" },
-                { label: "Empleo", value: "empleo" }
-            ],
-            selectedValues: ["proyecto", "empleo"],
-            multiSelect: true
-        },
-        {
-            label: "Sector productivo",
-            options: [
-                { label: "Industria", value: "industria" },
-                { label: "Comercio", value: "comercio" },
-                { label: "Servicios", value: "servicios" },
-                { label: "Minería", value: "mineria" },
-                { label: "Agricultura", value: "agricultura" },
-                { label: "Construcción", value: "construccion" },
-                { label: "Tecnología", value: "tecnologia" }
-            ],
-            selectedValues: ["industria", "comercio", "servicios", "mineria", "agricultura", "construccion", "tecnologia"],
-            multiSelect: true
-        },
-        {
-            label: "Nivel de inversión",
-            options: [
-                { label: "Alto (>$1M)", value: "alto" },
-                { label: "Medio ($100K-$1M)", value: "medio" },
-                { label: "Bajo (<$100K)", value: "bajo" }
-            ],
-            selectedValues: ["alto", "medio", "bajo"],
-            multiSelect: true
-        },
-        {
-            label: "Estado",
-            options: [
-                { label: "En ejecución", value: "ejecucion" },
-                { label: "Aprobado", value: "aprobado" },
-                { label: "En evaluación", value: "evaluacion" },
-                { label: "Finalizado", value: "finalizado" },
-                { label: "Suspendido", value: "suspendido" },
-                { label: "Rechazado", value: "rechazado" },
-                { label: "En construcción", value: "construccion" },
-                { label: "Operativo", value: "operativo" },
-                { label: "Paralizado", value: "paralizado" },
-                { label: "Postergado", value: "postergado" }
-            ],
-            selectedValues: ["ejecucion", "aprobado", "evaluacion", "finalizado", "suspendido", "rechazado", "construccion", "operativo", "paralizado", "postergado"],
-            multiSelect: true
-        },
-        {
-            label: "Región",
-            options: regionData.map(r => ({ label: r.period, value: r.region })),
-            selectedValues: regionData.map(r => r.region),
-            multiSelect: true
+    // Merge toolOutput into dashboardState whenever it changes
+    useEffect(() => {
+        if (toolOutput == null) {
+            console.log('No toolOutput available');
+            return;
         }
-    ]);
+
+        // Serialize to check if actually changed
+        const serializedToolOutput = (() => {
+            try {
+                return JSON.stringify({ toolOutput, toolResponseMetadata });
+            } catch (error) {
+                console.warn("Unable to serialize toolOutput", error);
+                return "__tool_output_error__";
+            }
+        })();
+
+        if (serializedToolOutput === lastToolOutputRef.current) {
+            console.log('toolOutput unchanged, skipping update');
+            return;
+        }
+        lastToolOutputRef.current = serializedToolOutput;
+
+        console.log('Processing new toolOutput:', toolOutput);
+
+        try {
+            // Parse the MCP tool output
+            const incomingData = parseGPTOutput(toolOutput);
+
+            // Merge with existing widgetState (from previous turn)
+            const baseState = widgetStateFromGlobal ?? dashboardState ?? createDefaultDashboardState();
+
+            // Create next state by merging
+            const nextState: GPTDashboardData = {
+                activeView: incomingData.activeView || baseState.activeView,
+                widgets: {
+                    ...baseState.widgets,
+                    ...incomingData.widgets
+                },
+                filters: {
+                    ...baseState.filters,
+                    ...incomingData.filters
+                },
+                charts: {
+                    timeSeriesData: incomingData.charts.timeSeriesData.length > 0
+                        ? incomingData.charts.timeSeriesData
+                        : baseState.charts.timeSeriesData,
+                    regionData: incomingData.charts.regionData.length > 0
+                        ? incomingData.charts.regionData
+                        : baseState.charts.regionData,
+                    candlestickData: incomingData.charts.candlestickData.length > 0
+                        ? incomingData.charts.candlestickData
+                        : baseState.charts.candlestickData,
+                }
+            };
+
+            console.log('Updating dashboard state:', nextState);
+            setDashboardState(nextState);
+        } catch (error) {
+            console.error('Error processing toolOutput:', error);
+        }
+    }, [toolOutput, toolResponseMetadata, widgetStateFromGlobal]);
+
+    const data = dashboardState ?? createDefaultDashboardState();
+
+    const [activeView, setActiveView] = React.useState<'proyectos' | 'empleo'>(
+        data.activeView
+    );
+    const [selectedMetric, setSelectedMetric] = React.useState<string>(
+        activeView === 'proyectos' ? 'revenue' : 'units'
+    );
+
+    // Update view when data changes
+    useEffect(() => {
+        setActiveView(data.activeView);
+        setSelectedMetric(data.activeView === 'proyectos' ? 'revenue' : 'units');
+    }, [data.activeView]);
+
+    // Build filter configurations
+    const filterConfigs = useMemo(() => buildFilterConfigs(data), [data]);
+    const [filters, setFilters] = React.useState<FilterConfig[]>(filterConfigs);
+
+    useEffect(() => {
+        setFilters(buildFilterConfigs(data));
+    }, [data]);
 
     const handleFilterChange = (filterLabel: string, selectedValues: string[]) => {
-        setFilters(filters.map(f =>
-            f.label === filterLabel
-                ? { ...f, selectedValues }
-                : f
-        ));
+        setFilters(prevFilters =>
+            prevFilters.map(filter =>
+                filter.label === filterLabel
+                    ? { ...filter, selectedValues }
+                    : filter
+            )
+        );
     };
 
-    const topSectorPercentage = "22.7";
+    const metricOptions: MetricOption[] = activeView === 'proyectos'
+        ? [
+            { label: "Inversión", value: "revenue" },
+            { label: "Empleos", value: "units" },
+            { label: "Beneficio", value: "profit" }
+        ]
+        : [
+            { label: "Empleos", value: "units" },
+            { label: "Inversión", value: "revenue" },
+            { label: "Beneficio", value: "profit" }
+        ];
 
     return (
         <div style={{
-            minHeight: '100vh',
+            fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
             backgroundColor: '#f9fafb',
-            padding: '32px 16px',
-            fontFamily: 'system-ui, -apple-system, sans-serif'
+            minHeight: '100vh',
+            padding: '24px'
         }}>
-            <div style={{ maxWidth: 1600, margin: '0 auto' }}>
+            <div style={{ maxWidth: 1400, margin: '0 auto' }}>
                 {/* Header */}
-                <div style={{ marginBottom: 24 }}>
+                <div style={{
+                    marginBottom: 24,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: 16
+                }}>
+                    <div>
+                        <h1 style={{
+                            margin: 0,
+                            fontSize: 28,
+                            fontWeight: 700,
+                            color: '#111827'
+                        }}>
+                            Dashboard de Proyectos y Empleo
+                        </h1>
+                        <p style={{
+                            margin: '4px 0 0 0',
+                            fontSize: 14,
+                            color: '#6b7280'
+                        }}>
+                            Sistema de Evaluación de Impacto Ambiental
+                        </p>
+                    </div>
+
+                    {/* View Toggle */}
                     <div style={{
                         display: 'flex',
-                        gap: 16,
-                        marginBottom: 16
+                        gap: 8,
+                        backgroundColor: 'white',
+                        padding: 4,
+                        borderRadius: 8,
+                        border: '1px solid #e5e7eb'
                     }}>
                         <button
-                            onClick={() => handleViewChange('proyectos')}
+                            onClick={() => {
+                                setActiveView('proyectos');
+                                setSelectedMetric('revenue');
+                            }}
                             style={{
-                                padding: '10px 24px',
-                                borderRadius: 8,
+                                padding: '8px 16px',
+                                borderRadius: 6,
                                 border: 'none',
-                                backgroundColor: activeView === 'proyectos' ? 'white' : 'transparent',
-                                cursor: 'pointer',
+                                backgroundColor: activeView === 'proyectos' ? '#6366f1' : 'transparent',
+                                color: activeView === 'proyectos' ? 'white' : '#374151',
                                 fontSize: 14,
-                                fontWeight: activeView === 'proyectos' ? 600 : 500,
-                                borderBottom: activeView === 'proyectos' ? '3px solid #6366f1' : 'none',
-                                color: activeView === 'proyectos' ? '#6366f1' : '#6b7280'
+                                fontWeight: 500,
+                                cursor: 'pointer',
+                                transition: 'all 0.2s'
                             }}
                         >
                             Proyectos
                         </button>
                         <button
-                            onClick={() => handleViewChange('empleo')}
+                            onClick={() => {
+                                setActiveView('empleo');
+                                setSelectedMetric('units');
+                            }}
                             style={{
-                                padding: '10px 24px',
-                                borderRadius: 8,
+                                padding: '8px 16px',
+                                borderRadius: 6,
                                 border: 'none',
-                                backgroundColor: activeView === 'empleo' ? 'white' : 'transparent',
-                                cursor: 'pointer',
+                                backgroundColor: activeView === 'empleo' ? '#6366f1' : 'transparent',
+                                color: activeView === 'empleo' ? 'white' : '#374151',
                                 fontSize: 14,
-                                fontWeight: activeView === 'empleo' ? 600 : 500,
-                                borderBottom: activeView === 'empleo' ? '3px solid #6366f1' : 'none',
-                                color: activeView === 'empleo' ? '#6366f1' : '#6b7280'
+                                fontWeight: 500,
+                                cursor: 'pointer',
+                                transition: 'all 0.2s'
                             }}
                         >
                             Empleo
                         </button>
                     </div>
-
-                    <DropdownFilter
-                        filters={filters}
-                        onFilterChange={handleFilterChange}
-                    />
                 </div>
 
-                {/* Summary Cards */}
+                {/* Filters */}
+                <DropdownFilter
+                    filters={filters}
+                    onFilterChange={handleFilterChange}
+                />
+
+                {/* Widget Cards */}
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-                    gap: 20,
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                    gap: 16,
+                    marginTop: 24,
                     marginBottom: 24
                 }}>
                     <WidgetCard
-                        title={activeView === 'proyectos' ? "Total de proyectos" : "Total de empleos"}
-                        value={activeView === 'proyectos' ? 24246 : 15830}
-                        icon="🏢"
-                    />
-                    <WidgetCard
-                        title={activeView === 'proyectos' ? "Suma de inversión" : "Suma de empleos generados"}
-                        value={activeView === 'proyectos' ? "MMU$1.041.944" : "156.420"}
-                        icon="💰"
-                    />
-                    <WidgetCard
-                        title="Sector mayoritario"
-                        value="Industria"
-                        subtitle={`${topSectorPercentage}% del total`}
+                        title="Total de proyectos"
+                        value={data.widgets.totalProjects}
                         icon="📊"
+                    />
+                    <WidgetCard
+                        title="Total de empleos"
+                        value={data.widgets.totalJobs}
+                        icon="👥"
+                    />
+                    <WidgetCard
+                        title={activeView === 'proyectos' ? "Suma de inversión" : "Suma de empleos"}
+                        value={activeView === 'proyectos'
+                            ? data.widgets.sumInvestment
+                            : data.widgets.sumJobs
+                        }
+                        icon={activeView === 'proyectos' ? "💰" : "🏢"}
+                    />
+                    <WidgetCard
+                        title="Sector productivo principal"
+                        value={data.widgets.topSector}
+                        subtitle={`${data.widgets.topSectorPercentage}% del total`}
+                        icon="🏭"
                     />
                 </div>
 
-                {/* Charts Grid - Responsive */}
+                {/* Charts */}
                 <div style={{
                     display: 'grid',
                     gridTemplateColumns: '1fr',
-                    gap: 20
+                    gap: 24
                 }}>
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 600px), 1fr))',
-                        gap: 20
-                    }}>
-                        {/* Revenue per Year - Two Way Plot */}
+                    {data.charts.timeSeriesData.length > 0 && (
                         <EnhancedBarplot
                             title={activeView === 'proyectos'
-                                ? "Número de proyectos presentados por año"
-                                : "Empleos generados por año"}
-                            metricOptions={[
-                                { label: activeView === 'proyectos' ? "Revenue" : "Units", value: selectedMetric }
-                            ]}
+                                ? "Evolución de Proyectos por Año"
+                                : "Evolución de Empleo por Año"
+                            }
+                            metricOptions={metricOptions}
                             selectedMetric={selectedMetric}
-                            rows={sampleData}
-                            onMetricChange={() => { }}
+                            rows={data.charts.timeSeriesData}
+                            onMetricChange={setSelectedMetric}
                             twoWayPlot={true}
-                            height={350}
+                            showYAxis={true}
+                            height={300}
                         />
+                    )}
 
-                        {/* Revenue per Region - Horizontal Bar Plot */}
+                    {data.charts.regionData.length > 0 && (
                         <HorizontalBarplot
                             title={activeView === 'proyectos'
-                                ? "Distribución por región"
-                                : "Empleos por región"}
-                            metricOptions={[
-                                { label: activeView === 'proyectos' ? "Revenue" : "Units", value: selectedMetric }
-                            ]}
+                                ? "Distribución por Región - Inversión"
+                                : "Distribución por Región - Empleo"
+                            }
+                            metricOptions={metricOptions}
                             selectedMetric={selectedMetric}
-                            rows={regionData}
-                            onMetricChange={() => { }}
-                            height={500}
+                            rows={data.charts.regionData}
+                            onMetricChange={setSelectedMetric}
+                            height={400}
                         />
-                    </div>
+                    )}
 
-                    {/* Candlestick Chart - Full Width */}
-                    <CandlestickChart
-                        title="Análisis de volatilidad por año"
-                        rows={candlestickData}
-                        height={400}
-                    />
+                    {data.charts.candlestickData.length > 0 && (
+                        <CandlestickChart
+                            title="Análisis de Volatilidad de Proyectos"
+                            rows={data.charts.candlestickData}
+                            height={400}
+                        />
+                    )}
                 </div>
             </div>
         </div>
     );
-};
+}
+
+export default Dashboard;
