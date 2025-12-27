@@ -1,4 +1,4 @@
-import { GPTRawOutput, GPTDashboardData } from './gpt-types';
+import { GPTDashboardData, GPTRawOutput } from './gpt-types';
 import { FilterConfig, FilterOption } from './types';
 
 /**
@@ -41,6 +41,8 @@ const DEFAULT_FILTER_OPTIONS = {
  * Converts GPT raw output into the format expected by Dashboard
  */
 export function parseGPTOutput(gptOutput: GPTRawOutput): GPTDashboardData {
+    console.log('Parsing GPT output:', gptOutput);
+
     // Parse widgets data
     const widgets = {
         totalProjects: gptOutput.totalProjects || 0,
@@ -67,12 +69,16 @@ export function parseGPTOutput(gptOutput: GPTRawOutput): GPTDashboardData {
         candlestickData: gptOutput.candlestickData || []
     };
 
-    return {
+    const result: GPTDashboardData = {
         activeView: gptOutput.view || 'proyectos',
         widgets,
         filters,
         charts
     };
+
+    console.log('Parsed dashboard data:', result);
+
+    return result;
 }
 
 /**
