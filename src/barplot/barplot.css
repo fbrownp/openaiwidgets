@@ -1,0 +1,219 @@
+/* Barplot Widget Styles */
+
+.barplot-widget {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.barplot-card {
+    padding: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background-color: white;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.barplot-card.size-sm {
+    padding: 8px;
+}
+
+.barplot-card.size-lg {
+    padding: 24px;
+}
+
+.barplot-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+.barplot-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: #374151;
+}
+
+.barplot-spacer {
+    flex: 1;
+}
+
+.barplot-select {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    font-size: 14px;
+    background-color: white;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.barplot-select:focus {
+    border-color: #3b82f6;
+}
+
+.barplot-select:hover {
+    border-color: #9ca3af;
+}
+
+.barplot-chart-container {
+    height: 180px;
+    width: 100%;
+    position: relative;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 16px 12px;
+    background-color: #fafafa;
+}
+
+.barplot-yaxis {
+    position: absolute;
+    left: 8px;
+    top: 20px;
+    bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-size: 10px;
+    color: #6b7280;
+}
+
+.barplot-bars-container {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    height: 100%;
+    padding-bottom: 4px;
+    margin-left: 40px;
+    margin-top: 20px;
+}
+
+.barplot-bar-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 30px;
+}
+
+.barplot-bar-value {
+    font-size: 10px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 2px;
+}
+
+.barplot-bar {
+    width: 100%;
+    background-color: #3b82f6;
+    border-radius: 4px 4px 0 0;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    min-height: 2px;
+}
+
+.barplot-bar:hover {
+    opacity: 0.8;
+    transform: translateY(-2px);
+}
+
+.barplot-bar.color-blue {
+    background-color: #3b82f6;
+}
+
+.barplot-bar.color-green {
+    background-color: #10b981;
+}
+
+.barplot-bar.color-red {
+    background-color: #ef4444;
+}
+
+.barplot-bar.color-yellow {
+    background-color: #f59e0b;
+}
+
+.barplot-bar.color-purple {
+    background-color: #8b5cf6;
+}
+
+.barplot-xlabel {
+    font-size: 11px;
+    color: #6b7280;
+    font-weight: 500;
+    margin-top: 4px;
+}
+
+/* Responsive styles */
+@media (max-width: 640px) {
+    .barplot-chart-container {
+        padding: 12px 8px;
+    }
+
+    .barplot-bars-container {
+        margin-left: 35px;
+        gap: 4px;
+    }
+
+    .barplot-bar-wrapper {
+        min-width: 20px;
+    }
+
+    .barplot-bar-value,
+    .barplot-xlabel {
+        font-size: 9px;
+    }
+}
+
+/* Animation */
+@keyframes barGrow {
+    from {
+        height: 0;
+    }
+
+    to {
+        height: var(--bar-height);
+    }
+}
+
+.barplot-bar.animate {
+    animation: barGrow 0.5s ease-out;
+}
+
+/* Loading state */
+.barplot-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 180px;
+    color: #6b7280;
+}
+
+.barplot-loading::after {
+    content: '';
+    width: 20px;
+    height: 20px;
+    border: 2px solid #e5e7eb;
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Empty state */
+.barplot-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 180px;
+    color: #9ca3af;
+    font-size: 14px;
+}
