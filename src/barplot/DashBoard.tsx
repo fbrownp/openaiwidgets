@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CandlestickChart } from './CandlestickChart';
 import { DropdownFilter } from './DropdownFilter';
 import { EnhancedBarplot } from './EnhancedBarplot';
 import { HorizontalBarplot } from './HorizontalBarplot';
 import { CandlestickDataRow, DataRow, FilterConfig } from './types';
 import { WidgetCard } from './WidgetCard';
+import { GPTDashboardData } from './gpt-types';
+import { buildFilterConfigs } from './gpt-adapter';
 
 // Sample data with extended fields
 const sampleData: DataRow[] = [
@@ -67,8 +69,14 @@ const candlestickData: CandlestickDataRow[] = [
     { period: "2024", year: 2024, open: 420, high: 450, low: 350, close: 380 },
 ];
 
-export const Dashboard: React.FC = () => {
-    const [activeView, setActiveView] = useState<'proyectos' | 'empleo'>('proyectos');
+interface DashboardProps {
+    gptData?: GPTDashboardData;
+}
+
+export const Dashboard: React.FC<DashboardProps> = ({ gptData }) => {
+    const [activeView, setActiveView] = useState<'proyectos' | 'empleo'>(
+        gptData?.activeView || 'proyectos'
+    );
 
     // Automatically set metric based on active view
     const selectedMetric = activeView === 'proyectos' ? 'revenue' : 'units';
@@ -76,64 +84,75 @@ export const Dashboard: React.FC = () => {
     const handleViewChange = (view: 'proyectos' | 'empleo') => {
         setActiveView(view);
     };
-    const [filters, setFilters] = useState<FilterConfig[]>([
-        {
-            label: "Forma de presentación",
-            options: [
-                { label: "Proyecto", value: "proyecto" },
-                { label: "Empleo", value: "empleo" }
-            ],
-            selectedValues: ["proyecto", "empleo"],
-            multiSelect: true
-        },
-        {
-            label: "Sector productivo",
-            options: [
-                { label: "Industria", value: "industria" },
-                { label: "Comercio", value: "comercio" },
-                { label: "Servicios", value: "servicios" },
-                { label: "Minería", value: "mineria" },
-                { label: "Agricultura", value: "agricultura" },
-                { label: "Construcción", value: "construccion" },
-                { label: "Tecnología", value: "tecnologia" }
-            ],
-            selectedValues: ["industria", "comercio", "servicios", "mineria", "agricultura", "construccion", "tecnologia"],
-            multiSelect: true
-        },
-        {
-            label: "Nivel de inversión",
-            options: [
-                { label: "Alto (>$1M)", value: "alto" },
-                { label: "Medio ($100K-$1M)", value: "medio" },
-                { label: "Bajo (<$100K)", value: "bajo" }
-            ],
-            selectedValues: ["alto", "medio", "bajo"],
-            multiSelect: true
-        },
-        {
-            label: "Estado",
-            options: [
-                { label: "En ejecución", value: "ejecucion" },
-                { label: "Aprobado", value: "aprobado" },
-                { label: "En evaluación", value: "evaluacion" },
-                { label: "Finalizado", value: "finalizado" },
-                { label: "Suspendido", value: "suspendido" },
-                { label: "Rechazado", value: "rechazado" },
-                { label: "En construcción", value: "construccion" },
-                { label: "Operativo", value: "operativo" },
-                { label: "Paralizado", value: "paralizado" },
-                { label: "Postergado", value: "postergado" }
-            ],
-            selectedValues: ["ejecucion", "aprobado", "evaluacion", "finalizado", "suspendido", "rechazado", "construccion", "operativo", "paralizado", "postergado"],
-            multiSelect: true
-        },
-        {
-            label: "Región",
-            options: regionData.map(r => ({ label: r.period, value: r.region })),
-            selectedValues: regionData.map(r => r.region),
-            multiSelect: true
+
+    // Initialize filters from GPT data or use defaults
+    const getInitialFilters = (): FilterConfig[] => {
+        if (gptData) {
+            return buildFilterConfigs(gptData);
         }
-    ]);
+
+        // Default filters when no GPT data
+        return [
+            {
+                label: "Forma de presentación",
+                options: [
+                    { label: "Proyecto", value: "proyecto" },
+                    { label: "Empleo", value: "empleo" }
+                ],
+                selectedValues: ["proyecto", "empleo"],
+                multiSelect: true
+            },
+            {
+                label: "Sector productivo",
+                options: [
+                    { label: "Industria", value: "industria" },
+                    { label: "Comercio", value: "comercio" },
+                    { label: "Servicios", value: "servicios" },
+                    { label: "Minería", value: "mineria" },
+                    { label: "Agricultura", value: "agricultura" },
+                    { label: "Construcción", value: "construccion" },
+                    { label: "Tecnología", value: "tecnologia" }
+                ],
+                selectedValues: ["industria", "comercio", "servicios", "mineria", "agricultura", "construccion", "tecnologia"],
+                multiSelect: true
+            },
+            {
+                label: "Nivel de inversión",
+                options: [
+                    { label: "Alto (>$1M)", value: "alto" },
+                    { label: "Medio ($100K-$1M)", value: "medio" },
+                    { label: "Bajo (<$100K)", value: "bajo" }
+                ],
+                selectedValues: ["alto", "medio", "bajo"],
+                multiSelect: true
+            },
+            {
+                label: "Estado",
+                options: [
+                    { label: "En ejecución", value: "ejecucion" },
+                    { label: "Aprobado", value: "aprobado" },
+                    { label: "En evaluación", value: "evaluacion" },
+                    { label: "Finalizado", value: "finalizado" },
+                    { label: "Suspendido", value: "suspendido" },
+                    { label: "Rechazado", value: "rechazado" },
+                    { label: "En construcción", value: "construccion" },
+                    { label: "Operativo", value: "operativo" },
+                    { label: "Paralizado", value: "paralizado" },
+                    { label: "Postergado", value: "postergado" }
+                ],
+                selectedValues: ["ejecucion", "aprobado", "evaluacion", "finalizado", "suspendido", "rechazado", "construccion", "operativo", "paralizado", "postergado"],
+                multiSelect: true
+            },
+            {
+                label: "Región",
+                options: regionData.map(r => ({ label: r.period, value: r.region })),
+                selectedValues: regionData.map(r => r.region),
+                multiSelect: true
+            }
+        ];
+    };
+
+    const [filters, setFilters] = useState<FilterConfig[]>(getInitialFilters());
 
     const handleFilterChange = (filterLabel: string, selectedValues: string[]) => {
         setFilters(filters.map(f =>
@@ -143,7 +162,30 @@ export const Dashboard: React.FC = () => {
         ));
     };
 
-    const topSectorPercentage = "22.7";
+    // Update filters when GPT data changes
+    useEffect(() => {
+        if (gptData) {
+            setFilters(buildFilterConfigs(gptData));
+            setActiveView(gptData.activeView);
+        }
+    }, [gptData]);
+
+    // Get widget values from GPT data or use defaults
+    const widgetValues = {
+        totalProjects: gptData?.widgets.totalProjects ?? 24246,
+        totalJobs: gptData?.widgets.totalJobs ?? 15830,
+        sumInvestment: gptData?.widgets.sumInvestment ?? "MMU$1.041.944",
+        sumJobs: gptData?.widgets.sumJobs ?? "156.420",
+        topSector: gptData?.widgets.topSector ?? "Industria",
+        topSectorPercentage: gptData?.widgets.topSectorPercentage ?? "22.7"
+    };
+
+    // Get chart data from GPT data or use defaults
+    const chartData = {
+        timeSeries: gptData?.charts.timeSeriesData ?? sampleData,
+        region: gptData?.charts.regionData ?? regionData,
+        candlestick: gptData?.charts.candlestickData ?? candlestickData
+    };
 
     return (
         <div style={{
@@ -209,18 +251,18 @@ export const Dashboard: React.FC = () => {
                 }}>
                     <WidgetCard
                         title={activeView === 'proyectos' ? "Total de proyectos" : "Total de empleos"}
-                        value={activeView === 'proyectos' ? 24246 : 15830}
+                        value={activeView === 'proyectos' ? widgetValues.totalProjects : widgetValues.totalJobs}
                         icon="🏢"
                     />
                     <WidgetCard
                         title={activeView === 'proyectos' ? "Suma de inversión" : "Suma de empleos generados"}
-                        value={activeView === 'proyectos' ? "MMU$1.041.944" : "156.420"}
+                        value={activeView === 'proyectos' ? widgetValues.sumInvestment : widgetValues.sumJobs}
                         icon="💰"
                     />
                     <WidgetCard
                         title="Sector mayoritario"
-                        value="Industria"
-                        subtitle={`${topSectorPercentage}% del total`}
+                        value={widgetValues.topSector}
+                        subtitle={`${widgetValues.topSectorPercentage}% del total`}
                         icon="📊"
                     />
                 </div>
@@ -245,7 +287,7 @@ export const Dashboard: React.FC = () => {
                                 { label: activeView === 'proyectos' ? "Revenue" : "Units", value: selectedMetric }
                             ]}
                             selectedMetric={selectedMetric}
-                            rows={sampleData}
+                            rows={chartData.timeSeries}
                             onMetricChange={() => { }}
                             twoWayPlot={true}
                             height={350}
@@ -260,7 +302,7 @@ export const Dashboard: React.FC = () => {
                                 { label: activeView === 'proyectos' ? "Revenue" : "Units", value: selectedMetric }
                             ]}
                             selectedMetric={selectedMetric}
-                            rows={regionData}
+                            rows={chartData.region}
                             onMetricChange={() => { }}
                             height={500}
                         />
@@ -269,7 +311,7 @@ export const Dashboard: React.FC = () => {
                     {/* Candlestick Chart - Full Width */}
                     <CandlestickChart
                         title="Análisis de volatilidad por año"
-                        rows={candlestickData}
+                        rows={chartData.candlestick}
                         height={400}
                     />
                 </div>

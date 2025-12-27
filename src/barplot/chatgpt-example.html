@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard ChatGPT - Example</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        .control-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            max-width: 300px;
+        }
+
+        .control-panel h3 {
+            margin-top: 0;
+            font-size: 16px;
+        }
+
+        .control-panel button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: none;
+            background: #6366f1;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .control-panel button:hover {
+            background: #4f46e5;
+        }
+
+        .control-panel textarea {
+            width: 100%;
+            height: 100px;
+            margin: 10px 0;
+            padding: 8px;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        .info {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Dashboard root element -->
+    <div id="barplot-root"></div>
+
+    <!-- Control Panel for Testing -->
+    <div class="control-panel">
+        <h3>ChatGPT Dashboard Controls</h3>
+
+        <button onclick="loadProyectosView()">Load Proyectos View</button>
+        <button onclick="loadEmpleoView()">Load Empleo View</button>
+        <button onclick="updateFilters()">Update Filters</button>
+        <button onclick="loadCustomData()">Load Custom Data</button>
+
+        <textarea id="customDataInput" placeholder='Enter custom JSON data here...'></textarea>
+        <button onclick="loadFromTextarea()">Apply Custom Data</button>
+
+        <div class="info">
+            Open browser console to see data structure
+        </div>
+    </div>
+
+    <!-- Include the dashboard script -->
+    <script src="chatgpt-entry.js"></script>
+
+    <!-- Example GPT interactions -->
+    <script>
+        // Example 1: Load Proyectos view with full data
+        function loadProyectosView() {
+            const gptData = {
+                view: 'proyectos',
+                totalProjects: 24246,
+                totalJobs: 15830,
+                sumInvestment: "MMU$1.041.944",
+                sumJobs: "156.420",
+                topSector: "Industria",
+                topSectorPercentage: "22.7",
+
+                nivelInversion: ["alto", "medio", "bajo"],
+                estado: ["ejecucion", "aprobado", "evaluacion"],
+                sectorProductivo: ["industria", "comercio", "servicios"],
+
+                timeSeriesData: [
+                    { period: "2020", year: 2020, region: "Nacional", revenue: 680, units: 230, profit: 205 },
+                    { period: "2021", year: 2021, region: "Nacional", revenue: 550, units: 185, profit: 165 },
+                    { period: "2022", year: 2022, region: "Nacional", revenue: 420, units: 140, profit: 125 },
+                    { period: "2023", year: 2023, region: "Nacional", revenue: 400, units: 135, profit: 120 },
+                    { period: "2024", year: 2024, region: "Nacional", revenue: 380, units: 125, profit: 115 }
+                ],
+
+                regionData: [
+                    { period: "Metropolitana", year: 2024, region: "Metropolitana", revenue: 4200, units: 1450, profit: 1260 },
+                    { period: "Los Lagos", year: 2024, region: "Los Lagos", revenue: 3800, units: 1300, profit: 1140 },
+                    { period: "Valparaíso", year: 2024, region: "Valparaíso", revenue: 2680, units: 915, profit: 804 },
+                    { period: "Biobío", year: 2024, region: "Biobío", revenue: 2450, units: 835, profit: 735 },
+                    { period: "O'Higgins", year: 2024, region: "O'Higgins", revenue: 2150, units: 735, profit: 645 }
+                ],
+
+                candlestickData: [
+                    { period: "2020", year: 2020, open: 580, high: 720, low: 560, close: 680 },
+                    { period: "2021", year: 2021, open: 680, high: 650, low: 500, close: 550 },
+                    { period: "2022", year: 2022, open: 550, high: 700, low: 380, close: 420 },
+                    { period: "2023", year: 2023, open: 420, high: 500, low: 350, close: 400 },
+                    { period: "2024", year: 2024, open: 400, high: 450, low: 350, close: 380 }
+                ]
+            };
+
+            console.log('Loading Proyectos view:', gptData);
+            window.renderDashboard(gptData);
+        }
+
+        // Example 2: Load Empleo view
+        function loadEmpleoView() {
+            const gptData = {
+                view: 'empleo',
+                totalProjects: 24246,
+                totalJobs: 15830,
+                sumInvestment: "MMU$1.041.944",
+                sumJobs: "156.420",
+                topSector: "Comercio",
+                topSectorPercentage: "18.5",
+
+                timeSeriesData: [
+                    { period: "2020", year: 2020, region: "Nacional", revenue: 680, units: 3200, profit: 205 },
+                    { period: "2021", year: 2021, region: "Nacional", revenue: 550, units: 2850, profit: 165 },
+                    { period: "2022", year: 2022, region: "Nacional", revenue: 420, units: 3100, profit: 125 },
+                    { period: "2023", year: 2023, region: "Nacional", revenue: 400, units: 3350, profit: 120 },
+                    { period: "2024", year: 2024, region: "Nacional", revenue: 380, units: 3500, profit: 115 }
+                ],
+
+                regionData: [
+                    { period: "Metropolitana", year: 2024, region: "Metropolitana", revenue: 4200, units: 5200, profit: 1260 },
+                    { period: "Valparaíso", year: 2024, region: "Valparaíso", revenue: 2680, units: 3800, profit: 804 },
+                    { period: "Biobío", year: 2024, region: "Biobío", revenue: 2450, units: 3200, profit: 735 }
+                ]
+            };
+
+            console.log('Loading Empleo view:', gptData);
+            window.renderDashboard(gptData);
+        }
+
+        // Example 3: Update only filters
+        function updateFilters() {
+            const partialData = {
+                nivelInversion: ["alto"],
+                estado: ["ejecucion", "aprobado"],
+                sectorProductivo: ["tecnologia", "servicios"],
+                totalProjects: 8500,
+                sumInvestment: "MMU$450.250"
+            };
+
+            console.log('Updating filters:', partialData);
+            window.updateDashboard(partialData);
+        }
+
+        // Example 4: Load custom data
+        function loadCustomData() {
+            const customData = {
+                view: 'proyectos',
+                totalProjects: 50000,
+                sumInvestment: "MMU$2.500.000",
+                topSector: "Tecnología",
+                topSectorPercentage: "35.2",
+
+                timeSeriesData: [
+                    { period: "Q1 2024", year: 2024, region: "Nacional", revenue: 850, units: 420, profit: 320 },
+                    { period: "Q2 2024", year: 2024, region: "Nacional", revenue: 920, units: 450, profit: 350 },
+                    { period: "Q3 2024", year: 2024, region: "Nacional", revenue: 980, units: 480, profit: 380 },
+                    { period: "Q4 2024", year: 2024, region: "Nacional", revenue: 1050, units: 520, profit: 420 }
+                ],
+
+                regionData: [
+                    { period: "Santiago", year: 2024, region: "Santiago", revenue: 8500, units: 4200, profit: 3150 },
+                    { period: "Concepción", year: 2024, region: "Concepción", revenue: 5200, units: 2850, profit: 1980 },
+                    { period: "Valparaíso", year: 2024, region: "Valparaíso", revenue: 4800, units: 2450, profit: 1750 }
+                ]
+            };
+
+            console.log('Loading custom data:', customData);
+            window.renderDashboard(customData);
+        }
+
+        // Load data from textarea
+        function loadFromTextarea() {
+            try {
+                const textarea = document.getElementById('customDataInput');
+                const customData = JSON.parse(textarea.value);
+                console.log('Loading data from textarea:', customData);
+                window.renderDashboard(customData);
+            } catch (error) {
+                alert('Invalid JSON: ' + error.message);
+                console.error('JSON parse error:', error);
+            }
+        }
+
+        // Auto-load default view on page load
+        window.addEventListener('load', () => {
+            console.log('Page loaded. Dashboard functions available:');
+            console.log('- window.renderDashboard(data)');
+            console.log('- window.updateDashboard(partialData)');
+
+            // Load default view
+            setTimeout(loadProyectosView, 500);
+        });
+    </script>
+</body>
+</html>
