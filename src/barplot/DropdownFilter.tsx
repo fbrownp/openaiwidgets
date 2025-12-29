@@ -3,7 +3,8 @@ import { DropdownFilterProps, FilterConfig } from './types';
 
 export const DropdownFilter: React.FC<DropdownFilterProps> = ({
     filters,
-    onFilterChange
+    onFilterChange,
+    themeColors
 }) => {
     const [openFilter, setOpenFilter] = useState<string | null>(null);
 
@@ -36,7 +37,7 @@ export const DropdownFilter: React.FC<DropdownFilterProps> = ({
             flexWrap: 'wrap',
             alignItems: 'center',
             padding: '16px 0',
-            borderBottom: '1px solid #e5e7eb'
+            borderBottom: `1px solid ${themeColors.border}`
         }}>
             {filters.map((filter) => (
                 <div key={filter.label} style={{ position: 'relative' }}>
@@ -45,8 +46,8 @@ export const DropdownFilter: React.FC<DropdownFilterProps> = ({
                         style={{
                             padding: '8px 16px',
                             borderRadius: 8,
-                            border: '1px solid #d1d5db',
-                            backgroundColor: 'white',
+                            border: `1px solid ${themeColors.dropdownBorder}`,
+                            backgroundColor: themeColors.dropdownBg,
                             cursor: 'pointer',
                             fontSize: 14,
                             fontWeight: 500,
@@ -54,21 +55,21 @@ export const DropdownFilter: React.FC<DropdownFilterProps> = ({
                             alignItems: 'center',
                             gap: 8,
                             transition: 'all 0.2s',
-                            color: filter.selectedValues.length > 0 ? '#6366f1' : '#374151'
+                            color: filter.selectedValues.length > 0 ? themeColors.purple : themeColors.text
                         }}
                         onMouseEnter={(e) => {
-                            e.currentTarget.style.borderColor = '#6366f1';
-                            e.currentTarget.style.backgroundColor = '#f9fafb';
+                            e.currentTarget.style.borderColor = themeColors.purple;
+                            e.currentTarget.style.backgroundColor = themeColors.dropdownHover;
                         }}
                         onMouseLeave={(e) => {
-                            e.currentTarget.style.borderColor = '#d1d5db';
-                            e.currentTarget.style.backgroundColor = 'white';
+                            e.currentTarget.style.borderColor = themeColors.dropdownBorder;
+                            e.currentTarget.style.backgroundColor = themeColors.dropdownBg;
                         }}
                     >
                         {filter.label}
                         {filter.selectedValues.length > 0 && (
                             <span style={{
-                                backgroundColor: '#6366f1',
+                                backgroundColor: themeColors.purple,
                                 color: 'white',
                                 borderRadius: 10,
                                 padding: '2px 8px',
@@ -78,7 +79,7 @@ export const DropdownFilter: React.FC<DropdownFilterProps> = ({
                                 {filter.selectedValues.length}
                             </span>
                         )}
-                        <span style={{ fontSize: 10 }}>▼</span>
+                        <span style={{ fontSize: 10, color: themeColors.textSecondary }}>▼</span>
                     </button>
 
                     {openFilter === filter.label && (
@@ -87,10 +88,10 @@ export const DropdownFilter: React.FC<DropdownFilterProps> = ({
                             top: '100%',
                             left: 0,
                             marginTop: 4,
-                            backgroundColor: 'white',
-                            border: '1px solid #e5e7eb',
+                            backgroundColor: themeColors.dropdownBg,
+                            border: `1px solid ${themeColors.border}`,
                             borderRadius: 8,
-                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)',
                             zIndex: 1000,
                             minWidth: 200,
                             maxHeight: 300,
@@ -108,17 +109,18 @@ export const DropdownFilter: React.FC<DropdownFilterProps> = ({
                                         gap: 8,
                                         fontSize: 14,
                                         transition: 'background-color 0.2s',
+                                        color: themeColors.text,
                                         backgroundColor: filter.selectedValues.includes(option.value)
-                                            ? '#f0f0ff'
+                                            ? themeColors.dropdownSelected
                                             : 'transparent'
                                     }}
                                     onMouseEnter={(e) => {
-                                        e.currentTarget.style.backgroundColor = '#f9fafb';
+                                        e.currentTarget.style.backgroundColor = themeColors.dropdownHover;
                                     }}
                                     onMouseLeave={(e) => {
                                         e.currentTarget.style.backgroundColor =
                                             filter.selectedValues.includes(option.value)
-                                                ? '#f0f0ff'
+                                                ? themeColors.dropdownSelected
                                                 : 'transparent';
                                     }}
                                 >
@@ -126,11 +128,11 @@ export const DropdownFilter: React.FC<DropdownFilterProps> = ({
                                         <div style={{
                                             width: 16,
                                             height: 16,
-                                            border: '2px solid #6366f1',
+                                            border: `2px solid ${themeColors.purple}`,
                                             borderRadius: 3,
                                             backgroundColor: filter.selectedValues.includes(option.value)
-                                                ? '#6366f1'
-                                                : 'white',
+                                                ? themeColors.purple
+                                                : themeColors.cardBackground,
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',

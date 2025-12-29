@@ -4,7 +4,7 @@ import { EnhancedBarplot } from './EnhancedBarplot';
 import { buildFilterConfigs, parseGPTOutput } from './gpt-adapter';
 import { GPTDashboardData, GPTRawOutput } from './gpt-types';
 import { HorizontalBarplot } from './HorizontalBarplot';
-import { FilterConfig, MetricOption, DataRow } from './types';
+import { FilterConfig, MetricOption, DataRow, ThemeColors } from './types';
 import { WidgetCard } from './WidgetCard';
 
 // Import hooks from parent directory
@@ -33,7 +33,64 @@ const createDefaultDashboardState = (): GPTDashboardData => ({
     data: []
 });
 
+// Theme configuration
+type Theme = 'light' | 'dark';
+
+const getThemeColors = (theme: Theme): ThemeColors => {
+    if (theme === 'light') {
+        return {
+            background: '#f9fafb',
+            cardBackground: 'white',
+            cardBorder: '#f0f0f0',
+            text: '#111827',
+            textSecondary: '#6b7280',
+            buttonText: '#374151',
+            buttonBackground: 'transparent',
+            buttonHover: '#f3f4f6',
+            buttonActiveBg: '#7c3aed',
+            buttonActiveText: 'white',
+            purple: '#8b5cf6',
+            purpleDark: '#7c3aed',
+            purpleLight: '#f0f0ff',
+            border: '#e5e7eb',
+            borderLight: '#f0f0f0',
+            gridLine: '#f0f0f0',
+            dropdownBg: 'white',
+            dropdownBorder: '#d1d5db',
+            dropdownHover: '#f9fafb',
+            dropdownSelected: '#f0f0ff'
+        };
+    } else {
+        return {
+            background: '#0f172a',
+            cardBackground: '#1e293b',
+            cardBorder: '#334155',
+            text: '#f1f5f9',
+            textSecondary: '#94a3b8',
+            buttonText: '#cbd5e1',
+            buttonBackground: 'transparent',
+            buttonHover: '#334155',
+            buttonActiveBg: '#7c3aed',
+            buttonActiveText: 'white',
+            purple: '#8b5cf6',
+            purpleDark: '#7c3aed',
+            purpleLight: '#4c1d95',
+            border: '#334155',
+            borderLight: '#475569',
+            gridLine: '#334155',
+            dropdownBg: '#1e293b',
+            dropdownBorder: '#475569',
+            dropdownHover: '#334155',
+            dropdownSelected: '#4c1d95'
+        };
+    }
+};
+
 export function Dashboard() {
+    // Theme state
+    const [theme, setTheme] = React.useState<Theme>('light');
+    const themeColors = getThemeColors(theme);
+
     // Hook into OpenAI global state using existing hooks
     const toolOutput = useOpenAiGlobal('toolOutput') as GPTRawOutput | null;
     const toolResponseMetadata = useOpenAiGlobal('toolResponseMetadata');
@@ -259,7 +316,7 @@ export function Dashboard() {
     return (
         <div style={{
             fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-            backgroundColor: '#f9fafb',
+            backgroundColor: themeColors.background,
             minHeight: '100vh',
             padding: '24px'
         }}>
@@ -273,32 +330,77 @@ export function Dashboard() {
                     flexWrap: 'wrap',
                     gap: 16
                 }}>
-                    <div>
-                        <h1 style={{
-                            margin: 0,
-                            fontSize: 28,
-                            fontWeight: 700,
-                            color: '#111827'
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+                        <div>
+                            <h1 style={{
+                                margin: 0,
+                                fontSize: 28,
+                                fontWeight: 700,
+                                color: themeColors.text
+                            }}>
+                                Dashboard de Proyectos y Empleo
+                            </h1>
+                            <p style={{
+                                margin: '4px 0 0 0',
+                                fontSize: 14,
+                                color: themeColors.textSecondary
+                            }}>
+                                Sistema de Evaluación de Impacto Ambiental
+                            </p>
+                        </div>
+
+                        {/* Theme Toggle */}
+                        <div style={{
+                            display: 'flex',
+                            gap: 8,
+                            backgroundColor: themeColors.cardBackground,
+                            padding: 4,
+                            borderRadius: 8,
+                            border: `1px solid ${themeColors.border}`
                         }}>
-                            Dashboard de Proyectos y Empleo
-                        </h1>
-                        <p style={{
-                            margin: '4px 0 0 0',
-                            fontSize: 14,
-                            color: '#6b7280'
-                        }}>
-                            Sistema de Evaluación de Impacto Ambiental
-                        </p>
+                            <button
+                                onClick={() => setTheme('light')}
+                                style={{
+                                    padding: '8px 16px',
+                                    borderRadius: 6,
+                                    border: 'none',
+                                    backgroundColor: theme === 'light' ? themeColors.buttonActiveBg : themeColors.buttonBackground,
+                                    color: theme === 'light' ? themeColors.buttonActiveText : themeColors.buttonText,
+                                    fontSize: 14,
+                                    fontWeight: 500,
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s'
+                                }}
+                            >
+                                Blanco
+                            </button>
+                            <button
+                                onClick={() => setTheme('dark')}
+                                style={{
+                                    padding: '8px 16px',
+                                    borderRadius: 6,
+                                    border: 'none',
+                                    backgroundColor: theme === 'dark' ? themeColors.buttonActiveBg : themeColors.buttonBackground,
+                                    color: theme === 'dark' ? themeColors.buttonActiveText : themeColors.buttonText,
+                                    fontSize: 14,
+                                    fontWeight: 500,
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s'
+                                }}
+                            >
+                                Oscuro
+                            </button>
+                        </div>
                     </div>
 
                     {/* View Toggle */}
                     <div style={{
                         display: 'flex',
                         gap: 8,
-                        backgroundColor: 'white',
+                        backgroundColor: themeColors.cardBackground,
                         padding: 4,
                         borderRadius: 8,
-                        border: '1px solid #e5e7eb'
+                        border: `1px solid ${themeColors.border}`
                     }}>
                         <button
                             onClick={() => {
@@ -309,8 +411,8 @@ export function Dashboard() {
                                 padding: '8px 16px',
                                 borderRadius: 6,
                                 border: 'none',
-                                backgroundColor: activeView === 'proyectos' ? '#6366f1' : 'transparent',
-                                color: activeView === 'proyectos' ? 'white' : '#374151',
+                                backgroundColor: activeView === 'proyectos' ? themeColors.buttonActiveBg : themeColors.buttonBackground,
+                                color: activeView === 'proyectos' ? themeColors.buttonActiveText : themeColors.buttonText,
                                 fontSize: 14,
                                 fontWeight: 500,
                                 cursor: 'pointer',
@@ -328,8 +430,8 @@ export function Dashboard() {
                                 padding: '8px 16px',
                                 borderRadius: 6,
                                 border: 'none',
-                                backgroundColor: activeView === 'inversion' ? '#6366f1' : 'transparent',
-                                color: activeView === 'inversion' ? 'white' : '#374151',
+                                backgroundColor: activeView === 'inversion' ? themeColors.buttonActiveBg : themeColors.buttonBackground,
+                                color: activeView === 'inversion' ? themeColors.buttonActiveText : themeColors.buttonText,
                                 fontSize: 14,
                                 fontWeight: 500,
                                 cursor: 'pointer',
@@ -345,6 +447,7 @@ export function Dashboard() {
                 <DropdownFilter
                     filters={filters}
                     onFilterChange={handleFilterChange}
+                    themeColors={themeColors}
                 />
 
                 {/* Widget Cards */}
@@ -359,17 +462,20 @@ export function Dashboard() {
                         title="Total de proyectos"
                         value={data.widgets.totalProjects}
                         icon="📊"
+                        themeColors={themeColors}
                     />
                     <WidgetCard
                         title="Suma de inversión"
                         value={data.widgets.sumInvestment}
                         icon="💰"
+                        themeColors={themeColors}
                     />
                     <WidgetCard
                         title="Tipología principal"
                         value={data.widgets.topSector}
                         subtitle={`${data.widgets.topSectorPercentage}% del total`}
                         icon="🏭"
+                        themeColors={themeColors}
                     />
                 </div>
 

@@ -56,11 +56,36 @@ export type WidgetCardProps = {
     value: string | number;
     icon?: string;
     subtitle?: string;
+    themeColors: ThemeColors;
+};
+
+export type ThemeColors = {
+    background: string;
+    cardBackground: string;
+    cardBorder: string;
+    text: string;
+    textSecondary: string;
+    buttonText: string;
+    buttonBackground: string;
+    buttonHover: string;
+    buttonActiveBg: string;
+    buttonActiveText: string;
+    purple: string;
+    purpleDark: string;
+    purpleLight: string;
+    border: string;
+    borderLight: string;
+    gridLine: string;
+    dropdownBg: string;
+    dropdownBorder: string;
+    dropdownHover: string;
+    dropdownSelected: string;
 };
 
 export type DropdownFilterProps = {
     filters: FilterConfig[];
     onFilterChange: (filterLabel: string, selectedValues: string[]) => void;
+    themeColors: ThemeColors;
 };
 
 export type CandlestickDataRow = {
