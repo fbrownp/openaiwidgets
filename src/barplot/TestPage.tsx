@@ -5,24 +5,22 @@ import BarplotWidget from './barplot';
  * Test page for development with npm run dev
  */
 export default function TestPage() {
-    const [selectedMetric, setSelectedMetric] = React.useState("revenue");
+    const [selectedMetric, setSelectedMetric] = React.useState("inversion_total");
 
     const testData = {
         title: "Monthly Performance Dashboard",
         metricOptions: [
-            { label: "Revenue ($)", value: "revenue" },
-            { label: "Units Sold", value: "units" },
-            { label: "Profit ($)", value: "profit" },
-            { label: "Customers", value: "customers" }
+            { label: "Inversión Total", value: "inversion_total" },
+            { label: "Cantidad de Proyectos", value: "cantidad_proyectos" }
         ],
         selectedMetric: selectedMetric,
         rows: [
-            { period: "Jan", revenue: 12000, units: 150, profit: 3000, customers: 45 },
-            { period: "Feb", revenue: 15000, units: 200, profit: 4500, customers: 60 },
-            { period: "Mar", revenue: 11000, units: 140, profit: 2800, customers: 42 },
-            { period: "Apr", revenue: 18000, units: 250, profit: 5400, customers: 75 },
-            { period: "May", revenue: 16000, units: 220, profit: 4800, customers: 66 },
-            { period: "Jun", revenue: 20000, units: 280, profit: 6000, customers: 84 }
+            { period: "Jan", inversion_total: 12000, cantidad_proyectos: 150, year: 2024, region: "Nacional" },
+            { period: "Feb", inversion_total: 15000, cantidad_proyectos: 200, year: 2024, region: "Nacional" },
+            { period: "Mar", inversion_total: 11000, cantidad_proyectos: 140, year: 2024, region: "Nacional" },
+            { period: "Apr", inversion_total: 18000, cantidad_proyectos: 250, year: 2024, region: "Nacional" },
+            { period: "May", inversion_total: 16000, cantidad_proyectos: 220, year: 2024, region: "Nacional" },
+            { period: "Jun", inversion_total: 20000, cantidad_proyectos: 280, year: 2024, region: "Nacional" }
         ]
     };
 

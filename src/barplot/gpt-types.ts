@@ -5,8 +5,8 @@ import { DataRow, CandlestickDataRow, FilterConfig } from './types';
  * This matches the format that GPT will output
  */
 export interface GPTDashboardData {
-    // Active view - determines if we're showing projects or employment data
-    activeView: 'proyectos' | 'empleo';
+    // Active view - determines if we're showing projects or investment data
+    activeView: 'proyectos' | 'inversion';
 
     // Widget card data
     widgets: {
@@ -20,19 +20,17 @@ export interface GPTDashboardData {
 
     // Filter configurations
     filters: {
-        nivelInversion: string[];    // e.g., ["alto", "medio", "bajo"]
-        estado: string[];             // e.g., ["ejecucion", "aprobado", "evaluacion"]
-        sectorProductivo: string[];   // e.g., ["industria", "comercio"]
-        formasPresentacion: string[]; // e.g., ["proyecto", "empleo"]
-        regiones: string[];           // e.g., ["Metropolitana", "O'Higgins"]
+        tipo_ingreso_seia: string[];    // e.g., ["DIA", "EIA"]
+        tipologia: string[];             // e.g., ["a1", "ñ7", "i5"]
+        tipologia_letra: string[];       // e.g., ["k", "b", "t"]
+        region: string[];                // e.g., ["Región Metropolitana de Santiago", "Región de Valparaíso"]
+        estado_proyecto: string[];       // e.g., ["Aprobado", "En Calificación"]
+        etiqueta_inversion: string[];    // e.g., ["Grandes (≥ 100)", "Medianos (≥ 10 - 100)"]
+        ano_presentacion: string[];      // e.g., ["2014", "2015", "2016"]
     };
 
-    // Chart data
-    charts: {
-        timeSeriesData: DataRow[];        // For yearly bar chart
-        regionData: DataRow[];             // For regional horizontal bar chart
-        candlestickData: CandlestickDataRow[]; // For volatility chart
-    };
+    // Unified data array - single source for all charts
+    data: DataRow[];  // Each row contains all filter fields + metrics
 }
 
 /**
@@ -40,7 +38,7 @@ export interface GPTDashboardData {
  * GPT will output a simpler format that we'll parse
  */
 export interface GPTRawOutput {
-    view: 'proyectos' | 'empleo';
+    view: 'proyectos' | 'inversion';
 
     // Simple numeric values
     totalProjects?: number;
@@ -51,29 +49,56 @@ export interface GPTRawOutput {
     topSectorPercentage?: string;
 
     // Filter values
-    nivelInversion?: string[];
-    estado?: string[];
-    sectorProductivo?: string[];
-    formasPresentacion?: string[];
-    regiones?: string[];
+    tipo_ingreso_seia?: string[];
+    tipologia?: string[];
+    tipologia_letra?: string[];
+    region?: string[];
+    estado_proyecto?: string[];
+    etiqueta_inversion?: string[];
+    ano_presentacion?: string[];
 
-    // Chart data arrays
+    // Unified data array - each row contains filter fields + metrics
+    // Matches schema: ano_presentacion, tipo_ingreso_seia, tipologia_letra, region, estado_proyecto, cantidad_proyectos, inversion_total
+    data?: Array<{
+        ano_presentacion: number;        // Year of presentation
+        tipo_ingreso_seia: string;       // Type of SEIA entry
+        tipologia_letra: string;         // Typology letter
+        region: string;                  // Region
+        estado_proyecto: string;         // Project state
+        cantidad_proyectos: number;      // Count of projects
+        inversion_total: number;         // Total investment
+        // Optional fields
+        tipologia?: string;              // Full typology code
+        etiqueta_inversion?: string;     // Investment label
+    }>;
+
+    // Legacy support - will be deprecated
     timeSeriesData?: Array<{
         period: string;
         year: number;
         region: string;
-        revenue?: number;
-        units?: number;
-        profit?: number;
+        tipo_ingreso_seia?: string;
+        tipologia?: string;
+        tipologia_letra?: string;
+        estado_proyecto?: string;
+        etiqueta_inversion?: string;
+        ano_presentacion?: number;
+        cantidad_proyectos?: number;
+        inversion_total?: number;
     }>;
 
     regionData?: Array<{
         period: string;
         year: number;
         region: string;
-        revenue?: number;
-        units?: number;
-        profit?: number;
+        tipo_ingreso_seia?: string;
+        tipologia?: string;
+        tipologia_letra?: string;
+        estado_proyecto?: string;
+        etiqueta_inversion?: string;
+        ano_presentacion?: number;
+        cantidad_proyectos?: number;
+        inversion_total?: number;
     }>;
 
     candlestickData?: Array<{

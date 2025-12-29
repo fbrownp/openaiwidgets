@@ -5,15 +5,16 @@ export const WidgetCard: React.FC<WidgetCardProps> = ({
     title,
     value,
     icon = '📊',
-    subtitle
+    subtitle,
+    themeColors
 }) => {
     return (
         <div style={{
-            backgroundColor: 'white',
+            backgroundColor: themeColors.cardBackground,
             borderRadius: 12,
             padding: '24px',
             boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-            border: '1px solid #f0f0f0',
+            border: `1px solid ${themeColors.cardBorder}`,
             display: 'flex',
             flexDirection: 'column',
             gap: 8,
@@ -21,7 +22,7 @@ export const WidgetCard: React.FC<WidgetCardProps> = ({
         }}>
             <div style={{
                 fontSize: 13,
-                color: '#6b7280',
+                color: themeColors.textSecondary,
                 fontWeight: 500,
                 display: 'flex',
                 alignItems: 'center',
@@ -40,7 +41,7 @@ export const WidgetCard: React.FC<WidgetCardProps> = ({
                 <div style={{
                     fontSize: 32,
                     fontWeight: 700,
-                    color: '#111827',
+                    color: themeColors.text,
                     lineHeight: 1.2
                 }}>
                     {typeof value === 'number' ? value.toLocaleString() : value}
@@ -50,7 +51,7 @@ export const WidgetCard: React.FC<WidgetCardProps> = ({
                     width: 48,
                     height: 48,
                     borderRadius: '50%',
-                    backgroundColor: '#f3f4f6',
+                    backgroundColor: themeColors.buttonHover,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -63,7 +64,7 @@ export const WidgetCard: React.FC<WidgetCardProps> = ({
             {subtitle && (
                 <div style={{
                     fontSize: 13,
-                    color: '#6b7280',
+                    color: themeColors.textSecondary,
                     marginTop: 4
                 }}>
                     {subtitle}

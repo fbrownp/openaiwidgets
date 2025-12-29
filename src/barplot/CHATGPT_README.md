@@ -80,69 +80,72 @@ Filters are provided as arrays of selected values:
 
 ```javascript
 {
-    // Nivel de Inversión
-    nivelInversion: ["alto", "medio", "bajo"],
+    // Tipo de Ingreso
+    tipo_ingreso_seia: ["DIA", "EIA"],
+
+    // Tipología
+    tipologia: ["a1", "ñ7", "i5"],
+
+    // Letra de tipología
+    tipologia_letra: ["k", "b", "t"],
+
+    // Región
+    region: ["Región Metropolitana de Santiago", "Región de Valparaíso"],
 
     // Estado
-    estado: ["ejecucion", "aprobado", "evaluacion", "finalizado"],
+    estado_proyecto: ["Aprobado", "En Calificación"],
 
-    // Sector Productivo
-    sectorProductivo: ["industria", "comercio", "servicios"],
+    // Nivel de Inversión
+    etiqueta_inversion: ["Grandes (≥ 100)", "Medianos (≥ 10 - 100)"],
 
-    // Formas de Presentación
-    formasPresentacion: ["proyecto", "empleo"],
-
-    // Regiones
-    regiones: ["Metropolitana", "O'Higgins", "Biobío"]
+    // Año de Presentación
+    ano_presentacion: ["2020", "2021", "2022", "2023", "2024"]
 }
 ```
 
-### Chart Data
+### Unified Data Array
 
-**Time Series Data** (for yearly trends):
+**NEW FORMAT**: The dashboard now uses a single unified data array that feeds all three charts:
+
 ```javascript
-timeSeriesData: [
+data: [
     {
-        period: "2024",        // Display label
-        year: 2024,            // Numeric year
-        region: "Nacional",    // Region name
-        revenue: 1200,         // Used for 'proyectos' view
-        units: 450,            // Used for 'empleo' view
-        profit: 380            // Optional
+        // Required fields (matches schema)
+        ano_presentacion: 2022,          // Year of presentation
+        tipo_ingreso_seia: "EIA",        // Type: "DIA" or "EIA"
+        tipologia_letra: "c",            // Typology letter
+        region: "Región del Biobío",     // Chilean region
+        estado_proyecto: "No calificado",// Project state
+        cantidad_proyectos: 1,           // Count of projects
+        inversion_total: 420.0,          // Total investment
+        // Optional fields
+        tipologia: "c1",                 // Full typology code
+        etiqueta_inversion: "Pequeños (0 - 10)"  // Investment category
     },
+    {
+        ano_presentacion: 2023,
+        tipo_ingreso_seia: "DIA",
+        tipologia_letra: "a",
+        region: "Región Metropolitana de Santiago",
+        estado_proyecto: "Aprobado",
+        cantidad_proyectos: 5,
+        inversion_total: 1500.0,
+        tipologia: "a1",
+        etiqueta_inversion: "Medianos (≥ 10 - 100)"
+    }
     // ... more data points
 ]
 ```
 
-**Region Data** (for horizontal bar chart):
-```javascript
-regionData: [
-    {
-        period: "Metropolitana",  // Region label
-        year: 2024,
-        region: "Metropolitana",
-        revenue: 4200,            // Used for 'proyectos'
-        units: 1450,              // Used for 'empleo'
-        profit: 1260
-    },
-    // ... more regions
-]
-```
-
-**Candlestick Data** (for volatility):
-```javascript
-candlestickData: [
-    {
-        period: "2024",
-        year: 2024,
-        open: 420,
-        high: 450,
-        low: 350,
-        close: 380
-    },
-    // ... more data points
-]
-```
+**How it Works**:
+- Single data array contains raw data matching your database schema
+- Dashboard automatically generates 3 charts from this data:
+  1. **Time Series**: Aggregates by year (ano_presentacion)
+  2. **Region Chart**: Aggregates by region
+  3. **Candlestick**: Calculates OHLC from inversion_total by year
+- Filters apply to the base data before chart generation
+- Empty filter selections show all data
+- Multiple filters use AND logic
 
 ## 🎯 Example GPT Interactions
 
@@ -159,27 +162,22 @@ window.renderDashboard({
     topSector: "Industria",
     topSectorPercentage: "22.7",
 
-    timeSeriesData: [
-        { period: "2020", year: 2020, region: "Nacional", revenue: 680, units: 230, profit: 205 },
-        { period: "2022", year: 2022, region: "Nacional", revenue: 420, units: 140, profit: 125 },
-        { period: "2024", year: 2024, region: "Nacional", revenue: 380, units: 125, profit: 115 }
-    ],
-
-    regionData: [
-        { period: "Metropolitana", year: 2024, region: "Metropolitana", revenue: 4200, units: 1450, profit: 1260 },
-        { period: "Valparaíso", year: 2024, region: "Valparaíso", revenue: 2680, units: 915, profit: 804 }
+    data: [
+        { ano_presentacion: 2020, tipo_ingreso_seia: "DIA", tipologia_letra: "a", region: "Región Metropolitana de Santiago", estado_proyecto: "Aprobado", cantidad_proyectos: 230, inversion_total: 680 },
+        { ano_presentacion: 2022, tipo_ingreso_seia: "EIA", tipologia_letra: "c", region: "Región de Valparaíso", estado_proyecto: "En Calificación", cantidad_proyectos: 140, inversion_total: 420 },
+        { ano_presentacion: 2024, tipo_ingreso_seia: "DIA", tipologia_letra: "b", region: "Región del Biobío", estado_proyecto: "Aprobado", cantidad_proyectos: 125, inversion_total: 380 }
     ]
 });
 ```
 
 ### Example 2: Filter Update
 
-**User**: "Show only 'En ejecución' and 'Aprobado' projects"
+**User**: "Show only 'Aprobado' and 'En Calificación' projects"
 
 **GPT Output**:
 ```javascript
 window.updateDashboard({
-    estado: ["ejecucion", "aprobado"],
+    estado_proyecto: ["Aprobado", "En Calificación"],
     totalProjects: 8420,
     sumInvestment: "MMU$350.500"
 });
@@ -257,37 +255,66 @@ window.updateDashboard({
 
 ## 📝 Filter Value Reference
 
-### Nivel de Inversión
+### Tipo de Ingreso (tipo_ingreso_seia)
 | Value | Label |
 |-------|-------|
-| `"alto"` | Alto (>$1M) |
-| `"medio"` | Medio ($100K-$1M) |
-| `"bajo"` | Bajo (<$100K) |
+| `"DIA"` | DIA |
+| `"EIA"` | EIA |
 
-### Estado
-| Value | Label |
-|-------|-------|
-| `"ejecucion"` | En ejecución |
-| `"aprobado"` | Aprobado |
-| `"evaluacion"` | En evaluación |
-| `"finalizado"` | Finalizado |
-| `"suspendido"` | Suspendido |
-| `"rechazado"` | Rechazado |
-| `"construccion"` | En construcción |
-| `"operativo"` | Operativo |
-| `"paralizado"` | Paralizado |
-| `"postergado"` | Postergado |
+### Tipología (tipologia)
+Codes like: `"a1"`, `"ñ7"`, `"i5"`, `"m4"`, `"k1"`, `"f3"`, `"e6"`, `"j1"`, `"h1"`, etc.
+See full list in DEFAULT_FILTER_OPTIONS in gpt-adapter.ts
 
-### Sector Productivo
+### Letra de tipología (tipologia_letra)
 | Value | Label |
 |-------|-------|
-| `"industria"` | Industria |
-| `"comercio"` | Comercio |
-| `"servicios"` | Servicios |
-| `"mineria"` | Minería |
-| `"agricultura"` | Agricultura |
-| `"construccion"` | Construcción |
-| `"tecnologia"` | Tecnología |
+| `"k"`, `"b"`, `"t"`, `"l"`, `"s"`, `"u"`, `"ñ"`, `"a"`, `"h"`, `"j"`, `"n"`, `"p"`, `"f"`, `"c"`, `"e"`, `"i"`, `"g"`, `"d"`, `"r"`, `"m"`, `"o"` | Same as value |
+
+### Región (region)
+| Value | Label |
+|-------|-------|
+| `"Región Metropolitana de Santiago"` | Región Metropolitana de Santiago |
+| `"Región de Valparaíso"` | Región de Valparaíso |
+| `"Región del Biobío"` | Región del Biobío |
+| And other Chilean regions | See full list in DEFAULT_FILTER_OPTIONS |
+
+### Estado (estado_proyecto)
+| Value | Label |
+|-------|-------|
+| `"Aprobado"` | Aprobado |
+| `"En Calificación"` | En Calificación |
+| `"En Admisión"` | En Admisión |
+| `"Rechazado"` | Rechazado |
+| `"Desistido"` | Desistido |
+| `"Abandonado"` | Abandonado |
+| `"Caducado"` | Caducado |
+| `"Revocado"` | Revocado |
+| `"Renuncia RCA"` | Renuncia RCA |
+| `"No Admitido a Tramitación"` | No Admitido a Tramitación |
+| `"No calificado"` | No calificado |
+
+### Nivel de Inversión (etiqueta_inversion)
+| Value | Label |
+|-------|-------|
+| `"Grandes (≥ 100)"` | Grandes (≥ 100) |
+| `"Medianos (≥ 10 - 100)"` | Medianos (≥ 10 - 100) |
+| `"Pequeños (0 - 10)"` | Pequeños (0 - 10) |
+
+### Año de Presentación (ano_presentacion)
+| Value | Label |
+|-------|-------|
+| `"2014"` | 2014 |
+| `"2015"` | 2015 |
+| `"2016"` | 2016 |
+| `"2017"` | 2017 |
+| `"2018"` | 2018 |
+| `"2019"` | 2019 |
+| `"2020"` | 2020 |
+| `"2021"` | 2021 |
+| `"2022"` | 2022 |
+| `"2023"` | 2023 |
+| `"2024"` | 2024 |
+| `"2025"` | 2025 |
 
 ## 🧪 Testing
 

@@ -8,7 +8,17 @@ export type DataRow = {
     period: string;
     year: number;
     region: string;
-    [key: string]: number | string;
+    // Filter fields from schema
+    tipo_ingreso_seia?: string;
+    tipologia?: string;
+    tipologia_letra?: string;
+    estado_proyecto?: string;
+    etiqueta_inversion?: string;
+    ano_presentacion?: number;
+    // Metric fields
+    cantidad_proyectos?: number;
+    inversion_total?: number;
+    [key: string]: number | string | undefined;
 };
 
 export type FilterOption = {
@@ -46,11 +56,36 @@ export type WidgetCardProps = {
     value: string | number;
     icon?: string;
     subtitle?: string;
+    themeColors: ThemeColors;
+};
+
+export type ThemeColors = {
+    background: string;
+    cardBackground: string;
+    cardBorder: string;
+    text: string;
+    textSecondary: string;
+    buttonText: string;
+    buttonBackground: string;
+    buttonHover: string;
+    buttonActiveBg: string;
+    buttonActiveText: string;
+    purple: string;
+    purpleDark: string;
+    purpleLight: string;
+    border: string;
+    borderLight: string;
+    gridLine: string;
+    dropdownBg: string;
+    dropdownBorder: string;
+    dropdownHover: string;
+    dropdownSelected: string;
 };
 
 export type DropdownFilterProps = {
     filters: FilterConfig[];
     onFilterChange: (filterLabel: string, selectedValues: string[]) => void;
+    themeColors: ThemeColors;
 };
 
 export type CandlestickDataRow = {
@@ -60,6 +95,23 @@ export type CandlestickDataRow = {
     high: number;
     low: number;
     close: number;
+};
+
+export type BoxPlotDataRow = {
+    period: string;
+    year: number;
+    min: number;
+    q1: number;
+    median: number;
+    q3: number;
+    max: number;
+    outliers?: number[];
+};
+
+export type BoxPlotProps = {
+    title: string;
+    rows: BoxPlotDataRow[];
+    height?: number;
 };
 
 // ADD THESE NEW TYPES FOR OPENAI INTEGRATION
