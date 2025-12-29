@@ -5,8 +5,8 @@ import { DataRow, CandlestickDataRow, FilterConfig } from './types';
  * This matches the format that GPT will output
  */
 export interface GPTDashboardData {
-    // Active view - determines if we're showing projects or employment data
-    activeView: 'proyectos' | 'empleo';
+    // Active view - determines if we're showing projects or investment data
+    activeView: 'proyectos' | 'inversion';
 
     // Widget card data
     widgets: {
@@ -38,7 +38,7 @@ export interface GPTDashboardData {
  * GPT will output a simpler format that we'll parse
  */
 export interface GPTRawOutput {
-    view: 'proyectos' | 'empleo';
+    view: 'proyectos' | 'inversion';
 
     // Simple numeric values
     totalProjects?: number;

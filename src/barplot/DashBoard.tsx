@@ -103,17 +103,17 @@ export function Dashboard() {
 
     const data = dashboardState ?? createDefaultDashboardState();
 
-    const [activeView, setActiveView] = React.useState<'proyectos' | 'empleo'>(
+    const [activeView, setActiveView] = React.useState<'proyectos' | 'inversion'>(
         data.activeView
     );
     const [selectedMetric, setSelectedMetric] = React.useState<string>(
-        activeView === 'proyectos' ? 'inversion_total' : 'cantidad_proyectos'
+        activeView === 'proyectos' ? 'cantidad_proyectos' : 'inversion_total'
     );
 
     // Update view when data changes
     useEffect(() => {
         setActiveView(data.activeView);
-        setSelectedMetric(data.activeView === 'proyectos' ? 'inversion_total' : 'cantidad_proyectos');
+        setSelectedMetric(data.activeView === 'proyectos' ? 'cantidad_proyectos' : 'inversion_total');
     }, [data.activeView]);
 
     // Build filter configurations
@@ -303,7 +303,7 @@ export function Dashboard() {
                         <button
                             onClick={() => {
                                 setActiveView('proyectos');
-                                setSelectedMetric('inversion_total');
+                                setSelectedMetric('cantidad_proyectos');
                             }}
                             style={{
                                 padding: '8px 16px',
@@ -321,22 +321,22 @@ export function Dashboard() {
                         </button>
                         <button
                             onClick={() => {
-                                setActiveView('empleo');
-                                setSelectedMetric('cantidad_proyectos');
+                                setActiveView('inversion');
+                                setSelectedMetric('inversion_total');
                             }}
                             style={{
                                 padding: '8px 16px',
                                 borderRadius: 6,
                                 border: 'none',
-                                backgroundColor: activeView === 'empleo' ? '#6366f1' : 'transparent',
-                                color: activeView === 'empleo' ? 'white' : '#374151',
+                                backgroundColor: activeView === 'inversion' ? '#6366f1' : 'transparent',
+                                color: activeView === 'inversion' ? 'white' : '#374151',
                                 fontSize: 14,
                                 fontWeight: 500,
                                 cursor: 'pointer',
                                 transition: 'all 0.2s'
                             }}
                         >
-                            Empleo
+                            Inversión
                         </button>
                     </div>
                 </div>
@@ -361,20 +361,12 @@ export function Dashboard() {
                         icon="📊"
                     />
                     <WidgetCard
-                        title="Total de empleos"
-                        value={data.widgets.totalJobs}
-                        icon="👥"
+                        title="Suma de inversión"
+                        value={data.widgets.sumInvestment}
+                        icon="💰"
                     />
                     <WidgetCard
-                        title={activeView === 'proyectos' ? "Suma de inversión" : "Suma de empleos"}
-                        value={activeView === 'proyectos'
-                            ? data.widgets.sumInvestment
-                            : data.widgets.sumJobs
-                        }
-                        icon={activeView === 'proyectos' ? "💰" : "🏢"}
-                    />
-                    <WidgetCard
-                        title="Sector productivo principal"
+                        title="Tipología principal"
                         value={data.widgets.topSector}
                         subtitle={`${data.widgets.topSectorPercentage}% del total`}
                         icon="🏭"
@@ -391,7 +383,7 @@ export function Dashboard() {
                         <EnhancedBarplot
                             title={activeView === 'proyectos'
                                 ? "Evolución de Proyectos por Año"
-                                : "Evolución de Empleo por Año"
+                                : "Evolución de Inversión por Año"
                             }
                             metricOptions={metricOptions}
                             selectedMetric={selectedMetric}
@@ -406,8 +398,8 @@ export function Dashboard() {
                     {filteredRegionData.length > 0 && (
                         <HorizontalBarplot
                             title={activeView === 'proyectos'
-                                ? "Distribución por Región - Inversión"
-                                : "Distribución por Región - Empleo"
+                                ? "Distribución por Región - Proyectos"
+                                : "Distribución por Región - Inversión"
                             }
                             metricOptions={metricOptions}
                             selectedMetric={selectedMetric}
