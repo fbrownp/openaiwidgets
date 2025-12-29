@@ -11,24 +11,24 @@ export const WidgetCard: React.FC<WidgetCardProps> = ({
     return (
         <div style={{
             backgroundColor: themeColors.cardBackground,
-            borderRadius: 12,
-            padding: '24px',
+            borderRadius: 8,
+            padding: '12px 16px',
             boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
             border: `1px solid ${themeColors.cardBorder}`,
             display: 'flex',
             flexDirection: 'column',
-            gap: 8,
-            minHeight: 140
+            gap: 6,
+            minHeight: 90
         }}>
             <div style={{
-                fontSize: 13,
+                fontSize: 11,
                 color: themeColors.textSecondary,
                 fontWeight: 500,
                 display: 'flex',
                 alignItems: 'center',
-                gap: 4
+                gap: 3
             }}>
-                <span style={{ fontSize: 10 }}>¹</span>
+                <span style={{ fontSize: 8 }}>¹</span>
                 {title}
             </div>
 
@@ -36,10 +36,10 @@ export const WidgetCard: React.FC<WidgetCardProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                gap: 16
+                gap: 12
             }}>
                 <div style={{
-                    fontSize: 32,
+                    fontSize: 22,
                     fontWeight: 700,
                     color: themeColors.text,
                     lineHeight: 1.2
@@ -48,14 +48,14 @@ export const WidgetCard: React.FC<WidgetCardProps> = ({
                 </div>
 
                 <div style={{
-                    width: 48,
-                    height: 48,
+                    width: 36,
+                    height: 36,
                     borderRadius: '50%',
                     backgroundColor: themeColors.buttonHover,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: 24
+                    fontSize: 18
                 }}>
                     {icon}
                 </div>
@@ -63,9 +63,9 @@ export const WidgetCard: React.FC<WidgetCardProps> = ({
 
             {subtitle && (
                 <div style={{
-                    fontSize: 13,
+                    fontSize: 11,
                     color: themeColors.textSecondary,
-                    marginTop: 4
+                    marginTop: 2
                 }}>
                     {subtitle}
                 </div>

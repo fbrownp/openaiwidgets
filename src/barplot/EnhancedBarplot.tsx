@@ -9,21 +9,33 @@ export const EnhancedBarplot: React.FC<BarplotProps> = ({
     onMetricChange,
     twoWayPlot = false,
     showYAxis = true,
-    height = 300
+    height = 300,
+    themeColors
 }) => {
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
     const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
 
+    // Default to light theme colors if not provided
+    const colors = themeColors || {
+        cardBackground: 'white',
+        cardBorder: '#f0f0f0',
+        text: '#111827',
+        textSecondary: '#6b7280',
+        gridLine: '#f0f0f0',
+        purple: '#8b5cf6',
+        purpleDark: '#7c3aed'
+    };
+
     if (!rows || rows.length === 0) {
         return (
             <div style={{
-                backgroundColor: 'white',
+                backgroundColor: colors.cardBackground,
                 borderRadius: 12,
                 padding: 24,
                 boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-                border: '1px solid #f0f0f0'
+                border: `1px solid ${colors.cardBorder}`
             }}>
-                <div style={{ textAlign: 'center', color: '#6b7280', padding: 40 }}>
+                <div style={{ textAlign: 'center', color: colors.textSecondary, padding: 40 }}>
                     No data available
                 </div>
             </div>
@@ -64,11 +76,11 @@ export const EnhancedBarplot: React.FC<BarplotProps> = ({
 
     return (
         <div style={{
-            backgroundColor: 'white',
+            backgroundColor: colors.cardBackground,
             borderRadius: 12,
             padding: 24,
             boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-            border: '1px solid #f0f0f0',
+            border: `1px solid ${colors.cardBorder}`,
             position: 'relative'
         }}>
             {/* Header */}
@@ -83,13 +95,13 @@ export const EnhancedBarplot: React.FC<BarplotProps> = ({
                 <div style={{
                     fontSize: 15,
                     fontWeight: 600,
-                    color: '#111827',
+                    color: colors.text,
                     display: 'flex',
                     alignItems: 'center',
                     gap: 4
                 }}>
                     {title}
-                    <span style={{ fontSize: 10, color: '#6b7280' }}>¹</span>
+                    <span style={{ fontSize: 10, color: colors.textSecondary }}>¹</span>
                 </div>
             </div>
 
@@ -111,7 +123,7 @@ export const EnhancedBarplot: React.FC<BarplotProps> = ({
                         justifyContent: 'space-between',
                         alignItems: 'flex-end',
                         fontSize: 11,
-                        color: '#6b7280',
+                        color: colors.textSecondary,
                         paddingRight: 8
                     }}>
                         <span>{formatNumber(maxValue)}</span>
@@ -139,7 +151,7 @@ export const EnhancedBarplot: React.FC<BarplotProps> = ({
                             y1={availableHeight * (1 - ratio)}
                             x2="100%"
                             y2={availableHeight * (1 - ratio)}
-                            stroke="#f0f0f0"
+                            stroke={colors.gridLine}
                             strokeWidth="1"
                             strokeDasharray="4,4"
                         />
@@ -154,6 +166,7 @@ export const EnhancedBarplot: React.FC<BarplotProps> = ({
                     height: availableHeight,
                     display: 'flex',
                     alignItems: 'flex-end',
+                    justifyContent: 'center',
                     gap: twoWayPlot ? 12 : 8
                 }}>
                     {rows.map((item, index) => {
@@ -171,6 +184,7 @@ export const EnhancedBarplot: React.FC<BarplotProps> = ({
                                     alignItems: 'center',
                                     gap: 8,
                                     minWidth: 20,
+                                    maxWidth: 60,
                                     position: 'relative'
                                 }}
                             >
@@ -195,7 +209,7 @@ export const EnhancedBarplot: React.FC<BarplotProps> = ({
 
                                 <span style={{
                                     fontSize: 11,
-                                    color: '#6b7280',
+                                    color: colors.textSecondary,
                                     fontWeight: 500,
                                     textAlign: 'center',
                                     whiteSpace: 'nowrap'
@@ -226,7 +240,7 @@ export const EnhancedBarplot: React.FC<BarplotProps> = ({
                                 return `${x}%,${y}`;
                             }).join(' ')}
                             fill="none"
-                            stroke="#6366f1"
+                            stroke={colors.purpleDark}
                             strokeWidth="3"
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -241,8 +255,8 @@ export const EnhancedBarplot: React.FC<BarplotProps> = ({
                                     cx={`${x}%`}
                                     cy={y}
                                     r="4"
-                                    fill="#6366f1"
-                                    stroke="white"
+                                    fill={colors.purpleDark}
+                                    stroke={colors.cardBackground}
                                     strokeWidth="2"
                                 />
                             );
@@ -256,7 +270,7 @@ export const EnhancedBarplot: React.FC<BarplotProps> = ({
                     right: paddingRight,
                     bottom: paddingBottom - 1,
                     height: 1,
-                    backgroundColor: '#e5e7eb'
+                    backgroundColor: colors.border
                 }} />
             </div>
 
