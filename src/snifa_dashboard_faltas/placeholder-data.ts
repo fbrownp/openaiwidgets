@@ -63,31 +63,41 @@ const generatePlaceholderData = (): FaltaDataRow[] => {
     'Residuos Peligrosos',
   ];
 
-  const gravedades = ['Leves', 'Graves', 'Gravísimas', 'En blanco'];
+  const gravedades: Array<'Leves' | 'Graves' | 'Gravísimas' | 'En blanco'> = ['Leves', 'Graves', 'Gravísimas', 'En blanco'];
 
   const data: FaltaDataRow[] = [];
   let idCounter = 1;
 
   // Generate data for years 2013-2024
   for (let year = 2013; year <= 2024; year++) {
-    const numRecords = year < 2021 ? 300 + Math.random() * 200 : 150 + Math.random() * 100;
+    // More records in earlier years, fewer in recent years (matching the trend in the image)
+    const numRecords = Math.floor(year < 2021 ? 400 : 200);
 
     for (let i = 0; i < numRecords; i++) {
+      const regionIdx = Math.floor(Math.random() * regions.length);
+      const catIdx = Math.floor(Math.random() * categoriasEconomicas.length);
+      const subtipoIdx = Math.floor(Math.random() * subtiposCompromiso.length);
+      const subcompIdx = Math.floor(Math.random() * subcomponentes.length);
+      const gravedadIdx = Math.floor(Math.random() * gravedades.length);
+
       data.push({
-        id_fdc: `FDC-${idCounter++}`,
-        region: regions[Math.floor(Math.random() * regions.length)],
-        categoria_economica: categoriasEconomicas[Math.floor(Math.random() * categoriasEconomicas.length)],
-        subcategoria_economica: `Sub-${Math.floor(Math.random() * 20)}`,
-        clasificacion_gravedad: gravedades[Math.floor(Math.random() * gravedades.length)] as any,
+        id_fdc: `FDC-${String(idCounter).padStart(6, '0')}`,
+        region: regions[regionIdx],
+        categoria_economica: categoriasEconomicas[catIdx],
+        subcategoria_economica: `Subcategoría ${Math.floor(Math.random() * 20) + 1}`,
+        clasificacion_gravedad: gravedades[gravedadIdx],
         ano: year,
-        subtipo_compromiso: subtiposCompromiso[Math.floor(Math.random() * subtiposCompromiso.length)],
-        subcomponente: subcomponentes[Math.floor(Math.random() * subcomponentes.length)],
-        instrumento_infringido_norm: ['Todas', 'Tipo A', 'Tipo B', 'Tipo C'][Math.floor(Math.random() * 4)],
-        etiqueta_legal: ['Todas', 'Legal A', 'Legal B'][Math.floor(Math.random() * 3)],
+        subtipo_compromiso: subtiposCompromiso[subtipoIdx],
+        subcomponente: subcomponentes[subcompIdx],
+        instrumento_infringido_norm: ['RCA', 'DIA', 'EIA', 'Normativa Sectorial'][Math.floor(Math.random() * 4)],
+        etiqueta_legal: ['Ambiental', 'Sanitaria', 'Territorial'][Math.floor(Math.random() * 3)],
       });
+
+      idCounter++;
     }
   }
 
+  console.log(`Generated ${data.length} placeholder records`);
   return data;
 };
 

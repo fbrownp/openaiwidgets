@@ -72,6 +72,8 @@ const getThemeColors = (theme: 'light' | 'dark'): ThemeColors => {
 };
 
 export const Dashboard: React.FC = () => {
+    console.log('SNIFA Dashboard Faltas rendering...');
+
     // State management
     const [activeView, setActiveView] = useState<'faltas' | 'detalle'>('faltas');
     const [theme, setTheme] = useState<'light' | 'dark'>('dark');
@@ -86,12 +88,20 @@ export const Dashboard: React.FC = () => {
     });
 
     // Load initial data
-    const dashboardData = useMemo(() => getInitialData(), []);
+    const dashboardData = useMemo(() => {
+        const data = getInitialData();
+        console.log('Dashboard data loaded:', {
+            totalFaltas: data.totalFaltas,
+            dataRows: data.data.length,
+            availableFilters: Object.keys(data.availableFilters)
+        });
+        return data;
+    }, []);
     const themeColors = useMemo(() => getThemeColors(theme), [theme]);
 
     // Apply filters to data
     const filteredData = useMemo(() => {
-        return dashboardData.data.filter(row => {
+        const filtered = dashboardData.data.filter(row => {
             // Check each filter category
             for (const [key, selectedValues] of Object.entries(filterState)) {
                 if (selectedValues.length > 0 && !selectedValues.includes('Todas')) {
@@ -103,6 +113,8 @@ export const Dashboard: React.FC = () => {
             }
             return true;
         });
+        console.log(`Filtered data: ${filtered.length} records`);
+        return filtered;
     }, [dashboardData.data, filterState]);
 
     // Aggregate data by region
