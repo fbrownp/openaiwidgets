@@ -23,11 +23,12 @@ const createDefaultDashboardState = (): GPTDashboardData => ({
         topSectorPercentage: "0"
     },
     filters: {
-        nivelInversion: ["alto", "medio", "bajo"],
-        estado: ["ejecucion", "aprobado", "evaluacion"],
-        sectorProductivo: ["industria", "comercio", "servicios"],
-        formasPresentacion: ["proyecto", "empleo"],
-        regiones: []
+        tipo_ingreso_seia: ["DIA", "EIA"],
+        tipologia: [],
+        tipologia_letra: [],
+        region: [],
+        estado_proyecto: [],
+        etiqueta_inversion: []
     },
     charts: {
         timeSeriesData: [],

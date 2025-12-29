@@ -80,20 +80,23 @@ Filters are provided as arrays of selected values:
 
 ```javascript
 {
-    // Nivel de Inversión
-    nivelInversion: ["alto", "medio", "bajo"],
+    // Tipo de Ingreso
+    tipo_ingreso_seia: ["DIA", "EIA"],
+
+    // Tipología
+    tipologia: ["a1", "ñ7", "i5"],
+
+    // Letra de tipología
+    tipologia_letra: ["k", "b", "t"],
+
+    // Región
+    region: ["Región Metropolitana de Santiago", "Región de Valparaíso"],
 
     // Estado
-    estado: ["ejecucion", "aprobado", "evaluacion", "finalizado"],
+    estado_proyecto: ["Aprobado", "En Calificación"],
 
-    // Sector Productivo
-    sectorProductivo: ["industria", "comercio", "servicios"],
-
-    // Formas de Presentación
-    formasPresentacion: ["proyecto", "empleo"],
-
-    // Regiones
-    regiones: ["Metropolitana", "O'Higgins", "Biobío"]
+    // Nivel de Inversión
+    etiqueta_inversion: ["Grandes (≥ 100)", "Medianos (≥ 10 - 100)"]
 }
 ```
 
@@ -174,12 +177,12 @@ window.renderDashboard({
 
 ### Example 2: Filter Update
 
-**User**: "Show only 'En ejecución' and 'Aprobado' projects"
+**User**: "Show only 'Aprobado' and 'En Calificación' projects"
 
 **GPT Output**:
 ```javascript
 window.updateDashboard({
-    estado: ["ejecucion", "aprobado"],
+    estado_proyecto: ["Aprobado", "En Calificación"],
     totalProjects: 8420,
     sumInvestment: "MMU$350.500"
 });
@@ -257,37 +260,50 @@ window.updateDashboard({
 
 ## 📝 Filter Value Reference
 
-### Nivel de Inversión
+### Tipo de Ingreso (tipo_ingreso_seia)
 | Value | Label |
 |-------|-------|
-| `"alto"` | Alto (>$1M) |
-| `"medio"` | Medio ($100K-$1M) |
-| `"bajo"` | Bajo (<$100K) |
+| `"DIA"` | DIA |
+| `"EIA"` | EIA |
 
-### Estado
-| Value | Label |
-|-------|-------|
-| `"ejecucion"` | En ejecución |
-| `"aprobado"` | Aprobado |
-| `"evaluacion"` | En evaluación |
-| `"finalizado"` | Finalizado |
-| `"suspendido"` | Suspendido |
-| `"rechazado"` | Rechazado |
-| `"construccion"` | En construcción |
-| `"operativo"` | Operativo |
-| `"paralizado"` | Paralizado |
-| `"postergado"` | Postergado |
+### Tipología (tipologia)
+Codes like: `"a1"`, `"ñ7"`, `"i5"`, `"m4"`, `"k1"`, `"f3"`, `"e6"`, `"j1"`, `"h1"`, etc.
+See full list in DEFAULT_FILTER_OPTIONS in gpt-adapter.ts
 
-### Sector Productivo
+### Letra de tipología (tipologia_letra)
 | Value | Label |
 |-------|-------|
-| `"industria"` | Industria |
-| `"comercio"` | Comercio |
-| `"servicios"` | Servicios |
-| `"mineria"` | Minería |
-| `"agricultura"` | Agricultura |
-| `"construccion"` | Construcción |
-| `"tecnologia"` | Tecnología |
+| `"k"`, `"b"`, `"t"`, `"l"`, `"s"`, `"u"`, `"ñ"`, `"a"`, `"h"`, `"j"`, `"n"`, `"p"`, `"f"`, `"c"`, `"e"`, `"i"`, `"g"`, `"d"`, `"r"`, `"m"`, `"o"` | Same as value |
+
+### Región (region)
+| Value | Label |
+|-------|-------|
+| `"Región Metropolitana de Santiago"` | Región Metropolitana de Santiago |
+| `"Región de Valparaíso"` | Región de Valparaíso |
+| `"Región del Biobío"` | Región del Biobío |
+| And other Chilean regions | See full list in DEFAULT_FILTER_OPTIONS |
+
+### Estado (estado_proyecto)
+| Value | Label |
+|-------|-------|
+| `"Aprobado"` | Aprobado |
+| `"En Calificación"` | En Calificación |
+| `"En Admisión"` | En Admisión |
+| `"Rechazado"` | Rechazado |
+| `"Desistido"` | Desistido |
+| `"Abandonado"` | Abandonado |
+| `"Caducado"` | Caducado |
+| `"Revocado"` | Revocado |
+| `"Renuncia RCA"` | Renuncia RCA |
+| `"No Admitido a Tramitación"` | No Admitido a Tramitación |
+| `"No calificado"` | No calificado |
+
+### Nivel de Inversión (etiqueta_inversion)
+| Value | Label |
+|-------|-------|
+| `"Grandes (≥ 100)"` | Grandes (≥ 100) |
+| `"Medianos (≥ 10 - 100)"` | Medianos (≥ 10 - 100) |
+| `"Pequeños (0 - 10)"` | Pequeños (0 - 10) |
 
 ## 🧪 Testing
 

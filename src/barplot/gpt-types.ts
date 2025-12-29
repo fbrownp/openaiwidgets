@@ -20,11 +20,12 @@ export interface GPTDashboardData {
 
     // Filter configurations
     filters: {
-        nivelInversion: string[];    // e.g., ["alto", "medio", "bajo"]
-        estado: string[];             // e.g., ["ejecucion", "aprobado", "evaluacion"]
-        sectorProductivo: string[];   // e.g., ["industria", "comercio"]
-        formasPresentacion: string[]; // e.g., ["proyecto", "empleo"]
-        regiones: string[];           // e.g., ["Metropolitana", "O'Higgins"]
+        tipo_ingreso_seia: string[];    // e.g., ["DIA", "EIA"]
+        tipologia: string[];             // e.g., ["a1", "ñ7", "i5"]
+        tipologia_letra: string[];       // e.g., ["k", "b", "t"]
+        region: string[];                // e.g., ["Región Metropolitana de Santiago", "Región de Valparaíso"]
+        estado_proyecto: string[];       // e.g., ["Aprobado", "En Calificación"]
+        etiqueta_inversion: string[];    // e.g., ["Grandes (≥ 100)", "Medianos (≥ 10 - 100)"]
     };
 
     // Chart data
@@ -51,11 +52,12 @@ export interface GPTRawOutput {
     topSectorPercentage?: string;
 
     // Filter values
-    nivelInversion?: string[];
-    estado?: string[];
-    sectorProductivo?: string[];
-    formasPresentacion?: string[];
-    regiones?: string[];
+    tipo_ingreso_seia?: string[];
+    tipologia?: string[];
+    tipologia_letra?: string[];
+    region?: string[];
+    estado_proyecto?: string[];
+    etiqueta_inversion?: string[];
 
     // Chart data arrays
     timeSeriesData?: Array<{

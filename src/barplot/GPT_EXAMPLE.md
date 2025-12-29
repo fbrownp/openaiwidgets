@@ -24,11 +24,12 @@ window.__GPT_DASHBOARD_DATA__ = {
   topSectorPercentage: "22.7",
 
   // Filter selections (all optional)
-  nivelInversion: ["alto", "medio", "bajo"],
-  estado: ["ejecucion", "aprobado", "evaluacion"],
-  sectorProductivo: ["industria", "comercio", "servicios"],
-  formasPresentacion: ["proyecto", "empleo"],
-  regiones: ["Metropolitana", "O'Higgins", "Biobío"],
+  tipo_ingreso_seia: ["DIA", "EIA"],
+  tipologia: ["a1", "ñ7", "i5"],
+  tipologia_letra: ["k", "b", "t"],
+  region: ["Región Metropolitana de Santiago", "Región de Valparaíso"],
+  estado_proyecto: ["Aprobado", "En Calificación"],
+  etiqueta_inversion: ["Grandes (≥ 100)", "Medianos (≥ 10 - 100)"],
 
   // Time series data for yearly chart
   timeSeriesData: [
@@ -80,12 +81,12 @@ window.renderDashboard({
 
 ### Example 2: Filter by Estado
 
-**User**: "Show only projects that are 'En ejecución' or 'Aprobado'"
+**User**: "Show only projects that are 'Aprobado' or 'En Calificación'"
 
 **GPT Response**:
 ```javascript
 window.updateDashboard({
-  estado: ["ejecucion", "aprobado"],
+  estado_proyecto: ["Aprobado", "En Calificación"],
   totalProjects: 8420,
   sumInvestment: "MMU$350.500"
 });
@@ -116,31 +117,41 @@ When GPT outputs numeric values for widgets, use these exact formats:
 
 ## Filter Values
 
-### Nivel de Inversión
-- `"alto"`: Alto (>$1M)
-- `"medio"`: Medio ($100K-$1M)
-- `"bajo"`: Bajo (<$100K)
+### Tipo de Ingreso (tipo_ingreso_seia)
+- `"DIA"`: DIA
+- `"EIA"`: EIA
 
-### Estado
-- `"ejecucion"`: En ejecución
-- `"aprobado"`: Aprobado
-- `"evaluacion"`: En evaluación
-- `"finalizado"`: Finalizado
-- `"suspendido"`: Suspendido
-- `"rechazado"`: Rechazado
-- `"construccion"`: En construcción
-- `"operativo"`: Operativo
-- `"paralizado"`: Paralizado
-- `"postergado"`: Postergado
+### Tipología (tipologia)
+- Codes like: `"a1"`, `"ñ7"`, `"i5"`, `"m4"`, `"k1"`, etc.
+- See full list in DEFAULT_FILTER_OPTIONS
 
-### Sector Productivo
-- `"industria"`: Industria
-- `"comercio"`: Comercio
-- `"servicios"`: Servicios
-- `"mineria"`: Minería
-- `"agricultura"`: Agricultura
-- `"construccion"`: Construcción
-- `"tecnologia"`: Tecnología
+### Letra de tipología (tipologia_letra)
+- Letters: `"k"`, `"b"`, `"t"`, `"l"`, `"s"`, `"u"`, `"ñ"`, `"a"`, `"h"`, `"j"`, `"n"`, `"p"`, `"f"`, `"c"`, `"e"`, `"i"`, `"g"`, `"d"`, `"r"`, `"m"`, `"o"`
+
+### Región (region)
+- `"Región Metropolitana de Santiago"`
+- `"Región de Valparaíso"`
+- `"Región del Biobío"`
+- `"Región de La Araucanía"`
+- And other Chilean regions
+
+### Estado (estado_proyecto)
+- `"Aprobado"`: Aprobado
+- `"En Calificación"`: En Calificación
+- `"En Admisión"`: En Admisión
+- `"Rechazado"`: Rechazado
+- `"Desistido"`: Desistido
+- `"Abandonado"`: Abandonado
+- `"Caducado"`: Caducado
+- `"Revocado"`: Revocado
+- `"Renuncia RCA"`: Renuncia RCA
+- `"No Admitido a Tramitación"`: No Admitido a Tramitación
+- `"No calificado"`: No calificado
+
+### Nivel de Inversión (etiqueta_inversion)
+- `"Grandes (≥ 100)"`: Grandes (≥ 100)
+- `"Medianos (≥ 10 - 100)"`: Medianos (≥ 10 - 100)
+- `"Pequeños (0 - 10)"`: Pequeños (0 - 10)
 
 ## Chart Data Structure
 
@@ -215,8 +226,8 @@ window.__GPT_DASHBOARD_DATA__ = {
   topSector: "Industria",
   topSectorPercentage: "22.7",
 
-  nivelInversion: ["alto", "medio"],
-  estado: ["ejecucion", "aprobado"],
+  tipo_ingreso_seia: ["DIA", "EIA"],
+  estado_proyecto: ["Aprobado", "En Calificación"],
 
   timeSeriesData: [
     { period: "2020", year: 2020, region: "Nacional", revenue: 680, units: 230, profit: 205 },
