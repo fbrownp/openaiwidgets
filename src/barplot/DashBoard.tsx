@@ -545,8 +545,8 @@ export function Dashboard() {
                 {/* Charts */}
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
-                    gap: 16
+                    gridTemplateColumns: '1fr',
+                    gap: 20
                 }}>
                     {filteredTimeSeriesData.length > 0 && (
                         <EnhancedBarplot
