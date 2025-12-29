@@ -1,11 +1,10 @@
 import React, { useEffect, useMemo, useRef } from 'react';
-import { BoxPlot } from './BoxPlot';
 import { DropdownFilter } from './DropdownFilter';
 import { EnhancedBarplot } from './EnhancedBarplot';
 import { buildFilterConfigs, parseGPTOutput } from './gpt-adapter';
 import { GPTDashboardData, GPTRawOutput } from './gpt-types';
 import { HorizontalBarplot } from './HorizontalBarplot';
-import { FilterConfig, MetricOption, DataRow, BoxPlotDataRow } from './types';
+import { FilterConfig, MetricOption, DataRow } from './types';
 import { WidgetCard } from './WidgetCard';
 
 // Import hooks from parent directory
@@ -231,64 +230,6 @@ export function Dashboard() {
             .sort((a, b) => (b.inversion_total || 0) - (a.inversion_total || 0));
     };
 
-    // Calculate box plot data from filtered data
-    const calculateBoxPlot = (rows: DataRow[], metric: string): BoxPlotDataRow[] => {
-        const yearMap = new Map<number, number[]>();
-
-        rows.forEach(row => {
-            const year = row.ano_presentacion || row.year;
-            const value = row[metric] as number;
-            if (!year || value === undefined) return;
-
-            if (!yearMap.has(year)) {
-                yearMap.set(year, []);
-            }
-            yearMap.get(year)!.push(value);
-        });
-
-        return Array.from(yearMap.entries())
-            .map(([year, values]) => {
-                values.sort((a, b) => a - b);
-                const n = values.length;
-
-                if (n === 0) {
-                    return null;
-                }
-
-                // Calculate quartiles
-                const min = values[0];
-                const max = values[n - 1];
-                const median = n % 2 === 0
-                    ? (values[Math.floor(n / 2) - 1] + values[Math.floor(n / 2)]) / 2
-                    : values[Math.floor(n / 2)];
-                const q1 = n >= 4
-                    ? (values[Math.floor(n / 4)] + values[Math.ceil(n / 4) - 1]) / 2
-                    : values[0];
-                const q3 = n >= 4
-                    ? (values[Math.floor(3 * n / 4)] + values[Math.ceil(3 * n / 4) - 1]) / 2
-                    : values[n - 1];
-
-                // Calculate IQR and identify outliers
-                const iqr = q3 - q1;
-                const lowerBound = q1 - 1.5 * iqr;
-                const upperBound = q3 + 1.5 * iqr;
-                const outliers = values.filter(v => v < lowerBound || v > upperBound);
-
-                return {
-                    period: year.toString(),
-                    year,
-                    min,
-                    q1,
-                    median,
-                    q3,
-                    max,
-                    outliers: outliers.length > 0 ? outliers : undefined
-                };
-            })
-            .filter((item): item is BoxPlotDataRow => item !== null)
-            .sort((a, b) => a.year - b.year);
-    };
-
     // Apply filters and transform data for each chart
     const filteredData = useMemo(
         () => applyFilters(data.data),
@@ -303,11 +244,6 @@ export function Dashboard() {
     const filteredRegionData = useMemo(
         () => aggregateByRegion(filteredData),
         [filteredData]
-    );
-
-    const filteredBoxPlotData = useMemo(
-        () => calculateBoxPlot(filteredData, selectedMetric),
-        [filteredData, selectedMetric]
     );
 
     const metricOptions: MetricOption[] = activeView === 'proyectos'
@@ -477,17 +413,6 @@ export function Dashboard() {
                             selectedMetric={selectedMetric}
                             rows={filteredRegionData}
                             onMetricChange={setSelectedMetric}
-                            height={400}
-                        />
-                    )}
-
-                    {filteredBoxPlotData.length > 0 && (
-                        <BoxPlot
-                            title={activeView === 'proyectos'
-                                ? `Distribución de ${selectedMetric === 'inversion_total' ? 'Inversión' : 'Proyectos'} por Año`
-                                : `Distribución de ${selectedMetric === 'cantidad_proyectos' ? 'Proyectos' : 'Empleos'} por Año`
-                            }
-                            rows={filteredBoxPlotData}
                             height={400}
                         />
                     )}
