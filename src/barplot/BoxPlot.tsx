@@ -151,7 +151,7 @@ export const BoxPlot: React.FC<BoxPlotProps> = ({
                 >
                     {rows.map((item, index) => {
                         const x = ((index + 0.5) / rows.length) * 100;
-                        const boxWidth = Math.max(60 / rows.length, 8);
+                        const boxWidth = Math.max(80 / rows.length, 20);
 
                         const minY = valueToY(item.min);
                         const maxY = valueToY(item.max);
@@ -175,65 +175,67 @@ export const BoxPlot: React.FC<BoxPlotProps> = ({
                                     y1={minY}
                                     x2={`${x}%`}
                                     y2={q1Y}
-                                    stroke={color}
-                                    strokeWidth="2"
-                                    opacity={hoveredIndex === index ? 0.8 : 1}
+                                    stroke="#9ca3af"
+                                    strokeWidth="1.5"
+                                    strokeDasharray="4,3"
+                                    opacity={0.7}
                                 />
                                 <line
                                     x1={`${x}%`}
                                     y1={q3Y}
                                     x2={`${x}%`}
                                     y2={maxY}
-                                    stroke={color}
-                                    strokeWidth="2"
-                                    opacity={hoveredIndex === index ? 0.8 : 1}
+                                    stroke="#9ca3af"
+                                    strokeWidth="1.5"
+                                    strokeDasharray="4,3"
+                                    opacity={0.7}
                                 />
 
                                 {/* Min and Max caps */}
                                 <line
-                                    x1={`calc(${x}% - ${boxWidth / 3}px)`}
+                                    x1={`calc(${x}% - ${boxWidth / 4}px)`}
                                     y1={minY}
-                                    x2={`calc(${x}% + ${boxWidth / 3}px)`}
+                                    x2={`calc(${x}% + ${boxWidth / 4}px)`}
                                     y2={minY}
-                                    stroke={color}
+                                    stroke="#9ca3af"
                                     strokeWidth="2"
-                                    opacity={hoveredIndex === index ? 0.8 : 1}
+                                    opacity={0.7}
                                 />
                                 <line
-                                    x1={`calc(${x}% - ${boxWidth / 3}px)`}
+                                    x1={`calc(${x}% - ${boxWidth / 4}px)`}
                                     y1={maxY}
-                                    x2={`calc(${x}% + ${boxWidth / 3}px)`}
+                                    x2={`calc(${x}% + ${boxWidth / 4}px)`}
                                     y2={maxY}
-                                    stroke={color}
+                                    stroke="#9ca3af"
                                     strokeWidth="2"
-                                    opacity={hoveredIndex === index ? 0.8 : 1}
+                                    opacity={0.7}
                                 />
 
-                                {/* Box (Q1 to Q3) */}
+                                {/* Box (Q1 to Q3) - Main rectangular body */}
                                 <rect
                                     x={`calc(${x}% - ${boxWidth / 2}px)`}
                                     y={q3Y}
                                     width={boxWidth}
-                                    height={Math.max(boxHeight, 1)}
+                                    height={Math.max(boxHeight, 2)}
                                     fill={color}
-                                    stroke="#8b5cf6"
-                                    strokeWidth="2"
-                                    opacity={hoveredIndex === index ? 0.8 : 1}
-                                    rx="3"
+                                    stroke="#7c3aed"
+                                    strokeWidth="2.5"
+                                    opacity={hoveredIndex === index ? 0.95 : 1}
+                                    rx="4"
                                 />
 
-                                {/* Median line */}
+                                {/* Median line - Bold line across the box */}
                                 <line
                                     x1={`calc(${x}% - ${boxWidth / 2}px)`}
                                     y1={medianY}
                                     x2={`calc(${x}% + ${boxWidth / 2}px)`}
                                     y2={medianY}
-                                    stroke="#6d28d9"
-                                    strokeWidth="3"
-                                    opacity={hoveredIndex === index ? 1 : 0.9}
+                                    stroke="#4c1d95"
+                                    strokeWidth="3.5"
+                                    opacity={1}
                                 />
 
-                                {/* Outliers */}
+                                {/* Outliers - Individual points */}
                                 {item.outliers && item.outliers.map((outlier, oi) => {
                                     const outlierY = valueToY(outlier);
                                     return (
@@ -241,11 +243,11 @@ export const BoxPlot: React.FC<BoxPlotProps> = ({
                                             key={oi}
                                             cx={`${x}%`}
                                             cy={outlierY}
-                                            r="3"
-                                            fill={color}
+                                            r="4"
+                                            fill="none"
                                             stroke="#8b5cf6"
-                                            strokeWidth="1.5"
-                                            opacity={hoveredIndex === index ? 0.8 : 1}
+                                            strokeWidth="2"
+                                            opacity={hoveredIndex === index ? 0.9 : 1}
                                         />
                                     );
                                 })}
