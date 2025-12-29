@@ -28,7 +28,7 @@ export interface ThemeColors {
 }
 
 // Classification severity levels
-export type ClasificacionGravedad = 'En blanco' | 'Graves' | 'Gravísimas' | 'Leves';
+export type ClasificacionGravedad = 'Leves' | 'Graves' | 'Gravísimas';
 
 // Data row structure for faltas
 export interface FaltaDataRow {
@@ -107,18 +107,16 @@ export interface DashboardData {
   availableFilters: DashboardState['filters'];
 }
 
-// Severity colors matching the charts
+// Severity colors matching the charts - Pink to Purple gradient
 export const GRAVEDAD_COLORS: Record<ClasificacionGravedad, string> = {
-  'En blanco': '#6B9BD1',  // Blue
-  'Graves': '#E74C3C',      // Red
+  'Leves': '#FFB3D9',       // Light pink
+  'Graves': '#E63C77',      // Darker pink
   'Gravísimas': '#8B4789',  // Purple
-  'Leves': '#27AE60',       // Green
 };
 
-// Severity order for stacking
+// Severity order for stacking (light to dark)
 export const GRAVEDAD_ORDER: ClasificacionGravedad[] = [
-  'En blanco',
+  'Leves',
   'Graves',
-  'Gravísimas',
-  'Leves'
+  'Gravísimas'
 ];

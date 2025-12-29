@@ -63,7 +63,7 @@ const generatePlaceholderData = (): FaltaDataRow[] => {
     'Residuos Peligrosos',
   ];
 
-  const gravedades: Array<'Leves' | 'Graves' | 'Gravísimas' | 'En blanco'> = ['Leves', 'Graves', 'Gravísimas', 'En blanco'];
+  const gravedades: Array<'Leves' | 'Graves' | 'Gravísimas'> = ['Leves', 'Graves', 'Gravísimas'];
 
   const data: FaltaDataRow[] = [];
   let idCounter = 1;
