@@ -26,6 +26,7 @@ export interface GPTDashboardData {
         region: string[];                // e.g., ["Región Metropolitana de Santiago", "Región de Valparaíso"]
         estado_proyecto: string[];       // e.g., ["Aprobado", "En Calificación"]
         etiqueta_inversion: string[];    // e.g., ["Grandes (≥ 100)", "Medianos (≥ 10 - 100)"]
+        ano_presentacion: string[];      // e.g., ["2014", "2015", "2016"]
     };
 
     // Chart data
@@ -58,6 +59,7 @@ export interface GPTRawOutput {
     region?: string[];
     estado_proyecto?: string[];
     etiqueta_inversion?: string[];
+    ano_presentacion?: string[];
 
     // Chart data arrays
     timeSeriesData?: Array<{

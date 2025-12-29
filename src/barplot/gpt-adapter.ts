@@ -156,6 +156,20 @@ const DEFAULT_FILTER_OPTIONS = {
         { label: "Grandes (≥ 100)", value: "Grandes (≥ 100)" },
         { label: "Medianos (≥ 10 - 100)", value: "Medianos (≥ 10 - 100)" },
         { label: "Pequeños (0 - 10)", value: "Pequeños (0 - 10)" }
+    ],
+    ano_presentacion: [
+        { label: "2014", value: "2014" },
+        { label: "2015", value: "2015" },
+        { label: "2016", value: "2016" },
+        { label: "2017", value: "2017" },
+        { label: "2018", value: "2018" },
+        { label: "2019", value: "2019" },
+        { label: "2020", value: "2020" },
+        { label: "2021", value: "2021" },
+        { label: "2022", value: "2022" },
+        { label: "2023", value: "2023" },
+        { label: "2024", value: "2024" },
+        { label: "2025", value: "2025" }
     ]
 };
 
@@ -182,7 +196,8 @@ export function parseGPTOutput(gptOutput: GPTRawOutput): GPTDashboardData {
         tipologia_letra: gptOutput.tipologia_letra || [],
         region: gptOutput.region || [],
         estado_proyecto: gptOutput.estado_proyecto || [],
-        etiqueta_inversion: gptOutput.etiqueta_inversion || []
+        etiqueta_inversion: gptOutput.etiqueta_inversion || [],
+        ano_presentacion: gptOutput.ano_presentacion || []
     };
 
     // Parse chart data
@@ -255,6 +270,14 @@ export function buildFilterConfigs(gptData: GPTDashboardData): FilterConfig[] {
         label: "Nivel de Inversión",
         options: DEFAULT_FILTER_OPTIONS.etiqueta_inversion,
         selectedValues: gptData.filters.etiqueta_inversion,
+        multiSelect: true
+    });
+
+    // Año de Presentación filter
+    filters.push({
+        label: "Año de Presentación",
+        options: DEFAULT_FILTER_OPTIONS.ano_presentacion,
+        selectedValues: gptData.filters.ano_presentacion,
         multiSelect: true
     });
 

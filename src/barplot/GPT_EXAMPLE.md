@@ -30,6 +30,7 @@ window.__GPT_DASHBOARD_DATA__ = {
   region: ["Región Metropolitana de Santiago", "Región de Valparaíso"],
   estado_proyecto: ["Aprobado", "En Calificación"],
   etiqueta_inversion: ["Grandes (≥ 100)", "Medianos (≥ 10 - 100)"],
+  ano_presentacion: ["2020", "2021", "2022", "2023", "2024"],
 
   // Time series data for yearly chart
   timeSeriesData: [
@@ -153,6 +154,20 @@ When GPT outputs numeric values for widgets, use these exact formats:
 - `"Medianos (≥ 10 - 100)"`: Medianos (≥ 10 - 100)
 - `"Pequeños (0 - 10)"`: Pequeños (0 - 10)
 
+### Año de Presentación (ano_presentacion)
+- `"2014"`: 2014
+- `"2015"`: 2015
+- `"2016"`: 2016
+- `"2017"`: 2017
+- `"2018"`: 2018
+- `"2019"`: 2019
+- `"2020"`: 2020
+- `"2021"`: 2021
+- `"2022"`: 2022
+- `"2023"`: 2023
+- `"2024"`: 2024
+- `"2025"`: 2025
+
 ## Chart Data Structure
 
 ### Time Series Data (DataRow)
@@ -228,6 +243,7 @@ window.__GPT_DASHBOARD_DATA__ = {
 
   tipo_ingreso_seia: ["DIA", "EIA"],
   estado_proyecto: ["Aprobado", "En Calificación"],
+  ano_presentacion: ["2020", "2021", "2022", "2023", "2024"],
 
   timeSeriesData: [
     { period: "2020", year: 2020, region: "Nacional", revenue: 680, units: 230, profit: 205 },

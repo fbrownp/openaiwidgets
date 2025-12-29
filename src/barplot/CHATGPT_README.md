@@ -96,7 +96,10 @@ Filters are provided as arrays of selected values:
     estado_proyecto: ["Aprobado", "En Calificación"],
 
     // Nivel de Inversión
-    etiqueta_inversion: ["Grandes (≥ 100)", "Medianos (≥ 10 - 100)"]
+    etiqueta_inversion: ["Grandes (≥ 100)", "Medianos (≥ 10 - 100)"],
+
+    // Año de Presentación
+    ano_presentacion: ["2020", "2021", "2022", "2023", "2024"]
 }
 ```
 
@@ -304,6 +307,22 @@ See full list in DEFAULT_FILTER_OPTIONS in gpt-adapter.ts
 | `"Grandes (≥ 100)"` | Grandes (≥ 100) |
 | `"Medianos (≥ 10 - 100)"` | Medianos (≥ 10 - 100) |
 | `"Pequeños (0 - 10)"` | Pequeños (0 - 10) |
+
+### Año de Presentación (ano_presentacion)
+| Value | Label |
+|-------|-------|
+| `"2014"` | 2014 |
+| `"2015"` | 2015 |
+| `"2016"` | 2016 |
+| `"2017"` | 2017 |
+| `"2018"` | 2018 |
+| `"2019"` | 2019 |
+| `"2020"` | 2020 |
+| `"2021"` | 2021 |
+| `"2022"` | 2022 |
+| `"2023"` | 2023 |
+| `"2024"` | 2024 |
+| `"2025"` | 2025 |
 
 ## 🧪 Testing
 

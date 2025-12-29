@@ -28,7 +28,8 @@ const createDefaultDashboardState = (): GPTDashboardData => ({
         tipologia_letra: [],
         region: [],
         estado_proyecto: [],
-        etiqueta_inversion: []
+        etiqueta_inversion: [],
+        ano_presentacion: []
     },
     charts: {
         timeSeriesData: [],
