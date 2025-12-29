@@ -33,17 +33,31 @@ window.__GPT_DASHBOARD_DATA__ = {
   ano_presentacion: ["2020", "2021", "2022", "2023", "2024"],
 
   // Time series data for yearly chart
+  // NOTE: Each row should include filter fields for proper filtering
   timeSeriesData: [
-    { period: "1992", year: 1992, region: "Metropolitana", cantidad_proyectos: 20, inversion_total: 50 },
-    { period: "1994", year: 1994, region: "O'Higgins", cantidad_proyectos: 45, inversion_total: 120 },
-    { period: "1996", year: 1996, region: "Biobío", cantidad_proyectos: 95, inversion_total: 280 }
+    {
+      period: "1992", year: 1992, region: "Metropolitana",
+      tipo_ingreso_seia: "DIA", tipologia: "a1", tipologia_letra: "a",
+      estado_proyecto: "Aprobado", etiqueta_inversion: "Grandes (≥ 100)", ano_presentacion: 1992,
+      cantidad_proyectos: 20, inversion_total: 50
+    },
+    {
+      period: "1994", year: 1994, region: "O'Higgins",
+      tipo_ingreso_seia: "EIA", tipologia: "ñ7", tipologia_letra: "ñ",
+      estado_proyecto: "En Calificación", etiqueta_inversion: "Medianos (≥ 10 - 100)", ano_presentacion: 1994,
+      cantidad_proyectos: 45, inversion_total: 120
+    }
     // ... more data points
   ],
 
   // Regional data for horizontal bar chart
   regionData: [
-    { period: "Metropolitana", year: 2024, region: "Metropolitana", cantidad_proyectos: 1450, inversion_total: 4200 },
-    { period: "Los Lagos", year: 2024, region: "Los Lagos", cantidad_proyectos: 1300, inversion_total: 3800 }
+    {
+      period: "Metropolitana", year: 2024, region: "Metropolitana",
+      tipo_ingreso_seia: "DIA", tipologia: "a1", tipologia_letra: "a",
+      estado_proyecto: "Aprobado", etiqueta_inversion: "Grandes (≥ 100)", ano_presentacion: 2024,
+      cantidad_proyectos: 1450, inversion_total: 4200
+    }
     // ... more regions
   ],
 
@@ -177,6 +191,16 @@ Required fields:
 - `region`: string (e.g., "Metropolitana")
 - `cantidad_proyectos`: number (count of projects)
 - `inversion_total`: number (total investment amount)
+
+Optional filter fields (enables filtering):
+- `tipo_ingreso_seia`: string (e.g., "DIA", "EIA")
+- `tipologia`: string (e.g., "a1", "ñ7")
+- `tipologia_letra`: string (e.g., "a", "ñ")
+- `estado_proyecto`: string (e.g., "Aprobado")
+- `etiqueta_inversion`: string (e.g., "Grandes (≥ 100)")
+- `ano_presentacion`: number (e.g., 2024)
+
+**Note**: When filter fields are included in chart data, the dashboard will automatically filter charts based on user selections. If a filter has no selections (empty array), all data is shown. Multiple filters are combined with AND logic.
 
 ### Region Data (DataRow)
 Same structure as time series data, but typically one row per region.

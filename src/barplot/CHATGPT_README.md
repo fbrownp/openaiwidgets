@@ -112,12 +112,26 @@ timeSeriesData: [
         period: "2024",              // Display label
         year: 2024,                  // Numeric year
         region: "Nacional",          // Region name
+        // Optional filter fields (enable filtering when included)
+        tipo_ingreso_seia: "DIA",
+        tipologia: "a1",
+        tipologia_letra: "a",
+        estado_proyecto: "Aprobado",
+        etiqueta_inversion: "Grandes (≥ 100)",
+        ano_presentacion: 2024,
+        // Metric fields
         cantidad_proyectos: 450,     // Count of projects
         inversion_total: 1200        // Total investment amount
     },
     // ... more data points
 ]
 ```
+
+**Filter Behavior**:
+- When filter fields are included in chart data, filters will automatically apply to charts
+- Empty filter selections (no values selected) show all data
+- Multiple active filters use AND logic (data must match ALL selected filters)
+- Filters apply to both time series and region charts
 
 **Region Data** (for horizontal bar chart):
 ```javascript

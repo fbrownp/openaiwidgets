@@ -147,6 +147,58 @@ export function Dashboard() {
         );
     };
 
+    // Filter chart data based on selected filters
+    const applyFilters = (rows: DataRow[]): DataRow[] => {
+        return rows.filter(row => {
+            // Map filter labels to data fields
+            const filterMapping: Record<string, keyof DataRow> = {
+                "Tipo de Ingreso": "tipo_ingreso_seia",
+                "Tipología": "tipologia",
+                "Letra de tipología": "tipologia_letra",
+                "Región": "region",
+                "Estado": "estado_proyecto",
+                "Nivel de Inversión": "etiqueta_inversion",
+                "Año de Presentación": "ano_presentacion"
+            };
+
+            // Check all filters
+            for (const filter of filters) {
+                const fieldName = filterMapping[filter.label];
+                if (!fieldName) continue;
+
+                // If filter has selections, check if row matches
+                if (filter.selectedValues.length > 0) {
+                    const rowValue = row[fieldName];
+
+                    // Convert to string for comparison (handles both string and number fields)
+                    const rowValueStr = rowValue?.toString();
+
+                    if (!rowValueStr || !filter.selectedValues.includes(rowValueStr)) {
+                        return false; // Row doesn't match this filter
+                    }
+                }
+            }
+
+            return true; // Row matches all filters
+        });
+    };
+
+    // Apply filters to chart data
+    const filteredTimeSeriesData = useMemo(
+        () => applyFilters(data.charts.timeSeriesData),
+        [data.charts.timeSeriesData, filters]
+    );
+
+    const filteredRegionData = useMemo(
+        () => applyFilters(data.charts.regionData),
+        [data.charts.regionData, filters]
+    );
+
+    const filteredCandlestickData = useMemo(
+        () => data.charts.candlestickData, // Candlestick doesn't need filtering for now
+        [data.charts.candlestickData]
+    );
+
     const metricOptions: MetricOption[] = activeView === 'proyectos'
         ? [
             { label: "Inversión Total", value: "inversion_total" },
@@ -288,7 +340,7 @@ export function Dashboard() {
                     gridTemplateColumns: '1fr',
                     gap: 24
                 }}>
-                    {data.charts.timeSeriesData.length > 0 && (
+                    {filteredTimeSeriesData.length > 0 && (
                         <EnhancedBarplot
                             title={activeView === 'proyectos'
                                 ? "Evolución de Proyectos por Año"
@@ -296,7 +348,7 @@ export function Dashboard() {
                             }
                             metricOptions={metricOptions}
                             selectedMetric={selectedMetric}
-                            rows={data.charts.timeSeriesData}
+                            rows={filteredTimeSeriesData}
                             onMetricChange={setSelectedMetric}
                             twoWayPlot={true}
                             showYAxis={true}
@@ -304,7 +356,7 @@ export function Dashboard() {
                         />
                     )}
 
-                    {data.charts.regionData.length > 0 && (
+                    {filteredRegionData.length > 0 && (
                         <HorizontalBarplot
                             title={activeView === 'proyectos'
                                 ? "Distribución por Región - Inversión"
@@ -312,16 +364,16 @@ export function Dashboard() {
                             }
                             metricOptions={metricOptions}
                             selectedMetric={selectedMetric}
-                            rows={data.charts.regionData}
+                            rows={filteredRegionData}
                             onMetricChange={setSelectedMetric}
                             height={400}
                         />
                     )}
 
-                    {data.charts.candlestickData.length > 0 && (
+                    {filteredCandlestickData.length > 0 && (
                         <CandlestickChart
                             title="Análisis de Volatilidad de Proyectos"
-                            rows={data.charts.candlestickData}
+                            rows={filteredCandlestickData}
                             height={400}
                         />
                     )}

@@ -66,6 +66,14 @@ export interface GPTRawOutput {
         period: string;
         year: number;
         region: string;
+        // Filter fields
+        tipo_ingreso_seia?: string;
+        tipologia?: string;
+        tipologia_letra?: string;
+        estado_proyecto?: string;
+        etiqueta_inversion?: string;
+        ano_presentacion?: number;
+        // Metric fields
         cantidad_proyectos?: number;
         inversion_total?: number;
     }>;
@@ -74,6 +82,14 @@ export interface GPTRawOutput {
         period: string;
         year: number;
         region: string;
+        // Filter fields
+        tipo_ingreso_seia?: string;
+        tipologia?: string;
+        tipologia_letra?: string;
+        estado_proyecto?: string;
+        etiqueta_inversion?: string;
+        ano_presentacion?: number;
+        // Metric fields
         cantidad_proyectos?: number;
         inversion_total?: number;
     }>;

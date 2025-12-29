@@ -8,7 +8,17 @@ export type DataRow = {
     period: string;
     year: number;
     region: string;
-    [key: string]: number | string;
+    // Filter fields from schema
+    tipo_ingreso_seia?: string;
+    tipologia?: string;
+    tipologia_letra?: string;
+    estado_proyecto?: string;
+    etiqueta_inversion?: string;
+    ano_presentacion?: number;
+    // Metric fields
+    cantidad_proyectos?: number;
+    inversion_total?: number;
+    [key: string]: number | string | undefined;
 };
 
 export type FilterOption = {
