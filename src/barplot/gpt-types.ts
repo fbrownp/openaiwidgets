@@ -18,7 +18,7 @@ export interface GPTDashboardData {
         topSectorPercentage: string; // e.g., "22.7"
     };
 
-    // Filter configurations
+    // Filter configurations (selected values)
     filters: {
         tipo_ingreso_seia: string[];    // e.g., ["DIA", "EIA"]
         tipologia: string[];             // e.g., ["a1", "ñ7", "i5"]
@@ -31,6 +31,17 @@ export interface GPTDashboardData {
 
     // Unified data array - single source for all charts
     data: DataRow[];  // Each row contains all filter fields + metrics
+
+    // Optional: Filter options can be provided directly
+    // If not provided, will be extracted from data
+    filterOptions?: {
+        tipo_ingreso_seia?: Array<{ label: string; value: string }>;
+        tipologia_letra?: Array<{ label: string; value: string }>;
+        region?: Array<{ label: string; value: string }>;
+        estado_proyecto?: Array<{ label: string; value: string }>;
+        etiqueta_inversion?: Array<{ label: string; value: string }>;
+        ano_presentacion?: Array<{ label: string; value: string }>;
+    };
 }
 
 /**
@@ -48,7 +59,7 @@ export interface GPTRawOutput {
     topSector?: string;
     topSectorPercentage?: string;
 
-    // Filter values
+    // Filter values (selected values)
     tipo_ingreso_seia?: string[];
     tipologia?: string[];
     tipologia_letra?: string[];
@@ -56,6 +67,17 @@ export interface GPTRawOutput {
     estado_proyecto?: string[];
     etiqueta_inversion?: string[];
     ano_presentacion?: string[];
+
+    // Optional: Filter options can be passed directly from GPT
+    // If not provided, will be extracted from data
+    filterOptions?: {
+        tipo_ingreso_seia?: Array<{ label: string; value: string }>;
+        tipologia_letra?: Array<{ label: string; value: string }>;
+        region?: Array<{ label: string; value: string }>;
+        estado_proyecto?: Array<{ label: string; value: string }>;
+        etiqueta_inversion?: Array<{ label: string; value: string }>;
+        ano_presentacion?: Array<{ label: string; value: string }>;
+    };
 
     // Unified data array - each row contains filter fields + metrics
     // Matches schema: ano_presentacion, tipo_ingreso_seia, tipologia_letra, region, estado_proyecto, cantidad_proyectos, inversion_total

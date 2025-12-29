@@ -191,7 +191,7 @@ export function parseGPTOutput(gptOutput: GPTRawOutput): GPTDashboardData {
 
     // Parse filter values
     const filters = {
-        tipo_ingreso_seia: gptOutput.tipo_ingreso_seia || ["DIA", "EIA"],
+        tipo_ingreso_seia: gptOutput.tipo_ingreso_seia || [],
         tipologia: gptOutput.tipologia || [],
         tipologia_letra: gptOutput.tipologia_letra || [],
         region: gptOutput.region || [],
@@ -207,7 +207,9 @@ export function parseGPTOutput(gptOutput: GPTRawOutput): GPTDashboardData {
         activeView: gptOutput.view || 'proyectos',
         widgets,
         filters,
-        data
+        data,
+        // Pass filterOptions if provided
+        filterOptions: gptOutput.filterOptions
     };
 
     console.log('Parsed dashboard data:', result);
@@ -216,58 +218,115 @@ export function parseGPTOutput(gptOutput: GPTRawOutput): GPTDashboardData {
 }
 
 /**
+ * Extract unique filter values from data
+ */
+function extractUniqueValues(data: Array<any>, field: string): FilterOption[] {
+    const uniqueValues = new Set<string>();
+
+    data.forEach(row => {
+        const value = row[field];
+        if (value !== undefined && value !== null && value !== '') {
+            uniqueValues.add(String(value));
+        }
+    });
+
+    // Convert to FilterOption array and sort
+    return Array.from(uniqueValues)
+        .sort((a, b) => {
+            // Special sorting for years (numeric)
+            if (field === 'ano_presentacion') {
+                return Number(a) - Number(b);
+            }
+            // Alphabetical for others
+            return a.localeCompare(b);
+        })
+        .map(value => ({ label: value, value }));
+}
+
+/**
  * Converts GPT dashboard data into FilterConfig array
+ * Now dynamically builds filters based on actual data values or provided options
  */
 export function buildFilterConfigs(gptData: GPTDashboardData): FilterConfig[] {
     const filters: FilterConfig[] = [];
+    const data = gptData.data || [];
+    const providedOptions = gptData.filterOptions || {};
+
+    // Helper to create filter if data exists for that field
+    const addFilterIfHasData = (
+        label: string,
+        field: string,
+        selectedValues: string[],
+        fallbackOptions?: FilterOption[]
+    ) => {
+        // Priority: 1. Provided options, 2. Extract from data, 3. Fallback to defaults
+        let options: FilterOption[];
+
+        if (providedOptions[field as keyof typeof providedOptions]) {
+            // Use options provided directly from GPT
+            options = providedOptions[field as keyof typeof providedOptions]!;
+        } else if (data.length > 0) {
+            // Extract unique values from data
+            options = extractUniqueValues(data, field);
+        } else {
+            // Fall back to defaults
+            options = fallbackOptions || DEFAULT_FILTER_OPTIONS[field as keyof typeof DEFAULT_FILTER_OPTIONS] || [];
+        }
+
+        // Only add filter if there are options available
+        if (options.length > 0) {
+            filters.push({
+                label,
+                options,
+                selectedValues: selectedValues.filter(v =>
+                    options.some(opt => opt.value === v)
+                ),
+                multiSelect: true
+            });
+        }
+    };
 
     // Tipo de Ingreso filter
-    filters.push({
-        label: "Tipo de Ingreso",
-        options: DEFAULT_FILTER_OPTIONS.tipo_ingreso_seia,
-        selectedValues: gptData.filters.tipo_ingreso_seia,
-        multiSelect: true
-    });
+    addFilterIfHasData(
+        "Tipo de Ingreso",
+        "tipo_ingreso_seia",
+        gptData.filters.tipo_ingreso_seia
+    );
 
     // Letra de tipología filter
-    filters.push({
-        label: "Letra de tipología",
-        options: DEFAULT_FILTER_OPTIONS.tipologia_letra,
-        selectedValues: gptData.filters.tipologia_letra,
-        multiSelect: true
-    });
+    addFilterIfHasData(
+        "Letra de tipología",
+        "tipologia_letra",
+        gptData.filters.tipologia_letra
+    );
 
     // Región filter
-    filters.push({
-        label: "Región",
-        options: DEFAULT_FILTER_OPTIONS.region,
-        selectedValues: gptData.filters.region,
-        multiSelect: true
-    });
+    addFilterIfHasData(
+        "Región",
+        "region",
+        gptData.filters.region
+    );
 
     // Estado filter
-    filters.push({
-        label: "Estado",
-        options: DEFAULT_FILTER_OPTIONS.estado_proyecto,
-        selectedValues: gptData.filters.estado_proyecto,
-        multiSelect: true
-    });
+    addFilterIfHasData(
+        "Estado",
+        "estado_proyecto",
+        gptData.filters.estado_proyecto
+    );
 
     // Nivel de Inversión filter
-    filters.push({
-        label: "Nivel de Inversión",
-        options: DEFAULT_FILTER_OPTIONS.etiqueta_inversion,
-        selectedValues: gptData.filters.etiqueta_inversion,
-        multiSelect: true
-    });
+    addFilterIfHasData(
+        "Nivel de Inversión",
+        "etiqueta_inversion",
+        gptData.filters.etiqueta_inversion
+    );
 
     // Año de Presentación filter
-    filters.push({
-        label: "Año de Presentación",
-        options: DEFAULT_FILTER_OPTIONS.ano_presentacion,
-        selectedValues: gptData.filters.ano_presentacion,
-        multiSelect: true
-    });
+    addFilterIfHasData(
+        "Año de Presentación",
+        "ano_presentacion",
+        gptData.filters.ano_presentacion
+    );
 
     return filters;
 }
