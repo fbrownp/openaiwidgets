@@ -31,11 +31,7 @@ const createDefaultDashboardState = (): GPTDashboardData => ({
         etiqueta_inversion: [],
         ano_presentacion: []
     },
-    charts: {
-        timeSeriesData: [],
-        regionData: [],
-        candlestickData: []
-    }
+    data: []
 });
 
 export function Dashboard() {
@@ -94,17 +90,9 @@ export function Dashboard() {
                     ...baseState.filters,
                     ...incomingData.filters
                 },
-                charts: {
-                    timeSeriesData: incomingData.charts.timeSeriesData.length > 0
-                        ? incomingData.charts.timeSeriesData
-                        : baseState.charts.timeSeriesData,
-                    regionData: incomingData.charts.regionData.length > 0
-                        ? incomingData.charts.regionData
-                        : baseState.charts.regionData,
-                    candlestickData: incomingData.charts.candlestickData.length > 0
-                        ? incomingData.charts.candlestickData
-                        : baseState.charts.candlestickData,
-                }
+                data: incomingData.data.length > 0
+                    ? incomingData.data
+                    : baseState.data
             };
 
             console.log('Updating dashboard state:', nextState);
@@ -147,7 +135,7 @@ export function Dashboard() {
         );
     };
 
-    // Filter chart data based on selected filters
+    // Filter data based on selected filters
     const applyFilters = (rows: DataRow[]): DataRow[] => {
         return rows.filter(row => {
             // Map filter labels to data fields
@@ -183,20 +171,115 @@ export function Dashboard() {
         });
     };
 
-    // Apply filters to chart data
+    // Aggregate data by year for time series chart
+    const aggregateByYear = (rows: DataRow[]): DataRow[] => {
+        const yearMap = new Map<number, { cantidad_proyectos: number; inversion_total: number; row: DataRow }>();
+
+        rows.forEach(row => {
+            const year = row.ano_presentacion || row.year;
+            if (!year) return;
+
+            const existing = yearMap.get(year);
+            if (existing) {
+                existing.cantidad_proyectos += (row.cantidad_proyectos || 0);
+                existing.inversion_total += (row.inversion_total || 0);
+            } else {
+                yearMap.set(year, {
+                    cantidad_proyectos: row.cantidad_proyectos || 0,
+                    inversion_total: row.inversion_total || 0,
+                    row: { ...row, year, period: year.toString() }
+                });
+            }
+        });
+
+        return Array.from(yearMap.values())
+            .map(({ cantidad_proyectos, inversion_total, row }) => ({
+                ...row,
+                cantidad_proyectos,
+                inversion_total
+            }))
+            .sort((a, b) => (a.year || 0) - (b.year || 0));
+    };
+
+    // Aggregate data by region for region chart
+    const aggregateByRegion = (rows: DataRow[]): DataRow[] => {
+        const regionMap = new Map<string, { cantidad_proyectos: number; inversion_total: number; row: DataRow }>();
+
+        rows.forEach(row => {
+            const region = row.region;
+            if (!region) return;
+
+            const existing = regionMap.get(region);
+            if (existing) {
+                existing.cantidad_proyectos += (row.cantidad_proyectos || 0);
+                existing.inversion_total += (row.inversion_total || 0);
+            } else {
+                regionMap.set(region, {
+                    cantidad_proyectos: row.cantidad_proyectos || 0,
+                    inversion_total: row.inversion_total || 0,
+                    row: { ...row, period: region }
+                });
+            }
+        });
+
+        return Array.from(regionMap.values())
+            .map(({ cantidad_proyectos, inversion_total, row }) => ({
+                ...row,
+                cantidad_proyectos,
+                inversion_total
+            }))
+            .sort((a, b) => (b.inversion_total || 0) - (a.inversion_total || 0));
+    };
+
+    // Calculate candlestick data from filtered data
+    const calculateCandlestick = (rows: DataRow[]): CandlestickDataRow[] => {
+        const yearMap = new Map<number, number[]>();
+
+        rows.forEach(row => {
+            const year = row.ano_presentacion || row.year;
+            const value = row.inversion_total;
+            if (!year || value === undefined) return;
+
+            if (!yearMap.has(year)) {
+                yearMap.set(year, []);
+            }
+            yearMap.get(year)!.push(value);
+        });
+
+        return Array.from(yearMap.entries())
+            .map(([year, values]) => {
+                values.sort((a, b) => a - b);
+                return {
+                    period: year.toString(),
+                    year,
+                    open: values[0] || 0,
+                    high: values[values.length - 1] || 0,
+                    low: values[0] || 0,
+                    close: values[Math.floor(values.length / 2)] || 0
+                };
+            })
+            .sort((a, b) => a.year - b.year);
+    };
+
+    // Apply filters and transform data for each chart
+    const filteredData = useMemo(
+        () => applyFilters(data.data),
+        [data.data, filters]
+    );
+
     const filteredTimeSeriesData = useMemo(
-        () => applyFilters(data.charts.timeSeriesData),
-        [data.charts.timeSeriesData, filters]
+        () => aggregateByYear(filteredData),
+        [filteredData]
     );
 
     const filteredRegionData = useMemo(
-        () => applyFilters(data.charts.regionData),
-        [data.charts.regionData, filters]
+        () => aggregateByRegion(filteredData),
+        [filteredData]
     );
 
     const filteredCandlestickData = useMemo(
-        () => data.charts.candlestickData, // Candlestick doesn't need filtering for now
-        [data.charts.candlestickData]
+        () => calculateCandlestick(filteredData),
+        [filteredData]
     );
 
     const metricOptions: MetricOption[] = activeView === 'proyectos'

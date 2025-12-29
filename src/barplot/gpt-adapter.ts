@@ -200,18 +200,14 @@ export function parseGPTOutput(gptOutput: GPTRawOutput): GPTDashboardData {
         ano_presentacion: gptOutput.ano_presentacion || []
     };
 
-    // Parse chart data
-    const charts = {
-        timeSeriesData: gptOutput.timeSeriesData || [],
-        regionData: gptOutput.regionData || [],
-        candlestickData: gptOutput.candlestickData || []
-    };
+    // Parse unified data array (new format) or legacy chart arrays
+    const data = gptOutput.data || [];
 
     const result: GPTDashboardData = {
         activeView: gptOutput.view || 'proyectos',
         widgets,
         filters,
-        charts
+        data
     };
 
     console.log('Parsed dashboard data:', result);

@@ -103,64 +103,49 @@ Filters are provided as arrays of selected values:
 }
 ```
 
-### Chart Data
+### Unified Data Array
 
-**Time Series Data** (for yearly trends):
+**NEW FORMAT**: The dashboard now uses a single unified data array that feeds all three charts:
+
 ```javascript
-timeSeriesData: [
+data: [
     {
-        period: "2024",              // Display label
-        year: 2024,                  // Numeric year
-        region: "Nacional",          // Region name
-        // Optional filter fields (enable filtering when included)
+        // Required fields (matches schema)
+        ano_presentacion: 2022,          // Year of presentation
+        tipo_ingreso_seia: "EIA",        // Type: "DIA" or "EIA"
+        tipologia_letra: "c",            // Typology letter
+        region: "Región del Biobío",     // Chilean region
+        estado_proyecto: "No calificado",// Project state
+        cantidad_proyectos: 1,           // Count of projects
+        inversion_total: 420.0,          // Total investment
+        // Optional fields
+        tipologia: "c1",                 // Full typology code
+        etiqueta_inversion: "Pequeños (0 - 10)"  // Investment category
+    },
+    {
+        ano_presentacion: 2023,
         tipo_ingreso_seia: "DIA",
-        tipologia: "a1",
         tipologia_letra: "a",
+        region: "Región Metropolitana de Santiago",
         estado_proyecto: "Aprobado",
-        etiqueta_inversion: "Grandes (≥ 100)",
-        ano_presentacion: 2024,
-        // Metric fields
-        cantidad_proyectos: 450,     // Count of projects
-        inversion_total: 1200        // Total investment amount
-    },
+        cantidad_proyectos: 5,
+        inversion_total: 1500.0,
+        tipologia: "a1",
+        etiqueta_inversion: "Medianos (≥ 10 - 100)"
+    }
     // ... more data points
 ]
 ```
 
-**Filter Behavior**:
-- When filter fields are included in chart data, filters will automatically apply to charts
-- Empty filter selections (no values selected) show all data
-- Multiple active filters use AND logic (data must match ALL selected filters)
-- Filters apply to both time series and region charts
-
-**Region Data** (for horizontal bar chart):
-```javascript
-regionData: [
-    {
-        period: "Metropolitana",     // Region label
-        year: 2024,
-        region: "Metropolitana",
-        cantidad_proyectos: 1450,    // Count of projects
-        inversion_total: 4200        // Total investment amount
-    },
-    // ... more regions
-]
-```
-
-**Candlestick Data** (for volatility):
-```javascript
-candlestickData: [
-    {
-        period: "2024",
-        year: 2024,
-        open: 420,
-        high: 450,
-        low: 350,
-        close: 380
-    },
-    // ... more data points
-]
-```
+**How it Works**:
+- Single data array contains raw data matching your database schema
+- Dashboard automatically generates 3 charts from this data:
+  1. **Time Series**: Aggregates by year (ano_presentacion)
+  2. **Region Chart**: Aggregates by region
+  3. **Candlestick**: Calculates OHLC from inversion_total by year
+- Filters apply to the base data before chart generation
+- Empty filter selections show all data
+- Multiple filters use AND logic
 
 ## 🎯 Example GPT Interactions
 
@@ -177,15 +162,10 @@ window.renderDashboard({
     topSector: "Industria",
     topSectorPercentage: "22.7",
 
-    timeSeriesData: [
-        { period: "2020", year: 2020, region: "Nacional", cantidad_proyectos: 230, inversion_total: 680 },
-        { period: "2022", year: 2022, region: "Nacional", cantidad_proyectos: 140, inversion_total: 420 },
-        { period: "2024", year: 2024, region: "Nacional", cantidad_proyectos: 125, inversion_total: 380 }
-    ],
-
-    regionData: [
-        { period: "Metropolitana", year: 2024, region: "Metropolitana", cantidad_proyectos: 1450, inversion_total: 4200 },
-        { period: "Valparaíso", year: 2024, region: "Valparaíso", cantidad_proyectos: 915, inversion_total: 2680 }
+    data: [
+        { ano_presentacion: 2020, tipo_ingreso_seia: "DIA", tipologia_letra: "a", region: "Región Metropolitana de Santiago", estado_proyecto: "Aprobado", cantidad_proyectos: 230, inversion_total: 680 },
+        { ano_presentacion: 2022, tipo_ingreso_seia: "EIA", tipologia_letra: "c", region: "Región de Valparaíso", estado_proyecto: "En Calificación", cantidad_proyectos: 140, inversion_total: 420 },
+        { ano_presentacion: 2024, tipo_ingreso_seia: "DIA", tipologia_letra: "b", region: "Región del Biobío", estado_proyecto: "Aprobado", cantidad_proyectos: 125, inversion_total: 380 }
     ]
 });
 ```

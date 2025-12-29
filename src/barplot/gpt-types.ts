@@ -29,12 +29,8 @@ export interface GPTDashboardData {
         ano_presentacion: string[];      // e.g., ["2014", "2015", "2016"]
     };
 
-    // Chart data
-    charts: {
-        timeSeriesData: DataRow[];        // For yearly bar chart
-        regionData: DataRow[];             // For regional horizontal bar chart
-        candlestickData: CandlestickDataRow[]; // For volatility chart
-    };
+    // Unified data array - single source for all charts
+    data: DataRow[];  // Each row contains all filter fields + metrics
 }
 
 /**
@@ -61,19 +57,32 @@ export interface GPTRawOutput {
     etiqueta_inversion?: string[];
     ano_presentacion?: string[];
 
-    // Chart data arrays
+    // Unified data array - each row contains filter fields + metrics
+    // Matches schema: ano_presentacion, tipo_ingreso_seia, tipologia_letra, region, estado_proyecto, cantidad_proyectos, inversion_total
+    data?: Array<{
+        ano_presentacion: number;        // Year of presentation
+        tipo_ingreso_seia: string;       // Type of SEIA entry
+        tipologia_letra: string;         // Typology letter
+        region: string;                  // Region
+        estado_proyecto: string;         // Project state
+        cantidad_proyectos: number;      // Count of projects
+        inversion_total: number;         // Total investment
+        // Optional fields
+        tipologia?: string;              // Full typology code
+        etiqueta_inversion?: string;     // Investment label
+    }>;
+
+    // Legacy support - will be deprecated
     timeSeriesData?: Array<{
         period: string;
         year: number;
         region: string;
-        // Filter fields
         tipo_ingreso_seia?: string;
         tipologia?: string;
         tipologia_letra?: string;
         estado_proyecto?: string;
         etiqueta_inversion?: string;
         ano_presentacion?: number;
-        // Metric fields
         cantidad_proyectos?: number;
         inversion_total?: number;
     }>;
@@ -82,14 +91,12 @@ export interface GPTRawOutput {
         period: string;
         year: number;
         region: string;
-        // Filter fields
         tipo_ingreso_seia?: string;
         tipologia?: string;
         tipologia_letra?: string;
         estado_proyecto?: string;
         etiqueta_inversion?: string;
         ano_presentacion?: number;
-        // Metric fields
         cantidad_proyectos?: number;
         inversion_total?: number;
     }>;
