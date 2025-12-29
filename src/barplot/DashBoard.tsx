@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useRef } from 'react';
-import { CandlestickChart } from './CandlestickChart';
+import { BoxPlot } from './BoxPlot';
 import { DropdownFilter } from './DropdownFilter';
 import { EnhancedBarplot } from './EnhancedBarplot';
 import { buildFilterConfigs, parseGPTOutput } from './gpt-adapter';
 import { GPTDashboardData, GPTRawOutput } from './gpt-types';
 import { HorizontalBarplot } from './HorizontalBarplot';
-import { FilterConfig, MetricOption } from './types';
+import { FilterConfig, MetricOption, DataRow, BoxPlotDataRow } from './types';
 import { WidgetCard } from './WidgetCard';
 
 // Import hooks from parent directory
@@ -231,13 +231,13 @@ export function Dashboard() {
             .sort((a, b) => (b.inversion_total || 0) - (a.inversion_total || 0));
     };
 
-    // Calculate candlestick data from filtered data
-    const calculateCandlestick = (rows: DataRow[]): CandlestickDataRow[] => {
+    // Calculate box plot data from filtered data
+    const calculateBoxPlot = (rows: DataRow[], metric: string): BoxPlotDataRow[] => {
         const yearMap = new Map<number, number[]>();
 
         rows.forEach(row => {
             const year = row.ano_presentacion || row.year;
-            const value = row.inversion_total;
+            const value = row[metric] as number;
             if (!year || value === undefined) return;
 
             if (!yearMap.has(year)) {
@@ -249,15 +249,43 @@ export function Dashboard() {
         return Array.from(yearMap.entries())
             .map(([year, values]) => {
                 values.sort((a, b) => a - b);
+                const n = values.length;
+
+                if (n === 0) {
+                    return null;
+                }
+
+                // Calculate quartiles
+                const min = values[0];
+                const max = values[n - 1];
+                const median = n % 2 === 0
+                    ? (values[Math.floor(n / 2) - 1] + values[Math.floor(n / 2)]) / 2
+                    : values[Math.floor(n / 2)];
+                const q1 = n >= 4
+                    ? (values[Math.floor(n / 4)] + values[Math.ceil(n / 4) - 1]) / 2
+                    : values[0];
+                const q3 = n >= 4
+                    ? (values[Math.floor(3 * n / 4)] + values[Math.ceil(3 * n / 4) - 1]) / 2
+                    : values[n - 1];
+
+                // Calculate IQR and identify outliers
+                const iqr = q3 - q1;
+                const lowerBound = q1 - 1.5 * iqr;
+                const upperBound = q3 + 1.5 * iqr;
+                const outliers = values.filter(v => v < lowerBound || v > upperBound);
+
                 return {
                     period: year.toString(),
                     year,
-                    open: values[0] || 0,
-                    high: values[values.length - 1] || 0,
-                    low: values[0] || 0,
-                    close: values[Math.floor(values.length / 2)] || 0
+                    min,
+                    q1,
+                    median,
+                    q3,
+                    max,
+                    outliers: outliers.length > 0 ? outliers : undefined
                 };
             })
+            .filter((item): item is BoxPlotDataRow => item !== null)
             .sort((a, b) => a.year - b.year);
     };
 
@@ -277,9 +305,9 @@ export function Dashboard() {
         [filteredData]
     );
 
-    const filteredCandlestickData = useMemo(
-        () => calculateCandlestick(filteredData),
-        [filteredData]
+    const filteredBoxPlotData = useMemo(
+        () => calculateBoxPlot(filteredData, selectedMetric),
+        [filteredData, selectedMetric]
     );
 
     const metricOptions: MetricOption[] = activeView === 'proyectos'
@@ -453,10 +481,13 @@ export function Dashboard() {
                         />
                     )}
 
-                    {filteredCandlestickData.length > 0 && (
-                        <CandlestickChart
-                            title="Análisis de Volatilidad de Proyectos"
-                            rows={filteredCandlestickData}
+                    {filteredBoxPlotData.length > 0 && (
+                        <BoxPlot
+                            title={activeView === 'proyectos'
+                                ? `Distribución de ${selectedMetric === 'inversion_total' ? 'Inversión' : 'Proyectos'} por Año`
+                                : `Distribución de ${selectedMetric === 'cantidad_proyectos' ? 'Proyectos' : 'Empleos'} por Año`
+                            }
+                            rows={filteredBoxPlotData}
                             height={400}
                         />
                     )}

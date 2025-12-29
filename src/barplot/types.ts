@@ -72,6 +72,23 @@ export type CandlestickDataRow = {
     close: number;
 };
 
+export type BoxPlotDataRow = {
+    period: string;
+    year: number;
+    min: number;
+    q1: number;
+    median: number;
+    q3: number;
+    max: number;
+    outliers?: number[];
+};
+
+export type BoxPlotProps = {
+    title: string;
+    rows: BoxPlotDataRow[];
+    height?: number;
+};
+
 // ADD THESE NEW TYPES FOR OPENAI INTEGRATION
 export type UnknownObject = Record<string, unknown>;
 
