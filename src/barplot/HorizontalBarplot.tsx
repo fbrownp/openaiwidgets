@@ -7,20 +7,32 @@ export const HorizontalBarplot: React.FC<BarplotProps> = ({
     selectedMetric,
     rows,
     onMetricChange,
-    height = 500
+    height = 500,
+    themeColors
 }) => {
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
+    // Default to light theme colors if not provided
+    const colors = themeColors || {
+        cardBackground: 'white',
+        cardBorder: '#f0f0f0',
+        text: '#111827',
+        textSecondary: '#6b7280',
+        buttonHover: '#f3f4f6',
+        purple: '#8b5cf6',
+        purpleDark: '#7c3aed'
+    };
 
     if (!rows || rows.length === 0) {
         return (
             <div style={{
-                backgroundColor: 'white',
+                backgroundColor: colors.cardBackground,
                 borderRadius: 12,
                 padding: 24,
                 boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-                border: '1px solid #f0f0f0'
+                border: `1px solid ${colors.cardBorder}`
             }}>
-                <div style={{ textAlign: 'center', color: '#6b7280', padding: 40 }}>
+                <div style={{ textAlign: 'center', color: colors.textSecondary, padding: 40 }}>
                     No data available
                 </div>
             </div>
@@ -49,11 +61,11 @@ export const HorizontalBarplot: React.FC<BarplotProps> = ({
 
     return (
         <div style={{
-            backgroundColor: 'white',
+            backgroundColor: colors.cardBackground,
             borderRadius: 12,
             padding: 24,
             boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-            border: '1px solid #f0f0f0',
+            border: `1px solid ${colors.cardBorder}`,
             position: 'relative'
         }}>
             {/* Header */}
@@ -68,13 +80,13 @@ export const HorizontalBarplot: React.FC<BarplotProps> = ({
                 <div style={{
                     fontSize: 15,
                     fontWeight: 600,
-                    color: '#111827',
+                    color: colors.text,
                     display: 'flex',
                     alignItems: 'center',
                     gap: 4
                 }}>
                     {title}
-                    <span style={{ fontSize: 10, color: '#6b7280' }}>¹</span>
+                    <span style={{ fontSize: 10, color: colors.textSecondary }}>¹</span>
                 </div>
             </div>
 
@@ -109,7 +121,7 @@ export const HorizontalBarplot: React.FC<BarplotProps> = ({
                             <div style={{
                                 width: 120,
                                 fontSize: 12,
-                                color: '#374151',
+                                color: colors.text,
                                 fontWeight: 500,
                                 textAlign: 'right',
                                 flexShrink: 0,
@@ -125,7 +137,7 @@ export const HorizontalBarplot: React.FC<BarplotProps> = ({
                                 flex: 1,
                                 position: 'relative',
                                 height: barHeight,
-                                backgroundColor: '#f3f4f6',
+                                backgroundColor: colors.buttonHover,
                                 borderRadius: 4,
                                 overflow: 'hidden'
                             }}>
@@ -153,7 +165,7 @@ export const HorizontalBarplot: React.FC<BarplotProps> = ({
                                         <span style={{
                                             fontSize: 11,
                                             fontWeight: 600,
-                                            color: barWidth > 50 ? 'white' : '#374151'
+                                            color: barWidth > 50 ? 'white' : colors.text
                                         }}>
                                             {formatNumber(value)}
                                         </span>
@@ -167,7 +179,7 @@ export const HorizontalBarplot: React.FC<BarplotProps> = ({
                                     width: 60,
                                     fontSize: 11,
                                     fontWeight: 600,
-                                    color: '#6b7280',
+                                    color: colors.textSecondary,
                                     flexShrink: 0
                                 }}>
                                     {formatNumber(value)}

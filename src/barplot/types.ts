@@ -49,6 +49,7 @@ export type BarplotProps = {
     twoWayPlot?: boolean;
     showYAxis?: boolean;
     height?: number;
+    themeColors?: ThemeColors;
 };
 
 export type WidgetCardProps = {

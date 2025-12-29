@@ -62,25 +62,25 @@ const getThemeColors = (theme: Theme): ThemeColors => {
         };
     } else {
         return {
-            background: '#0f172a',
-            cardBackground: '#1e293b',
-            cardBorder: '#334155',
-            text: '#f1f5f9',
-            textSecondary: '#94a3b8',
-            buttonText: '#cbd5e1',
+            background: '#212121',
+            cardBackground: '#2d2d2d',
+            cardBorder: '#404040',
+            text: '#ffffff',
+            textSecondary: '#b0b0b0',
+            buttonText: '#e0e0e0',
             buttonBackground: 'transparent',
-            buttonHover: '#334155',
-            buttonActiveBg: '#7c3aed',
+            buttonHover: '#404040',
+            buttonActiveBg: '#8b5cf6',
             buttonActiveText: 'white',
-            purple: '#8b5cf6',
-            purpleDark: '#7c3aed',
-            purpleLight: '#4c1d95',
-            border: '#334155',
-            borderLight: '#475569',
-            gridLine: '#334155',
-            dropdownBg: '#1e293b',
-            dropdownBorder: '#475569',
-            dropdownHover: '#334155',
+            purple: '#a78bfa',
+            purpleDark: '#8b5cf6',
+            purpleLight: '#6d28d9',
+            border: '#404040',
+            borderLight: '#4a4a4a',
+            gridLine: '#404040',
+            dropdownBg: '#2d2d2d',
+            dropdownBorder: '#4a4a4a',
+            dropdownHover: '#404040',
             dropdownSelected: '#4c1d95'
         };
     }
@@ -561,6 +561,7 @@ export function Dashboard() {
                             twoWayPlot={true}
                             showYAxis={true}
                             height={280}
+                            themeColors={themeColors}
                         />
                     )}
 
@@ -575,6 +576,7 @@ export function Dashboard() {
                             rows={filteredRegionData}
                             onMetricChange={setSelectedMetric}
                             height={280}
+                            themeColors={themeColors}
                         />
                     )}
                 </div>
