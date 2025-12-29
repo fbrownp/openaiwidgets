@@ -120,13 +120,13 @@ export function Dashboard() {
         data.activeView
     );
     const [selectedMetric, setSelectedMetric] = React.useState<string>(
-        activeView === 'proyectos' ? 'revenue' : 'units'
+        activeView === 'proyectos' ? 'inversion_total' : 'cantidad_proyectos'
     );
 
     // Update view when data changes
     useEffect(() => {
         setActiveView(data.activeView);
-        setSelectedMetric(data.activeView === 'proyectos' ? 'revenue' : 'units');
+        setSelectedMetric(data.activeView === 'proyectos' ? 'inversion_total' : 'cantidad_proyectos');
     }, [data.activeView]);
 
     // Build filter configurations
@@ -149,14 +149,12 @@ export function Dashboard() {
 
     const metricOptions: MetricOption[] = activeView === 'proyectos'
         ? [
-            { label: "Inversión", value: "revenue" },
-            { label: "Empleos", value: "units" },
-            { label: "Beneficio", value: "profit" }
+            { label: "Inversión Total", value: "inversion_total" },
+            { label: "Cantidad de Proyectos", value: "cantidad_proyectos" }
         ]
         : [
-            { label: "Empleos", value: "units" },
-            { label: "Inversión", value: "revenue" },
-            { label: "Beneficio", value: "profit" }
+            { label: "Cantidad de Proyectos", value: "cantidad_proyectos" },
+            { label: "Inversión Total", value: "inversion_total" }
         ];
 
     return (
@@ -206,7 +204,7 @@ export function Dashboard() {
                         <button
                             onClick={() => {
                                 setActiveView('proyectos');
-                                setSelectedMetric('revenue');
+                                setSelectedMetric('inversion_total');
                             }}
                             style={{
                                 padding: '8px 16px',
@@ -225,7 +223,7 @@ export function Dashboard() {
                         <button
                             onClick={() => {
                                 setActiveView('empleo');
-                                setSelectedMetric('units');
+                                setSelectedMetric('cantidad_proyectos');
                             }}
                             style={{
                                 padding: '8px 16px',

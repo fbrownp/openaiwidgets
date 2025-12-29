@@ -66,18 +66,16 @@ export interface GPTRawOutput {
         period: string;
         year: number;
         region: string;
-        revenue?: number;
-        units?: number;
-        profit?: number;
+        cantidad_proyectos?: number;
+        inversion_total?: number;
     }>;
 
     regionData?: Array<{
         period: string;
         year: number;
         region: string;
-        revenue?: number;
-        units?: number;
-        profit?: number;
+        cantidad_proyectos?: number;
+        inversion_total?: number;
     }>;
 
     candlestickData?: Array<{

@@ -34,16 +34,16 @@ window.__GPT_DASHBOARD_DATA__ = {
 
   // Time series data for yearly chart
   timeSeriesData: [
-    { period: "1992", year: 1992, region: "Metropolitana", revenue: 50, units: 20, profit: 15 },
-    { period: "1994", year: 1994, region: "O'Higgins", revenue: 120, units: 45, profit: 35 },
-    { period: "1996", year: 1996, region: "Biobío", revenue: 280, units: 95, profit: 85 }
+    { period: "1992", year: 1992, region: "Metropolitana", cantidad_proyectos: 20, inversion_total: 50 },
+    { period: "1994", year: 1994, region: "O'Higgins", cantidad_proyectos: 45, inversion_total: 120 },
+    { period: "1996", year: 1996, region: "Biobío", cantidad_proyectos: 95, inversion_total: 280 }
     // ... more data points
   ],
 
   // Regional data for horizontal bar chart
   regionData: [
-    { period: "Metropolitana", year: 2024, region: "Metropolitana", revenue: 4200, units: 1450, profit: 1260 },
-    { period: "Los Lagos", year: 2024, region: "Los Lagos", revenue: 3800, units: 1300, profit: 1140 }
+    { period: "Metropolitana", year: 2024, region: "Metropolitana", cantidad_proyectos: 1450, inversion_total: 4200 },
+    { period: "Los Lagos", year: 2024, region: "Los Lagos", cantidad_proyectos: 1300, inversion_total: 3800 }
     // ... more regions
   ],
 
@@ -71,11 +71,11 @@ window.renderDashboard({
   topSector: "Industria",
   topSectorPercentage: "22.7",
   timeSeriesData: [
-    { period: "2024", year: 2024, region: "Nacional", revenue: 1200, units: 450, profit: 380 }
+    { period: "2024", year: 2024, region: "Nacional", cantidad_proyectos: 450, inversion_total: 1200 }
   ],
   regionData: [
-    { period: "Metropolitana", year: 2024, region: "Metropolitana", revenue: 4200, units: 1450, profit: 1260 },
-    { period: "Valparaíso", year: 2024, region: "Valparaíso", revenue: 2680, units: 915, profit: 804 }
+    { period: "Metropolitana", year: 2024, region: "Metropolitana", cantidad_proyectos: 1450, inversion_total: 4200 },
+    { period: "Valparaíso", year: 2024, region: "Valparaíso", cantidad_proyectos: 915, inversion_total: 2680 }
   ]
 });
 ```
@@ -175,9 +175,8 @@ Required fields:
 - `period`: string (display label, e.g., "1992")
 - `year`: number (e.g., 1992)
 - `region`: string (e.g., "Metropolitana")
-- `revenue`: number (used for 'proyectos' view)
-- `units`: number (used for 'empleo' view)
-- `profit`: number (optional)
+- `cantidad_proyectos`: number (count of projects)
+- `inversion_total`: number (total investment amount)
 
 ### Region Data (DataRow)
 Same structure as time series data, but typically one row per region.
@@ -246,15 +245,15 @@ window.__GPT_DASHBOARD_DATA__ = {
   ano_presentacion: ["2020", "2021", "2022", "2023", "2024"],
 
   timeSeriesData: [
-    { period: "2020", year: 2020, region: "Nacional", revenue: 680, units: 230, profit: 205 },
-    { period: "2022", year: 2022, region: "Nacional", revenue: 420, units: 140, profit: 125 },
-    { period: "2024", year: 2024, region: "Nacional", revenue: 380, units: 125, profit: 115 }
+    { period: "2020", year: 2020, region: "Nacional", cantidad_proyectos: 230, inversion_total: 680 },
+    { period: "2022", year: 2022, region: "Nacional", cantidad_proyectos: 140, inversion_total: 420 },
+    { period: "2024", year: 2024, region: "Nacional", cantidad_proyectos: 125, inversion_total: 380 }
   ],
 
   regionData: [
-    { period: "Metropolitana", year: 2024, region: "Metropolitana", revenue: 4200, units: 1450, profit: 1260 },
-    { period: "Los Lagos", year: 2024, region: "Los Lagos", revenue: 3800, units: 1300, profit: 1140 },
-    { period: "Valparaíso", year: 2024, region: "Valparaíso", revenue: 2680, units: 915, profit: 804 }
+    { period: "Metropolitana", year: 2024, region: "Metropolitana", cantidad_proyectos: 1450, inversion_total: 4200 },
+    { period: "Los Lagos", year: 2024, region: "Los Lagos", cantidad_proyectos: 1300, inversion_total: 3800 },
+    { period: "Valparaíso", year: 2024, region: "Valparaíso", cantidad_proyectos: 915, inversion_total: 2680 }
   ],
 
   candlestickData: [

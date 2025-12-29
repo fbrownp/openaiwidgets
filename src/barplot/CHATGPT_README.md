@@ -109,12 +109,11 @@ Filters are provided as arrays of selected values:
 ```javascript
 timeSeriesData: [
     {
-        period: "2024",        // Display label
-        year: 2024,            // Numeric year
-        region: "Nacional",    // Region name
-        revenue: 1200,         // Used for 'proyectos' view
-        units: 450,            // Used for 'empleo' view
-        profit: 380            // Optional
+        period: "2024",              // Display label
+        year: 2024,                  // Numeric year
+        region: "Nacional",          // Region name
+        cantidad_proyectos: 450,     // Count of projects
+        inversion_total: 1200        // Total investment amount
     },
     // ... more data points
 ]
@@ -124,12 +123,11 @@ timeSeriesData: [
 ```javascript
 regionData: [
     {
-        period: "Metropolitana",  // Region label
+        period: "Metropolitana",     // Region label
         year: 2024,
         region: "Metropolitana",
-        revenue: 4200,            // Used for 'proyectos'
-        units: 1450,              // Used for 'empleo'
-        profit: 1260
+        cantidad_proyectos: 1450,    // Count of projects
+        inversion_total: 4200        // Total investment amount
     },
     // ... more regions
 ]
@@ -166,14 +164,14 @@ window.renderDashboard({
     topSectorPercentage: "22.7",
 
     timeSeriesData: [
-        { period: "2020", year: 2020, region: "Nacional", revenue: 680, units: 230, profit: 205 },
-        { period: "2022", year: 2022, region: "Nacional", revenue: 420, units: 140, profit: 125 },
-        { period: "2024", year: 2024, region: "Nacional", revenue: 380, units: 125, profit: 115 }
+        { period: "2020", year: 2020, region: "Nacional", cantidad_proyectos: 230, inversion_total: 680 },
+        { period: "2022", year: 2022, region: "Nacional", cantidad_proyectos: 140, inversion_total: 420 },
+        { period: "2024", year: 2024, region: "Nacional", cantidad_proyectos: 125, inversion_total: 380 }
     ],
 
     regionData: [
-        { period: "Metropolitana", year: 2024, region: "Metropolitana", revenue: 4200, units: 1450, profit: 1260 },
-        { period: "Valparaíso", year: 2024, region: "Valparaíso", revenue: 2680, units: 915, profit: 804 }
+        { period: "Metropolitana", year: 2024, region: "Metropolitana", cantidad_proyectos: 1450, inversion_total: 4200 },
+        { period: "Valparaíso", year: 2024, region: "Valparaíso", cantidad_proyectos: 915, inversion_total: 2680 }
     ]
 });
 ```
