@@ -197,7 +197,6 @@ export function Dashboard() {
             // Map filter labels to data fields
             const filterMapping: Record<string, keyof DataRow> = {
                 "Tipo de Ingreso": "tipo_ingreso_seia",
-                "Tipología": "tipologia",
                 "Letra de tipología": "tipologia_letra",
                 "Región": "region",
                 "Estado": "estado_proyecto",

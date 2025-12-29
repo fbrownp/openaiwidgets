@@ -229,14 +229,6 @@ export function buildFilterConfigs(gptData: GPTDashboardData): FilterConfig[] {
         multiSelect: true
     });
 
-    // Tipología filter
-    filters.push({
-        label: "Tipología",
-        options: DEFAULT_FILTER_OPTIONS.tipologia,
-        selectedValues: gptData.filters.tipologia,
-        multiSelect: true
-    });
-
     // Letra de tipología filter
     filters.push({
         label: "Letra de tipología",
