@@ -383,14 +383,16 @@ export function Dashboard() {
             <div style={{ maxWidth: 1400, margin: '0 auto' }}>
                 {/* Header */}
                 <div style={{
-                    marginBottom: 24,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    flexWrap: 'wrap',
-                    gap: 16
+                    marginBottom: 16
                 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        justifyContent: 'space-between',
+                        flexWrap: 'wrap',
+                        gap: 16,
+                        marginBottom: 12
+                    }}>
                         <div>
                             <h1 style={{
                                 margin: 0,
@@ -398,7 +400,7 @@ export function Dashboard() {
                                 fontWeight: 700,
                                 color: themeColors.text
                             }}>
-                                Dashboard de Proyectos y Empleo
+                                Dashboard de Proyectos e Inversión
                             </h1>
                             <p style={{
                                 margin: '4px 0 0 0',
@@ -409,7 +411,7 @@ export function Dashboard() {
                             </p>
                         </div>
 
-                        {/* Theme Toggle */}
+                        {/* View Toggle - Right side */}
                         <div style={{
                             display: 'flex',
                             gap: 8,
@@ -419,86 +421,87 @@ export function Dashboard() {
                             border: `1px solid ${themeColors.border}`
                         }}>
                             <button
-                                onClick={() => setTheme('light')}
+                                onClick={() => {
+                                    setActiveView('proyectos');
+                                    setSelectedMetric('cantidad_proyectos');
+                                }}
                                 style={{
                                     padding: '8px 16px',
                                     borderRadius: 6,
                                     border: 'none',
-                                    backgroundColor: theme === 'light' ? themeColors.buttonActiveBg : themeColors.buttonBackground,
-                                    color: theme === 'light' ? themeColors.buttonActiveText : themeColors.buttonText,
+                                    backgroundColor: activeView === 'proyectos' ? themeColors.buttonActiveBg : themeColors.buttonBackground,
+                                    color: activeView === 'proyectos' ? themeColors.buttonActiveText : themeColors.buttonText,
                                     fontSize: 14,
                                     fontWeight: 500,
                                     cursor: 'pointer',
                                     transition: 'all 0.2s'
                                 }}
                             >
-                                Blanco
+                                Proyectos
                             </button>
                             <button
-                                onClick={() => setTheme('dark')}
+                                onClick={() => {
+                                    setActiveView('inversion');
+                                    setSelectedMetric('inversion_total');
+                                }}
                                 style={{
                                     padding: '8px 16px',
                                     borderRadius: 6,
                                     border: 'none',
-                                    backgroundColor: theme === 'dark' ? themeColors.buttonActiveBg : themeColors.buttonBackground,
-                                    color: theme === 'dark' ? themeColors.buttonActiveText : themeColors.buttonText,
+                                    backgroundColor: activeView === 'inversion' ? themeColors.buttonActiveBg : themeColors.buttonBackground,
+                                    color: activeView === 'inversion' ? themeColors.buttonActiveText : themeColors.buttonText,
                                     fontSize: 14,
                                     fontWeight: 500,
                                     cursor: 'pointer',
                                     transition: 'all 0.2s'
                                 }}
                             >
-                                Oscuro
+                                Inversión
                             </button>
                         </div>
                     </div>
 
-                    {/* View Toggle */}
+                    {/* Theme Toggle - Below title on left */}
                     <div style={{
                         display: 'flex',
                         gap: 8,
                         backgroundColor: themeColors.cardBackground,
                         padding: 4,
                         borderRadius: 8,
-                        border: `1px solid ${themeColors.border}`
+                        border: `1px solid ${themeColors.border}`,
+                        width: 'fit-content'
                     }}>
                         <button
-                            onClick={() => {
-                                setActiveView('proyectos');
-                                setSelectedMetric('cantidad_proyectos');
-                            }}
+                            onClick={() => setTheme('light')}
                             style={{
-                                padding: '8px 16px',
+                                padding: '6px 14px',
                                 borderRadius: 6,
                                 border: 'none',
-                                backgroundColor: activeView === 'proyectos' ? themeColors.buttonActiveBg : themeColors.buttonBackground,
-                                color: activeView === 'proyectos' ? themeColors.buttonActiveText : themeColors.buttonText,
-                                fontSize: 14,
+                                backgroundColor: theme === 'light' ? themeColors.buttonActiveBg : themeColors.buttonBackground,
+                                color: theme === 'light' ? themeColors.buttonActiveText : themeColors.buttonText,
+                                fontSize: 13,
                                 fontWeight: 500,
                                 cursor: 'pointer',
                                 transition: 'all 0.2s'
                             }}
                         >
-                            Proyectos
+                            Blanco
                         </button>
                         <button
-                            onClick={() => {
-                                setActiveView('inversion');
-                                setSelectedMetric('inversion_total');
-                            }}
+                            onClick={() => setTheme('dark')}
                             style={{
-                                padding: '8px 16px',
+                                padding: '6px 14px',
                                 borderRadius: 6,
                                 border: 'none',
-                                backgroundColor: activeView === 'inversion' ? themeColors.buttonActiveBg : themeColors.buttonBackground,
-                                color: activeView === 'inversion' ? themeColors.buttonActiveText : themeColors.buttonText,
-                                fontSize: 14,
+                                backgroundColor: theme === 'dark' ? themeColors.buttonActiveBg : themeColors.buttonBackground,
+                                color: theme === 'dark' ? themeColors.buttonActiveText : themeColors.buttonText,
+                                fontSize: 13,
                                 fontWeight: 500,
                                 cursor: 'pointer',
                                 transition: 'all 0.2s'
                             }}
                         >
-                            Inversión
+                            Oscuro
                         </button>
                     </div>
                 </div>
