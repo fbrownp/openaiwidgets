@@ -516,7 +516,7 @@ export function Dashboard() {
                 {/* Widget Cards */}
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                    gridTemplateColumns: 'repeat(3, 1fr)',
                     gap: 16,
                     marginTop: 24,
                     marginBottom: 24
@@ -545,8 +545,8 @@ export function Dashboard() {
                 {/* Charts */}
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: '1fr',
-                    gap: 24
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: 16
                 }}>
                     {filteredTimeSeriesData.length > 0 && (
                         <EnhancedBarplot
@@ -560,7 +560,7 @@ export function Dashboard() {
                             onMetricChange={setSelectedMetric}
                             twoWayPlot={true}
                             showYAxis={true}
-                            height={300}
+                            height={280}
                         />
                     )}
 
@@ -574,7 +574,7 @@ export function Dashboard() {
                             selectedMetric={selectedMetric}
                             rows={filteredRegionData}
                             onMetricChange={setSelectedMetric}
-                            height={400}
+                            height={280}
                         />
                     )}
                 </div>

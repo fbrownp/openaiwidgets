@@ -154,6 +154,7 @@ export const EnhancedBarplot: React.FC<BarplotProps> = ({
                     height: availableHeight,
                     display: 'flex',
                     alignItems: 'flex-end',
+                    justifyContent: 'center',
                     gap: twoWayPlot ? 12 : 8
                 }}>
                     {rows.map((item, index) => {
@@ -171,6 +172,7 @@ export const EnhancedBarplot: React.FC<BarplotProps> = ({
                                     alignItems: 'center',
                                     gap: 8,
                                     minWidth: 20,
+                                    maxWidth: 60,
                                     position: 'relative'
                                 }}
                             >
