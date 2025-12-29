@@ -4,7 +4,7 @@ import { EnhancedBarplot } from './EnhancedBarplot';
 import { buildFilterConfigs, parseGPTOutput } from './gpt-adapter';
 import { GPTDashboardData, GPTRawOutput } from './gpt-types';
 import { HorizontalBarplot } from './HorizontalBarplot';
-import { FilterConfig, MetricOption, DataRow, ThemeColors } from './types';
+import { DataRow, FilterConfig, MetricOption, ThemeColors } from './types';
 import { WidgetCard } from './WidgetCard';
 
 // Import hooks from parent directory
@@ -352,8 +352,8 @@ export function Dashboard() {
         const formattedInvestment = totalInvestment >= 1000000
             ? `MMU$${(totalInvestment / 1000000).toFixed(3)}`
             : totalInvestment >= 1000
-            ? `MU$${(totalInvestment / 1000).toFixed(1)}`
-            : `U$${totalInvestment.toFixed(0)}`;
+                ? `MU$${(totalInvestment / 1000).toFixed(1)}`
+                : `U$${totalInvestment.toFixed(0)}`;
 
         return {
             totalProjects,
@@ -398,7 +398,7 @@ export function Dashboard() {
                                 fontWeight: 700,
                                 color: themeColors.text
                             }}>
-                                Dashboard de Proyectos y Empleo
+                                Dashboard de Proyectos e Inversión
                             </h1>
                             <p style={{
                                 margin: '4px 0 0 0',
@@ -555,7 +555,7 @@ export function Dashboard() {
                             selectedMetric={selectedMetric}
                             rows={filteredTimeSeriesData}
                             onMetricChange={setSelectedMetric}
-                            twoWayPlot={true}
+                            twoWayPlot={false}
                             showYAxis={true}
                             height={300}
                         />
