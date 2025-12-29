@@ -47,15 +47,15 @@
 
 ### Charts in "Faltas" View
 1. **Horizontal stacked bar chart**: Violations by region
-   - Stacked by severity (En blanco, Graves, Gravísimas, Leves)
+   - Stacked by severity (Leves, Graves, Gravísimas)
    - Shows all 12 regions from Chile
 
 2. **Horizontal stacked bar chart**: Violations by economic category
    - Categories like Equipamiento, Agroindustrias, Minería, etc.
 
 3. **Line chart**: Time series from 2013-2024
-   - 4 lines (one for each severity level)
-   - Colors: Blue, Red, Purple, Green
+   - 3 lines (one for each severity level)
+   - Colors: Light pink → Darker pink → Purple gradient
 
 ### Charts in "Detalle" View
 1. **Filter bar** with 7 dropdown filters
@@ -111,7 +111,7 @@ The placeholder data generator creates:
 - **11 economic categories**
 - **9 commitment subtypes**
 - **12 subcomponents**
-- **4 severity levels**: En blanco, Graves, Gravísimas, Leves
+- **3 severity levels**: Leves (light pink), Graves (darker pink), Gravísimas (purple)
 
 ## Interactive Features
 

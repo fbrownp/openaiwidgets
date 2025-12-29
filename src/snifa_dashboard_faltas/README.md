@@ -43,11 +43,10 @@ Three summary widgets display:
 
 ### Severity Classifications
 
-Data is classified by `clasificacion_gravedad` with four levels:
-- **En blanco** (Blank) - Blue (#6B9BD1)
-- **Graves** (Serious) - Red (#E74C3C)
+Data is classified by `clasificacion_gravedad` with three levels using a pink-to-purple color gradient:
+- **Leves** (Minor) - Light pink (#FFB3D9)
+- **Graves** (Serious) - Darker pink (#E63C77)
 - **Gravísimas** (Very Serious) - Purple (#8B4789)
-- **Leves** (Minor) - Green (#27AE60)
 
 ### Theme Support
 
