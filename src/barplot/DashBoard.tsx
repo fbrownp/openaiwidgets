@@ -303,6 +303,67 @@ export function Dashboard() {
         [filteredData]
     );
 
+    // Calculate widget values from filtered data
+    const calculatedWidgets = useMemo(() => {
+        if (!filteredData || filteredData.length === 0) {
+            return {
+                totalProjects: 0,
+                totalInvestment: "MMU$0",
+                topTipology: "N/A",
+                topTipologyPercentage: "0"
+            };
+        }
+
+        // Calculate total investment
+        const totalInvestment = filteredData.reduce((sum, row) =>
+            sum + (row.inversion_total || 0), 0
+        );
+
+        // Calculate total projects
+        const totalProjects = filteredData.reduce((sum, row) =>
+            sum + (row.cantidad_proyectos || 0), 0
+        );
+
+        // Calculate top tipology (by cantidad_proyectos)
+        const tipologyMap = new Map<string, number>();
+        filteredData.forEach(row => {
+            const tipologia = row.tipologia_letra || 'N/A';
+            const cantidad = row.cantidad_proyectos || 0;
+            tipologyMap.set(
+                tipologia,
+                (tipologyMap.get(tipologia) || 0) + cantidad
+            );
+        });
+
+        let topTipology = 'N/A';
+        let topTipologyAmount = 0;
+        tipologyMap.forEach((amount, tipologia) => {
+            if (amount > topTipologyAmount) {
+                topTipologyAmount = amount;
+                topTipology = tipologia;
+            }
+        });
+
+        // Calculate percentage
+        const topTipologyPercentage = totalProjects > 0
+            ? ((topTipologyAmount / totalProjects) * 100).toFixed(1)
+            : "0";
+
+        // Format investment (in millions)
+        const formattedInvestment = totalInvestment >= 1000000
+            ? `MMU$${(totalInvestment / 1000000).toFixed(3)}`
+            : totalInvestment >= 1000
+            ? `MU$${(totalInvestment / 1000).toFixed(1)}`
+            : `U$${totalInvestment.toFixed(0)}`;
+
+        return {
+            totalProjects,
+            totalInvestment: formattedInvestment,
+            topTipology,
+            topTipologyPercentage
+        };
+    }, [filteredData]);
+
     const metricOptions: MetricOption[] = activeView === 'proyectos'
         ? [
             { label: "Inversión Total", value: "inversion_total" },
@@ -460,20 +521,20 @@ export function Dashboard() {
                 }}>
                     <WidgetCard
                         title="Total de proyectos"
-                        value={data.widgets.totalProjects}
+                        value={calculatedWidgets.totalProjects}
                         icon="📊"
                         themeColors={themeColors}
                     />
                     <WidgetCard
                         title="Suma de inversión"
-                        value={data.widgets.sumInvestment}
+                        value={calculatedWidgets.totalInvestment}
                         icon="💰"
                         themeColors={themeColors}
                     />
                     <WidgetCard
                         title="Tipología principal"
-                        value={data.widgets.topSector}
-                        subtitle={`${data.widgets.topSectorPercentage}% del total`}
+                        value={calculatedWidgets.topTipology}
+                        subtitle={`${calculatedWidgets.topTipologyPercentage}% del total`}
                         icon="🏭"
                         themeColors={themeColors}
                     />
