@@ -5,20 +5,23 @@
 
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import Dashboard from './Dashboard';
+import { Dashboard } from './Dashboard';
 
 console.log('SNIFA Dashboard Faltas - index.tsx loaded');
 
-const container = document.getElementById('snifa_dashboard_faltas-root');
+const rootElement = document.getElementById('snifa_dashboard_faltas-root');
 
-if (!container) {
+if (!rootElement) {
     console.error('Could not find root element with id "snifa_dashboard_faltas-root"');
-    console.error('Available elements:', document.body.innerHTML);
-} else {
-    const root = createRoot(container);
-    root.render(
-        <React.StrictMode>
-            <Dashboard />
-        </React.StrictMode>
-    );
+    console.error('Available body content:', document.body.innerHTML);
+    throw new Error('Missing snifa_dashboard_faltas-root element');
 }
+
+console.log('Mounting SNIFA Dashboard...');
+createRoot(rootElement).render(
+    <React.StrictMode>
+        <Dashboard />
+    </React.StrictMode>
+);
+
+export { Dashboard };
