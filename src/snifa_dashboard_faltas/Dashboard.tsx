@@ -98,7 +98,7 @@ export const Dashboard: React.FC = () => {
             // Check each filter category
             for (const [key, selectedValues] of Object.entries(filterState)) {
                 if (selectedValues.length > 0 && !selectedValues.includes('Todas')) {
-                    const fieldValue = row[key as keyof FaltaDataRow];
+                    const fieldValue = row[key as keyof FaltaDataRow] || 'Sin Información';
                     if (!selectedValues.includes(fieldValue as string)) {
                         return false;
                     }
@@ -115,15 +115,17 @@ export const Dashboard: React.FC = () => {
         const instrumentoMap = new Map<string, AggregatedData>();
 
         filteredData.forEach(row => {
-            if (!instrumentoMap.has(row.instrumento_infringido_norm)) {
-                instrumentoMap.set(row.instrumento_infringido_norm, {
-                    category: row.instrumento_infringido_norm,
+            const key = row.instrumento_infringido_norm || 'Sin Información';
+
+            if (!instrumentoMap.has(key)) {
+                instrumentoMap.set(key, {
+                    category: key,
                     count: 0,
                     byGravedad: {}
                 });
             }
 
-            const instrumentoData = instrumentoMap.get(row.instrumento_infringido_norm)!;
+            const instrumentoData = instrumentoMap.get(key)!;
             instrumentoData.count += row.cantidad_casos;
 
             const gravedad = row.clasificacion_gravedad;
@@ -138,15 +140,17 @@ export const Dashboard: React.FC = () => {
         const subtipoMap = new Map<string, AggregatedData>();
 
         filteredData.forEach(row => {
-            if (!subtipoMap.has(row.subtipo_compromiso)) {
-                subtipoMap.set(row.subtipo_compromiso, {
-                    category: row.subtipo_compromiso,
+            const key = row.subtipo_compromiso || 'Sin Información';
+
+            if (!subtipoMap.has(key)) {
+                subtipoMap.set(key, {
+                    category: key,
                     count: 0,
                     byGravedad: {}
                 });
             }
 
-            const subtipoData = subtipoMap.get(row.subtipo_compromiso)!;
+            const subtipoData = subtipoMap.get(key)!;
             subtipoData.count += row.cantidad_casos;
 
             const gravedad = row.clasificacion_gravedad;
@@ -161,15 +165,17 @@ export const Dashboard: React.FC = () => {
         const subcomponenteMap = new Map<string, AggregatedData>();
 
         filteredData.forEach(row => {
-            if (!subcomponenteMap.has(row.subcomponente)) {
-                subcomponenteMap.set(row.subcomponente, {
-                    category: row.subcomponente,
+            const key = row.subcomponente || 'Sin Información';
+
+            if (!subcomponenteMap.has(key)) {
+                subcomponenteMap.set(key, {
+                    category: key,
                     count: 0,
                     byGravedad: {}
                 });
             }
 
-            const subcomponenteData = subcomponenteMap.get(row.subcomponente)!;
+            const subcomponenteData = subcomponenteMap.get(key)!;
             subcomponenteData.count += row.cantidad_casos;
 
             const gravedad = row.clasificacion_gravedad;
@@ -184,15 +190,17 @@ export const Dashboard: React.FC = () => {
         const tipoProcesoMap = new Map<string, AggregatedData>();
 
         filteredData.forEach(row => {
-            if (!tipoProcesoMap.has(row.tipo_proceso_sancion)) {
-                tipoProcesoMap.set(row.tipo_proceso_sancion, {
-                    category: row.tipo_proceso_sancion,
+            const key = row.tipo_proceso_sancion || 'Sin Información';
+
+            if (!tipoProcesoMap.has(key)) {
+                tipoProcesoMap.set(key, {
+                    category: key,
                     count: 0,
                     byGravedad: {}
                 });
             }
 
-            const tipoProcesoData = tipoProcesoMap.get(row.tipo_proceso_sancion)!;
+            const tipoProcesoData = tipoProcesoMap.get(key)!;
             tipoProcesoData.count += row.cantidad_casos;
 
             const gravedad = row.clasificacion_gravedad;

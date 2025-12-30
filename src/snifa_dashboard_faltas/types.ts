@@ -33,14 +33,14 @@ export type ClasificacionGravedad = 'Leves' | 'Graves' | 'Gravísimas';
 // Data row structure for faltas
 export interface FaltaDataRow {
   clasificacion_gravedad: ClasificacionGravedad;
-  instrumento_infringido_norm: string;
-  etiqueta_tema_falta: string;
-  subcomponente: string;
-  subtipo_compromiso: string;
-  region: string;
-  tipo_proceso_sancion: string;
-  categoria_economica: string;
-  subcategoria_economica: string;
+  instrumento_infringido_norm: string | null;
+  etiqueta_tema_falta: string | null;
+  subcomponente: string | null;
+  subtipo_compromiso: string | null;
+  region: string | null;
+  tipo_proceso_sancion: string | null;
+  categoria_economica: string | null;
+  subcategoria_economica: string | null;
   cantidad_casos: number;
 }
 
