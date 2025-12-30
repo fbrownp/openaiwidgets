@@ -33,16 +33,24 @@ export const IndexBarplot: React.FC<IndexBarplotProps> = ({
         );
     }
 
-    // Status fields to display (all except 'indexado' since that's in the widget)
+    // Status fields to display (excluding pdf_validado)
     const statusFields = [
-        { key: 'listo_para_indexar', label: 'Listo para indexar', color: '#10b981' },
-        { key: 'corrompido', label: 'Corrompido', color: '#ef4444' },
-        { key: 'en_cola', label: 'En cola', color: '#f59e0b' },
-        { key: 'indexado', label: 'Indexado', color: '#8b5cf6' },
-        { key: 'falta_ocr', label: 'Falta OCR', color: '#ec4899' },
-        { key: 'pdf_validado', label: 'PDF validado', color: '#06b6d4' },
-        { key: 'no_descargado', label: 'No descargado', color: '#6b7280' }
+        { key: 'listo_para_indexar', label: 'Listo para indexar' },
+        { key: 'corrompido', label: 'Corrompido' },
+        { key: 'en_cola', label: 'En cola' },
+        { key: 'indexado', label: 'Indexado' },
+        { key: 'falta_ocr', label: 'Falta OCR' },
+        { key: 'no_descargado', label: 'No descargado' }
     ];
+
+    // Get bar color using white-pink-purple gradient (matching barplot theme)
+    const getBarColor = (value: number, maxVal: number) => {
+        const intensity = maxVal > 0 ? value / maxVal : 0;
+        const hue = 270; // Purple hue
+        const saturation = 60 + (intensity * 40);
+        const lightness = 95 - (intensity * 45);
+        return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+    };
 
     // Calculate max value for scaling
     const maxValue = Math.max(...data.flatMap(item =>
@@ -103,13 +111,13 @@ export const IndexBarplot: React.FC<IndexBarplotProps> = ({
                 marginBottom: 20,
                 fontSize: 12
             }}>
-                {statusFields.map(field => (
+                {statusFields.map((field, idx) => (
                     <div key={field.key} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                         <div style={{
                             width: 12,
                             height: 12,
                             borderRadius: 2,
-                            backgroundColor: field.color
+                            background: `linear-gradient(135deg, ${getBarColor(0.3 + idx * 0.15, 1)}, ${getBarColor(0.5 + idx * 0.15, 1)})`
                         }} />
                         <span style={{ color: themeColors.textSecondary }}>{field.label}</span>
                     </div>
@@ -122,7 +130,7 @@ export const IndexBarplot: React.FC<IndexBarplotProps> = ({
                 height: height,
                 width: '100%'
             }}>
-                {/* Y-axis labels (index names) */}
+                {/* Y-axis labels (tipo_documento) */}
                 <div style={{
                     position: 'absolute',
                     left: 0,
@@ -145,7 +153,7 @@ export const IndexBarplot: React.FC<IndexBarplotProps> = ({
                             justifyContent: 'flex-end',
                             fontWeight: 500
                         }}>
-                            {item.index_name}
+                            {item.tipo_documento}
                         </div>
                     ))}
                 </div>
@@ -214,6 +222,7 @@ export const IndexBarplot: React.FC<IndexBarplotProps> = ({
                             {statusFields.map(field => {
                                 const value = (item[field.key as keyof IndexStatus] as number) || 0;
                                 const barWidth = maxValue > 0 ? (value / maxValue) * 100 : 0;
+                                const barColor = getBarColor(value, maxValue);
 
                                 return (
                                     <div
@@ -223,7 +232,7 @@ export const IndexBarplot: React.FC<IndexBarplotProps> = ({
                                         style={{
                                             height: barHeight,
                                             width: `${barWidth}%`,
-                                            backgroundColor: field.color,
+                                            backgroundColor: barColor,
                                             borderRadius: 4,
                                             cursor: 'pointer',
                                             transition: 'all 0.2s ease',
@@ -232,7 +241,7 @@ export const IndexBarplot: React.FC<IndexBarplotProps> = ({
                                                 ? 'scaleY(1.1)'
                                                 : 'scaleY(1)',
                                             boxShadow: hoveredBar?.index === index && hoveredBar?.field === field.key
-                                                ? `0 2px 8px ${field.color}80`
+                                                ? `0 2px 8px ${barColor}80`
                                                 : 'none',
                                             position: 'relative'
                                         }}
@@ -263,7 +272,7 @@ export const IndexBarplot: React.FC<IndexBarplotProps> = ({
                     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.2)'
                 }}>
                     <div style={{ marginBottom: 4, fontWeight: 600 }}>
-                        {data[hoveredBar.index].index_name}
+                        {data[hoveredBar.index].tipo_documento}
                     </div>
                     <div style={{ fontSize: 12 }}>
                         {statusFields.find(f => f.key === hoveredBar.field)?.label}: {' '}
