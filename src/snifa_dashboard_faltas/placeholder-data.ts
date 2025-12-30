@@ -17,9 +17,10 @@ const generatePlaceholderData = (): FaltaDataRow[] => {
     'Región de Atacama',
     'Región del Biobío',
     'Región de Magallanes',
-    'Región del Libertador',
+    'Región del Libertador General Bernardo OHiggins',
     'Región de Antofagasta',
     'Región de Coquimbo',
+    'Región de Ñuble',
   ];
 
   const categoriasEconomicas = [
@@ -36,6 +37,21 @@ const generatePlaceholderData = (): FaltaDataRow[] => {
     'Infraestructura de Transporte',
   ];
 
+  const subcategoriasEconomicas = [
+    'Planta de celulosa y fabricación de papel',
+    'Producción agrícola / cultivos',
+    'Matadero / frigorífico',
+    'Centro de comercialización de combustible',
+    'Producción pecuaria',
+    'Planta elaboradora de productos del mar',
+    'Centro de cultivo de salmones',
+    'Planta de tratamiento de aguas servidas',
+    'Extracción de minerales metálicos',
+    'Parque eólico',
+    'Central hidroeléctrica',
+    'Relleno sanitario',
+  ];
+
   const subtiposCompromiso = [
     'Seguimiento',
     'Descripción del Proyecto',
@@ -46,11 +62,12 @@ const generatePlaceholderData = (): FaltaDataRow[] => {
     'PAS',
     'Provisional',
     'Cierre',
+    null, // Some can be null
   ];
 
   const subcomponentes = [
     'Ruido',
-    'Residuos Líquidos',
+    'Residuos Liquidos',
     'Calidad del Aire',
     'Aguas Superficiales',
     'Medidas Generales',
@@ -61,40 +78,64 @@ const generatePlaceholderData = (): FaltaDataRow[] => {
     'Residuos Agroalimentarios',
     'Residuos Acuícolas',
     'Residuos Peligrosos',
+    'Olores',
+  ];
+
+  const instrumentos = [
+    'RCA',
+    'PPDA',
+    'NE:90/2000',
+    'DIA',
+    'EIA',
+    'Otro',
+    null, // Some can be null
+  ];
+
+  const tiposProceso = [
+    'Fiscalización',
+    'Denuncia',
+    'Autodenuncia',
+    'Inspección',
+  ];
+
+  const etiquetasTema = [
+    'general',
+    'ambiental',
+    'sanitaria',
+    null, // Some can be null
   ];
 
   const gravedades: Array<'Leves' | 'Graves' | 'Gravísimas'> = ['Leves', 'Graves', 'Gravísimas'];
 
   const data: FaltaDataRow[] = [];
-  let idCounter = 1;
 
-  // Generate data for years 2013-2024
-  for (let year = 2013; year <= 2024; year++) {
-    // More records in earlier years, fewer in recent years (matching the trend in the image)
-    const numRecords = Math.floor(year < 2021 ? 400 : 200);
+  // Generate data with varying cantidad_casos
+  for (let i = 0; i < 200; i++) {
+    const regionIdx = Math.floor(Math.random() * regions.length);
+    const catIdx = Math.floor(Math.random() * categoriasEconomicas.length);
+    const subcatIdx = Math.floor(Math.random() * subcategoriasEconomicas.length);
+    const subtipoIdx = Math.floor(Math.random() * subtiposCompromiso.length);
+    const subcompIdx = Math.floor(Math.random() * subcomponentes.length);
+    const gravedadIdx = Math.floor(Math.random() * gravedades.length);
+    const instrumentoIdx = Math.floor(Math.random() * instrumentos.length);
+    const tipoProcesoIdx = Math.floor(Math.random() * tiposProceso.length);
+    const etiquetaIdx = Math.floor(Math.random() * etiquetasTema.length);
 
-    for (let i = 0; i < numRecords; i++) {
-      const regionIdx = Math.floor(Math.random() * regions.length);
-      const catIdx = Math.floor(Math.random() * categoriasEconomicas.length);
-      const subtipoIdx = Math.floor(Math.random() * subtiposCompromiso.length);
-      const subcompIdx = Math.floor(Math.random() * subcomponentes.length);
-      const gravedadIdx = Math.floor(Math.random() * gravedades.length);
+    // Random cantidad_casos between 1 and 10, with most being 1-3
+    const cantidadCasos = Math.random() < 0.7 ? Math.floor(Math.random() * 3) + 1 : Math.floor(Math.random() * 8) + 3;
 
-      data.push({
-        id_fdc: `FDC-${String(idCounter).padStart(6, '0')}`,
-        region: regions[regionIdx],
-        categoria_economica: categoriasEconomicas[catIdx],
-        subcategoria_economica: `Subcategoría ${Math.floor(Math.random() * 20) + 1}`,
-        clasificacion_gravedad: gravedades[gravedadIdx],
-        ano: year,
-        subtipo_compromiso: subtiposCompromiso[subtipoIdx],
-        subcomponente: subcomponentes[subcompIdx],
-        instrumento_infringido_norm: ['RCA', 'DIA', 'EIA', 'Normativa Sectorial'][Math.floor(Math.random() * 4)],
-        etiqueta_legal: ['Ambiental', 'Sanitaria', 'Territorial'][Math.floor(Math.random() * 3)],
-      });
-
-      idCounter++;
-    }
+    data.push({
+      clasificacion_gravedad: gravedades[gravedadIdx],
+      instrumento_infringido_norm: instrumentos[instrumentoIdx],
+      etiqueta_tema_falta: etiquetasTema[etiquetaIdx],
+      subcomponente: subcomponentes[subcompIdx],
+      subtipo_compromiso: subtiposCompromiso[subtipoIdx],
+      region: regions[regionIdx],
+      tipo_proceso_sancion: tiposProceso[tipoProcesoIdx],
+      categoria_economica: categoriasEconomicas[catIdx],
+      subcategoria_economica: subcategoriasEconomicas[subcatIdx],
+      cantidad_casos: cantidadCasos,
+    });
   }
 
   console.log(`Generated ${data.length} placeholder records`);
@@ -108,6 +149,8 @@ const getUniqueValues = (data: FaltaDataRow[], field: keyof FaltaDataRow): strin
     const value = row[field];
     if (typeof value === 'string') {
       values.add(value);
+    } else if (value === null) {
+      values.add('Sin Información');
     }
   });
   return ['Todas', ...Array.from(values).sort()];
@@ -122,13 +165,9 @@ export const generatePlaceholderOutput = (): GPTFaltasOutput => {
     totalFaltas: data.length,
     data,
     filters: {
-      instrumento_infringido_norm: getUniqueValues(data, 'instrumento_infringido_norm'),
-      subtipo_compromiso: getUniqueValues(data, 'subtipo_compromiso'),
+      region: getUniqueValues(data, 'region'),
       categoria_economica: getUniqueValues(data, 'categoria_economica'),
       subcategoria_economica: getUniqueValues(data, 'subcategoria_economica'),
-      region: getUniqueValues(data, 'region'),
-      subcomponente: getUniqueValues(data, 'subcomponente'),
-      etiqueta_legal: getUniqueValues(data, 'etiqueta_legal'),
     },
   };
 };
