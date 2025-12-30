@@ -65,7 +65,7 @@ export const IndexBarplot: React.FC<IndexBarplotProps> = ({
 
     const paddingTop = 40;
     const paddingBottom = 60;
-    const paddingLeft = 220; // Increased for longer document type names
+    const paddingLeft = 280; // Increased for longer document type names
     const paddingRight = 40;
     const availableHeight = height - paddingTop - paddingBottom;
     const rowHeight = availableHeight / data.length;
@@ -143,7 +143,7 @@ export const IndexBarplot: React.FC<IndexBarplotProps> = ({
                 }}>
                     {data.map((item, index) => (
                         <div key={index} style={{
-                            fontSize: 12,
+                            fontSize: 11,
                             color: themeColors.text,
                             textAlign: 'right',
                             paddingRight: 10,
@@ -151,7 +151,10 @@ export const IndexBarplot: React.FC<IndexBarplotProps> = ({
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'flex-end',
-                            fontWeight: 500
+                            fontWeight: 500,
+                            wordBreak: 'break-word',
+                            overflowWrap: 'break-word',
+                            hyphens: 'auto'
                         }}>
                             {item.tipo_documento}
                         </div>
