@@ -93,13 +93,16 @@ export function buildFilterConfigs(gptData: GPTDashboardData): FilterConfig[] {
 
     // Only add filter if there are options available
     if (options.length > 0) {
+        // Default to 'seia' if no selection
+        const selected = gptData.filters.index_name.filter(v =>
+            options.some(opt => opt.value === v)
+        );
+
         filters.push({
             label: "Index Name",
             options,
-            selectedValues: gptData.filters.index_name.filter(v =>
-                options.some(opt => opt.value === v)
-            ),
-            multiSelect: true
+            selectedValues: selected.length > 0 ? selected : ['seia'],
+            multiSelect: false // Single select only
         });
     }
 

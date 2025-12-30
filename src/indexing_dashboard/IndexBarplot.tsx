@@ -65,7 +65,7 @@ export const IndexBarplot: React.FC<IndexBarplotProps> = ({
 
     const paddingTop = 40;
     const paddingBottom = 60;
-    const paddingLeft = 150;
+    const paddingLeft = 220; // Increased for longer document type names
     const paddingRight = 40;
     const availableHeight = height - paddingTop - paddingBottom;
     const rowHeight = availableHeight / data.length;

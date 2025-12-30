@@ -15,7 +15,7 @@ const createDefaultDashboardState = (): GPTDashboardData => ({
         totalIndexado: 0
     },
     filters: {
-        index_name: []
+        index_name: ['seia'] // Default to SEIA filter
     },
     data: []
 });
@@ -74,8 +74,8 @@ const getThemeColors = (theme: Theme): ThemeColors => {
 };
 
 export function Dashboard() {
-    // Theme state
-    const [theme, setTheme] = React.useState<Theme>('light');
+    // Theme state - start in dark mode
+    const [theme, setTheme] = React.useState<Theme>('dark');
     const themeColors = getThemeColors(theme);
 
     // Hook into OpenAI global state using existing hooks
@@ -169,10 +169,13 @@ export function Dashboard() {
         return rows.filter(row => {
             // Check index_name filter
             const indexFilter = filters.find(f => f.label === "Index Name");
-            if (indexFilter && indexFilter.selectedValues.length > 0) {
-                if (!indexFilter.selectedValues.includes(row.index_name)) {
-                    return false;
-                }
+            // If no filter selected or empty, default to SEIA
+            const selectedValues = indexFilter?.selectedValues.length
+                ? indexFilter.selectedValues
+                : ['seia'];
+
+            if (!selectedValues.includes(row.index_name)) {
+                return false;
             }
             return true;
         });
