@@ -16,6 +16,7 @@ const GLOBAL_CSS_LIST = [path.resolve("src/index.css")];
 
 const targets: string[] = [
   "barplot",
+  "indexing_dashboard",
 ];
 const builtNames: string[] = [];
 
