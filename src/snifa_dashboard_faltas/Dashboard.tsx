@@ -10,7 +10,6 @@ import {
     FilterConfig,
     FaltaDataRow,
     AggregatedData,
-    TimeSeriesData,
     ClasificacionGravedad,
     GRAVEDAD_ORDER
 } from './types';
@@ -18,7 +17,6 @@ import { getInitialData } from './gpt-adapter';
 import { DropdownFilter } from './DropdownFilter';
 import { WidgetCard } from './WidgetCard';
 import { HorizontalStackedBarplot } from './HorizontalStackedBarplot';
-import { LineChart } from './LineChart';
 
 // Theme color definitions
 const getThemeColors = (theme: 'light' | 'dark'): ThemeColors => {
@@ -75,16 +73,11 @@ export const Dashboard: React.FC = () => {
     console.log('SNIFA Dashboard Faltas rendering...');
 
     // State management
-    const [activeView, setActiveView] = useState<'faltas' | 'detalle'>('faltas');
     const [theme, setTheme] = useState<'light' | 'dark'>('dark');
     const [filterState, setFilterState] = useState<DashboardState['filters']>({
-        instrumento_infringido_norm: [],
-        subtipo_compromiso: [],
-        categoria_economica: [],
-        subcategoria_economica: [],
         region: [],
-        subcomponente: [],
-        etiqueta_legal: []
+        categoria_economica: [],
+        subcategoria_economica: []
     });
 
     // Load initial data
@@ -117,50 +110,27 @@ export const Dashboard: React.FC = () => {
         return filtered;
     }, [dashboardData.data, filterState]);
 
-    // Aggregate data by region
-    const aggregateByRegion = useMemo((): AggregatedData[] => {
-        const regionMap = new Map<string, AggregatedData>();
+    // Aggregate data by instrumento_infringido_norm
+    const aggregateByInstrumento = useMemo((): AggregatedData[] => {
+        const instrumentoMap = new Map<string, AggregatedData>();
 
         filteredData.forEach(row => {
-            if (!regionMap.has(row.region)) {
-                regionMap.set(row.region, {
-                    category: row.region,
+            if (!instrumentoMap.has(row.instrumento_infringido_norm)) {
+                instrumentoMap.set(row.instrumento_infringido_norm, {
+                    category: row.instrumento_infringido_norm,
                     count: 0,
                     byGravedad: {}
                 });
             }
 
-            const regionData = regionMap.get(row.region)!;
-            regionData.count++;
+            const instrumentoData = instrumentoMap.get(row.instrumento_infringido_norm)!;
+            instrumentoData.count += row.cantidad_casos;
 
             const gravedad = row.clasificacion_gravedad;
-            regionData.byGravedad[gravedad] = (regionData.byGravedad[gravedad] || 0) + 1;
+            instrumentoData.byGravedad[gravedad] = (instrumentoData.byGravedad[gravedad] || 0) + row.cantidad_casos;
         });
 
-        return Array.from(regionMap.values()).sort((a, b) => b.count - a.count);
-    }, [filteredData]);
-
-    // Aggregate data by economic category
-    const aggregateByEconomicCategory = useMemo((): AggregatedData[] => {
-        const categoryMap = new Map<string, AggregatedData>();
-
-        filteredData.forEach(row => {
-            if (!categoryMap.has(row.categoria_economica)) {
-                categoryMap.set(row.categoria_economica, {
-                    category: row.categoria_economica,
-                    count: 0,
-                    byGravedad: {}
-                });
-            }
-
-            const categoryData = categoryMap.get(row.categoria_economica)!;
-            categoryData.count++;
-
-            const gravedad = row.clasificacion_gravedad;
-            categoryData.byGravedad[gravedad] = (categoryData.byGravedad[gravedad] || 0) + 1;
-        });
-
-        return Array.from(categoryMap.values()).sort((a, b) => b.count - a.count);
+        return Array.from(instrumentoMap.values()).sort((a, b) => b.count - a.count);
     }, [filteredData]);
 
     // Aggregate data by subtipo_compromiso
@@ -177,10 +147,10 @@ export const Dashboard: React.FC = () => {
             }
 
             const subtipoData = subtipoMap.get(row.subtipo_compromiso)!;
-            subtipoData.count++;
+            subtipoData.count += row.cantidad_casos;
 
             const gravedad = row.clasificacion_gravedad;
-            subtipoData.byGravedad[gravedad] = (subtipoData.byGravedad[gravedad] || 0) + 1;
+            subtipoData.byGravedad[gravedad] = (subtipoData.byGravedad[gravedad] || 0) + row.cantidad_casos;
         });
 
         return Array.from(subtipoMap.values()).sort((a, b) => b.count - a.count);
@@ -200,127 +170,76 @@ export const Dashboard: React.FC = () => {
             }
 
             const subcomponenteData = subcomponenteMap.get(row.subcomponente)!;
-            subcomponenteData.count++;
+            subcomponenteData.count += row.cantidad_casos;
 
             const gravedad = row.clasificacion_gravedad;
-            subcomponenteData.byGravedad[gravedad] = (subcomponenteData.byGravedad[gravedad] || 0) + 1;
+            subcomponenteData.byGravedad[gravedad] = (subcomponenteData.byGravedad[gravedad] || 0) + row.cantidad_casos;
         });
 
         return Array.from(subcomponenteMap.values()).sort((a, b) => b.count - a.count);
     }, [filteredData]);
 
-    // Aggregate time series data
-    const aggregateTimeSeries = useMemo((): TimeSeriesData[] => {
-        const yearMap = new Map<number, TimeSeriesData>();
+    // Aggregate data by tipo_proceso_sancion
+    const aggregateByTipoProceso = useMemo((): AggregatedData[] => {
+        const tipoProcesoMap = new Map<string, AggregatedData>();
 
         filteredData.forEach(row => {
-            if (!yearMap.has(row.ano)) {
-                yearMap.set(row.ano, {
-                    year: row.ano,
+            if (!tipoProcesoMap.has(row.tipo_proceso_sancion)) {
+                tipoProcesoMap.set(row.tipo_proceso_sancion, {
+                    category: row.tipo_proceso_sancion,
+                    count: 0,
                     byGravedad: {}
                 });
             }
 
-            const yearData = yearMap.get(row.ano)!;
+            const tipoProcesoData = tipoProcesoMap.get(row.tipo_proceso_sancion)!;
+            tipoProcesoData.count += row.cantidad_casos;
+
             const gravedad = row.clasificacion_gravedad;
-            yearData.byGravedad[gravedad] = (yearData.byGravedad[gravedad] || 0) + 1;
+            tipoProcesoData.byGravedad[gravedad] = (tipoProcesoData.byGravedad[gravedad] || 0) + row.cantidad_casos;
         });
 
-        return Array.from(yearMap.values()).sort((a, b) => a.year - b.year);
+        return Array.from(tipoProcesoMap.values()).sort((a, b) => b.count - a.count);
     }, [filteredData]);
 
     // Calculate widget values
-    const totalFaltas = filteredData.length;
-    const mostCommonGravedad = useMemo(() => {
-        const gravedadCounts: Record<string, number> = {};
-        filteredData.forEach(row => {
-            gravedadCounts[row.clasificacion_gravedad] =
-                (gravedadCounts[row.clasificacion_gravedad] || 0) + 1;
-        });
-
-        let maxCount = 0;
-        let mostCommon = 'N/A';
-        for (const [gravedad, count] of Object.entries(gravedadCounts)) {
-            if (count > maxCount) {
-                maxCount = count;
-                mostCommon = gravedad;
-            }
-        }
-        return mostCommon;
+    const totalCasos = useMemo(() => {
+        return filteredData.reduce((sum, row) => sum + row.cantidad_casos, 0);
     }, [filteredData]);
+    const mostAffectedSubcomponente = useMemo(() => {
+        if (aggregateBySubcomponente.length === 0) return 'N/A';
+        return aggregateBySubcomponente[0].category;
+    }, [aggregateBySubcomponente]);
 
-    const mostCommonRegion = useMemo(() => {
-        const regionCounts: Record<string, number> = {};
-        filteredData.forEach(row => {
-            regionCounts[row.region] = (regionCounts[row.region] || 0) + 1;
-        });
-
-        let maxCount = 0;
-        let mostCommon = 'N/A';
-        for (const [region, count] of Object.entries(regionCounts)) {
-            if (count > maxCount) {
-                maxCount = count;
-                mostCommon = region;
-            }
-        }
-        return mostCommon;
-    }, [filteredData]);
+    const mostAffectedSubtipo = useMemo(() => {
+        if (aggregateBySubtipoCompromiso.length === 0) return 'N/A';
+        return aggregateBySubtipoCompromiso[0].category;
+    }, [aggregateBySubtipoCompromiso]);
 
     // Build filter configurations
     const buildFilterConfigs = (): FilterConfig[] => {
         const configs: FilterConfig[] = [];
 
-        // Only show filters relevant to the active view
-        if (activeView === 'detalle') {
-            configs.push({
-                label: 'instrumento_infringido_norm',
-                options: dashboardData.availableFilters.instrumento_infringido_norm,
-                selectedValues: filterState.instrumento_infringido_norm,
-                multiSelect: true
-            });
+        configs.push({
+            label: 'region',
+            options: dashboardData.availableFilters.region,
+            selectedValues: filterState.region,
+            multiSelect: true
+        });
 
-            configs.push({
-                label: 'subtipo_compromiso',
-                options: dashboardData.availableFilters.subtipo_compromiso,
-                selectedValues: filterState.subtipo_compromiso,
-                multiSelect: true
-            });
+        configs.push({
+            label: 'categoria_economica',
+            options: dashboardData.availableFilters.categoria_economica,
+            selectedValues: filterState.categoria_economica,
+            multiSelect: true
+        });
 
-            configs.push({
-                label: 'categoria_economica',
-                options: dashboardData.availableFilters.categoria_economica,
-                selectedValues: filterState.categoria_economica,
-                multiSelect: true
-            });
-
-            configs.push({
-                label: 'subcategoria_economica',
-                options: dashboardData.availableFilters.subcategoria_economica,
-                selectedValues: filterState.subcategoria_economica,
-                multiSelect: true
-            });
-
-            configs.push({
-                label: 'region',
-                options: dashboardData.availableFilters.region,
-                selectedValues: filterState.region,
-                multiSelect: true
-            });
-
-            configs.push({
-                label: 'subcomponente',
-                options: dashboardData.availableFilters.subcomponente,
-                selectedValues: filterState.subcomponente,
-                multiSelect: true
-            });
-
-            configs.push({
-                label: 'etiqueta_legal',
-                options: dashboardData.availableFilters.etiqueta_legal,
-                selectedValues: filterState.etiqueta_legal,
-                multiSelect: true
-            });
-        }
+        configs.push({
+            label: 'subcategoria_economica',
+            options: dashboardData.availableFilters.subcategoria_economica,
+            selectedValues: filterState.subcategoria_economica,
+            multiSelect: true
+        });
 
         return configs;
     };
@@ -367,57 +286,6 @@ export const Dashboard: React.FC = () => {
                     </div>
 
                     <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                        {/* View Toggle */}
-                        <div style={{
-                            display: 'flex',
-                            gap: 8,
-                            backgroundColor: themeColors.buttonBackground,
-                            padding: 4,
-                            borderRadius: 8,
-                            border: `1px solid ${themeColors.border}`
-                        }}>
-                            <button
-                                onClick={() => setActiveView('faltas')}
-                                style={{
-                                    padding: '6px 16px',
-                                    borderRadius: 6,
-                                    border: 'none',
-                                    backgroundColor: activeView === 'faltas'
-                                        ? themeColors.buttonActiveBg
-                                        : 'transparent',
-                                    color: activeView === 'faltas'
-                                        ? themeColors.buttonActiveText
-                                        : themeColors.buttonText,
-                                    cursor: 'pointer',
-                                    fontSize: 13,
-                                    fontWeight: 600,
-                                    transition: 'all 0.2s'
-                                }}
-                            >
-                                Faltas
-                            </button>
-                            <button
-                                onClick={() => setActiveView('detalle')}
-                                style={{
-                                    padding: '6px 16px',
-                                    borderRadius: 6,
-                                    border: 'none',
-                                    backgroundColor: activeView === 'detalle'
-                                        ? themeColors.buttonActiveBg
-                                        : 'transparent',
-                                    color: activeView === 'detalle'
-                                        ? themeColors.buttonActiveText
-                                        : themeColors.buttonText,
-                                    cursor: 'pointer',
-                                    fontSize: 13,
-                                    fontWeight: 600,
-                                    transition: 'all 0.2s'
-                                }}
-                            >
-                                Detalle
-                            </button>
-                        </div>
-
                         {/* Theme Toggle */}
                         <div style={{
                             display: 'flex',
@@ -471,14 +339,12 @@ export const Dashboard: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Filters (only for Detalle view) */}
-                {activeView === 'detalle' && (
-                    <DropdownFilter
-                        filters={buildFilterConfigs()}
-                        onFilterChange={handleFilterChange}
-                        themeColors={themeColors}
-                    />
-                )}
+                {/* Filters */}
+                <DropdownFilter
+                    filters={buildFilterConfigs()}
+                    onFilterChange={handleFilterChange}
+                    themeColors={themeColors}
+                />
 
                 {/* Widget Cards */}
                 <div style={{
@@ -489,66 +355,55 @@ export const Dashboard: React.FC = () => {
                     marginBottom: 20
                 }}>
                     <WidgetCard
-                        title="Total de Faltas"
-                        value={totalFaltas}
+                        title="Cantidad de Casos Totales"
+                        value={totalCasos}
                         icon="⚠️"
                         themeColors={themeColors}
                     />
                     <WidgetCard
-                        title="Clasificación Más Común"
-                        value={mostCommonGravedad}
+                        title="Subcomponente Más Afectado"
+                        value={mostAffectedSubcomponente.length > 25
+                            ? mostAffectedSubcomponente.substring(0, 25) + '...'
+                            : mostAffectedSubcomponente}
                         icon="📊"
                         themeColors={themeColors}
                     />
                     <WidgetCard
-                        title="Región Principal"
-                        value={mostCommonRegion.length > 20
-                            ? mostCommonRegion.substring(0, 20) + '...'
-                            : mostCommonRegion}
-                        icon="🗺️"
+                        title="Subtipo Compromiso Más Afectado"
+                        value={mostAffectedSubtipo.length > 25
+                            ? mostAffectedSubtipo.substring(0, 25) + '...'
+                            : mostAffectedSubtipo}
+                        icon="🎯"
                         themeColors={themeColors}
                     />
                 </div>
 
-                {/* Charts - Faltas View */}
-                {activeView === 'faltas' && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                        <HorizontalStackedBarplot
-                            title="Recuento de id_fdc por región y clasificación_gravedad"
-                            data={aggregateByRegion}
-                            themeColors={themeColors}
-                        />
+                {/* Charts */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                    <HorizontalStackedBarplot
+                        title="Cantidad de Casos por Instrumento Infringido"
+                        data={aggregateByInstrumento}
+                        themeColors={themeColors}
+                    />
 
-                        <HorizontalStackedBarplot
-                            title="Recuento de id_fdc por categoría_economica y clasificación_gravedad"
-                            data={aggregateByEconomicCategory}
-                            themeColors={themeColors}
-                        />
+                    <HorizontalStackedBarplot
+                        title="Cantidad de Casos por Subtipo de Compromiso"
+                        data={aggregateBySubtipoCompromiso}
+                        themeColors={themeColors}
+                    />
 
-                        <LineChart
-                            title="Recuento de clasificacion_gravedad por Año y clasificacion_gravedad"
-                            data={aggregateTimeSeries}
-                            themeColors={themeColors}
-                        />
-                    </div>
-                )}
+                    <HorizontalStackedBarplot
+                        title="Cantidad de Casos por Subcomponente"
+                        data={aggregateBySubcomponente}
+                        themeColors={themeColors}
+                    />
 
-                {/* Charts - Detalle View */}
-                {activeView === 'detalle' && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                        <HorizontalStackedBarplot
-                            title="Recuento de subtipo_compromiso por subtipo_compromiso y clasificación_gravedad"
-                            data={aggregateBySubtipoCompromiso}
-                            themeColors={themeColors}
-                        />
-
-                        <HorizontalStackedBarplot
-                            title="Recuento de subcomponente por subcomponente y clasificación_gravedad"
-                            data={aggregateBySubcomponente}
-                            themeColors={themeColors}
-                        />
-                    </div>
-                )}
+                    <HorizontalStackedBarplot
+                        title="Cantidad de Casos por Tipo de Proceso Sanción"
+                        data={aggregateByTipoProceso}
+                        themeColors={themeColors}
+                    />
+                </div>
             </div>
         </div>
     );

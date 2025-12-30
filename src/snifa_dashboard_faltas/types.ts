@@ -32,16 +32,16 @@ export type ClasificacionGravedad = 'Leves' | 'Graves' | 'Gravísimas';
 
 // Data row structure for faltas
 export interface FaltaDataRow {
-  id_fdc: string;
+  clasificacion_gravedad: ClasificacionGravedad;
+  instrumento_infringido_norm: string;
+  etiqueta_tema_falta: string;
+  subcomponente: string;
+  subtipo_compromiso: string;
   region: string;
+  tipo_proceso_sancion: string;
   categoria_economica: string;
   subcategoria_economica: string;
-  clasificacion_gravedad: ClasificacionGravedad;
-  ano: number;
-  subtipo_compromiso: string;
-  subcomponente: string;
-  instrumento_infringido_norm: string;
-  etiqueta_legal: string;
+  cantidad_casos: number;
 }
 
 // Aggregated data for charts
@@ -74,13 +74,9 @@ export interface DashboardState {
   activeView: 'faltas' | 'detalle';
   theme: 'light' | 'dark';
   filters: {
-    instrumento_infringido_norm: string[];
-    subtipo_compromiso: string[];
+    region: string[];
     categoria_economica: string[];
     subcategoria_economica: string[];
-    region: string[];
-    subcomponente: string[];
-    etiqueta_legal: string[];
   };
 }
 
@@ -90,13 +86,9 @@ export interface GPTFaltasOutput {
   totalFaltas: number;
   data: FaltaDataRow[];
   filters: {
-    instrumento_infringido_norm: string[];
-    subtipo_compromiso: string[];
+    region: string[];
     categoria_economica: string[];
     subcategoria_economica: string[];
-    region: string[];
-    subcomponente: string[];
-    etiqueta_legal: string[];
   };
 }
 
