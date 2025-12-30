@@ -387,29 +387,38 @@ export const Dashboard: React.FC = () => {
                 </div>
 
                 {/* Charts */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(2, 1fr)',
+                    gap: 20,
+                    width: '100%'
+                }}>
                     <HorizontalStackedBarplot
                         title="Cantidad de Casos por Instrumento Infringido"
                         data={aggregateByInstrumento}
                         themeColors={themeColors}
+                        height={300}
                     />
 
                     <HorizontalStackedBarplot
                         title="Cantidad de Casos por Subtipo de Compromiso"
                         data={aggregateBySubtipoCompromiso}
                         themeColors={themeColors}
+                        height={300}
                     />
 
                     <HorizontalStackedBarplot
                         title="Cantidad de Casos por Subcomponente"
                         data={aggregateBySubcomponente}
                         themeColors={themeColors}
+                        height={300}
                     />
 
                     <HorizontalStackedBarplot
                         title="Cantidad de Casos por Tipo de Proceso Sanción"
                         data={aggregateByTipoProceso}
                         themeColors={themeColors}
+                        height={300}
                     />
                 </div>
             </div>
