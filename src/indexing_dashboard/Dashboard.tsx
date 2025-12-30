@@ -189,25 +189,25 @@ export function Dashboard() {
         [data.data, filters]
     );
 
-    // Calculate widget values from filtered data
+    // Calculate widget values
+    // - totalIndexado: FROM FILTERED DATA
+    // - documentosProcesados: FROM ALL DATA (no filters)
+    // - documentosIndexados: FROM ALL DATA (no filters)
     const calculatedWidgets = useMemo(() => {
-        if (!filteredData || filteredData.length === 0) {
-            return {
-                totalIndexado: 0,
-                documentosProcesados: 0,
-                documentosIndexados: 0
-            };
-        }
+        const allData = data.data || [];
 
+        // Documentos Específicos Indexados - WITH filters
         const totalIndexado = filteredData.reduce((sum, row) =>
             sum + (row.indexado || 0), 0
         );
 
-        const documentosProcesados = filteredData.reduce((sum, row) =>
+        // Documentos Procesados - WITHOUT filters (all data)
+        const documentosProcesados = allData.reduce((sum, row) =>
             sum + (row.pdf_validado || 0), 0
         );
 
-        const documentosIndexados = filteredData.reduce((sum, row) =>
+        // Documentos Indexados - WITHOUT filters (all data)
+        const documentosIndexados = allData.reduce((sum, row) =>
             sum + (row.indexado || 0), 0
         );
 
@@ -216,7 +216,7 @@ export function Dashboard() {
             documentosProcesados,
             documentosIndexados
         };
-    }, [filteredData]);
+    }, [filteredData, data.data]);
 
     return (
         <div style={{
