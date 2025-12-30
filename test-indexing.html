@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Indexing Dashboard Test</title>
+    <script type="module">
+        // Mock OpenAI integration
+        window.openai = {
+            toolOutput: {
+                data: [
+                    {
+                        'index_name': 'cmf-memorias',
+                        'tipo_documento': 'memoria_cmf',
+                        'listo_para_indexar': 0,
+                        'corrompido': 0,
+                        'en_cola': 0,
+                        'indexado': 595,
+                        'falta_ocr': 0,
+                        'pdf_validado': 595,
+                        'no_descargado': 0
+                    },
+                    {
+                        'index_name': 'denuncias-archivadas',
+                        'tipo_documento': 'denuncias_archivadas',
+                        'listo_para_indexar': 0,
+                        'corrompido': 0,
+                        'en_cola': 0,
+                        'indexado': 1642,
+                        'falta_ocr': 0,
+                        'pdf_validado': 1642,
+                        'no_descargado': 0
+                    }
+                ],
+                index_name: ['cmf-memorias', 'denuncias-archivadas'],
+                totalIndexado: 2237
+            }
+        };
+    </script>
+    <script type="module" src="http://localhost:4444/indexing_dashboard.js"></script>
+    <link rel="stylesheet" href="http://localhost:4444/indexing_dashboard.css">
+</head>
+<body>
+    <div id="indexing_dashboard-root"></div>
+</body>
+</html>
