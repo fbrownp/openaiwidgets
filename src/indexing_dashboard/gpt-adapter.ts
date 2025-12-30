@@ -30,14 +30,24 @@ export function parseGPTOutput(gptOutput: GPTRawOutput): GPTDashboardData {
     // Extract data array
     const data = gptOutput.data || [];
 
-    // Calculate total indexado from data if not provided
+    // Calculate totals from data if not provided
     const totalIndexado = gptOutput.totalIndexado !== undefined
         ? gptOutput.totalIndexado
         : data.reduce((sum, item) => sum + (item.indexado || 0), 0);
 
+    const documentosProcesados = gptOutput.documentosProcesados !== undefined
+        ? gptOutput.documentosProcesados
+        : data.reduce((sum, item) => sum + (item.pdf_validado || 0), 0);
+
+    const documentosIndexados = gptOutput.documentosIndexados !== undefined
+        ? gptOutput.documentosIndexados
+        : data.reduce((sum, item) => sum + (item.indexado || 0), 0);
+
     // Parse widgets data
     const widgets = {
-        totalIndexado
+        totalIndexado,
+        documentosProcesados,
+        documentosIndexados
     };
 
     // Parse filter values

@@ -12,7 +12,9 @@ import { useWidgetState } from '../use-widget-state';
 
 const createDefaultDashboardState = (): GPTDashboardData => ({
     widgets: {
-        totalIndexado: 0
+        totalIndexado: 0,
+        documentosProcesados: 0,
+        documentosIndexados: 0
     },
     filters: {
         index_name: ['seia'] // Default to SEIA filter
@@ -191,7 +193,9 @@ export function Dashboard() {
     const calculatedWidgets = useMemo(() => {
         if (!filteredData || filteredData.length === 0) {
             return {
-                totalIndexado: 0
+                totalIndexado: 0,
+                documentosProcesados: 0,
+                documentosIndexados: 0
             };
         }
 
@@ -199,8 +203,18 @@ export function Dashboard() {
             sum + (row.indexado || 0), 0
         );
 
+        const documentosProcesados = filteredData.reduce((sum, row) =>
+            sum + (row.pdf_validado || 0), 0
+        );
+
+        const documentosIndexados = filteredData.reduce((sum, row) =>
+            sum + (row.indexado || 0), 0
+        );
+
         return {
-            totalIndexado
+            totalIndexado,
+            documentosProcesados,
+            documentosIndexados
         };
     }, [filteredData]);
 
@@ -295,15 +309,30 @@ export function Dashboard() {
                     themeColors={themeColors}
                 />
 
-                {/* Widget Card - Only showing indexado count */}
+                {/* Widget Cards */}
                 <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(3, 1fr)',
+                    gap: 16,
                     marginTop: 24,
                     marginBottom: 24
                 }}>
                     <WidgetCard
-                        title="Total Documents Indexed"
+                        title="Documentos Específicos Indexados"
                         value={calculatedWidgets.totalIndexado}
                         icon="✅"
+                        themeColors={themeColors}
+                    />
+                    <WidgetCard
+                        title="Documentos Procesados"
+                        value={calculatedWidgets.documentosProcesados}
+                        icon="📄"
+                        themeColors={themeColors}
+                    />
+                    <WidgetCard
+                        title="Documentos Indexados"
+                        value={calculatedWidgets.documentosIndexados}
+                        icon="📊"
                         themeColors={themeColors}
                     />
                 </div>
