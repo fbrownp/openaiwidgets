@@ -20,7 +20,7 @@ const getUniqueValues = (data: FaltaDataRow[], field: keyof FaltaDataRow): strin
       values.add('Sin Información');
     }
   });
-  return ['Todas', ...Array.from(values).sort()];
+  return Array.from(values).sort();
 };
 
 /**

@@ -28,9 +28,9 @@ const createDefaultDashboardState = (): DashboardData => ({
     totalFaltas: 0,
     data: [],
     availableFilters: {
-        region: ['Todas'],
-        categoria_economica: ['Todas'],
-        subcategoria_economica: ['Todas']
+        region: [],
+        categoria_economica: [],
+        subcategoria_economica: []
     }
 });
 
@@ -38,26 +38,26 @@ const createDefaultDashboardState = (): DashboardData => ({
 const getThemeColors = (theme: 'light' | 'dark'): ThemeColors => {
     if (theme === 'dark') {
         return {
-            background: '#1a1625',
-            cardBackground: '#241b2f',
-            cardBorder: '#2d2439',
-            text: '#e8e6ed',
-            textSecondary: '#afa9ba',
-            buttonText: '#e8e6ed',
-            buttonBackground: '#2d2439',
-            buttonHover: '#3a2f47',
+            background: '#212121',
+            cardBackground: '#2d2d2d',
+            cardBorder: '#404040',
+            text: '#ffffff',
+            textSecondary: '#b0b0b0',
+            buttonText: '#e0e0e0',
+            buttonBackground: 'transparent',
+            buttonHover: '#404040',
             buttonActiveBg: '#8b5cf6',
-            buttonActiveText: '#ffffff',
+            buttonActiveText: 'white',
             purple: '#a78bfa',
-            purpleDark: '#7c3aed',
-            purpleLight: '#c4b5fd',
-            border: '#3a2f47',
-            borderLight: '#4a3f57',
-            gridLine: '#4a3f57',
-            dropdownBg: '#2d2439',
-            dropdownBorder: '#3a2f47',
-            dropdownHover: '#3a2f47',
-            dropdownSelected: '#4a3f57'
+            purpleDark: '#8b5cf6',
+            purpleLight: '#6d28d9',
+            border: '#404040',
+            borderLight: '#4a4a4a',
+            gridLine: '#404040',
+            dropdownBg: '#2d2d2d',
+            dropdownBorder: '#404040',
+            dropdownHover: '#404040',
+            dropdownSelected: '#4a4a4a'
         };
     }
 
@@ -172,7 +172,7 @@ export const Dashboard: React.FC = () => {
         const filtered = dashboardData.data.filter(row => {
             // Check each filter category
             for (const [key, selectedValues] of Object.entries(filterState)) {
-                if (selectedValues.length > 0 && !selectedValues.includes('Todas')) {
+                if (selectedValues.length > 0) {
                     const fieldValue = row[key as keyof FaltaDataRow] || 'Sin Información';
                     if (!selectedValues.includes(fieldValue as string)) {
                         return false;
@@ -320,7 +320,7 @@ export const Dashboard: React.FC = () => {
                     values.add('Sin Información');
                 }
             });
-            return ['Todas', ...Array.from(values).sort()];
+            return Array.from(values).sort();
         };
 
         // Region filter - always shows all regions
@@ -333,7 +333,7 @@ export const Dashboard: React.FC = () => {
 
         // Categoria economica filter - filtered by region if selected
         let dataForCategoriaEconomica = dashboardData.data;
-        if (filterState.region.length > 0 && !filterState.region.includes('Todas')) {
+        if (filterState.region.length > 0) {
             dataForCategoriaEconomica = dashboardData.data.filter(row => {
                 const regionValue = row.region || 'Sin Información';
                 return filterState.region.includes(regionValue);
@@ -350,13 +350,13 @@ export const Dashboard: React.FC = () => {
 
         // Subcategoria economica filter - filtered by region AND categoria_economica if selected
         let dataForSubcategoriaEconomica = dashboardData.data;
-        if (filterState.region.length > 0 && !filterState.region.includes('Todas')) {
+        if (filterState.region.length > 0) {
             dataForSubcategoriaEconomica = dataForSubcategoriaEconomica.filter(row => {
                 const regionValue = row.region || 'Sin Información';
                 return filterState.region.includes(regionValue);
             });
         }
-        if (filterState.categoria_economica.length > 0 && !filterState.categoria_economica.includes('Todas')) {
+        if (filterState.categoria_economica.length > 0) {
             dataForSubcategoriaEconomica = dataForSubcategoriaEconomica.filter(row => {
                 const categoriaValue = row.categoria_economica || 'Sin Información';
                 return filterState.categoria_economica.includes(categoriaValue);

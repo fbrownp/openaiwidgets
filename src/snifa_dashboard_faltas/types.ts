@@ -99,11 +99,11 @@ export interface DashboardData {
   availableFilters: DashboardState['filters'];
 }
 
-// Severity colors matching the charts - Pink to Purple gradient
+// Severity colors matching the charts - White-pink to Pink to Purple-white gradient
 export const GRAVEDAD_COLORS: Record<ClasificacionGravedad, string> = {
-  'Leves': '#FFB3D9',       // Light pink
-  'Graves': '#E63C77',      // Darker pink
-  'Gravísimas': '#8B4789',  // Purple
+  'Leves': '#FFE5F0',       // White-pink (very light pink)
+  'Graves': '#FF69B4',      // Hot pink
+  'Gravísimas': '#D8BFD8',  // Thistle (purple-white)
 };
 
 // Severity order for stacking (light to dark)

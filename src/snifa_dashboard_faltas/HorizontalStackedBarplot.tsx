@@ -142,6 +142,8 @@ export const HorizontalStackedBarplot: React.FC<HorizontalStackedBarplotProps> =
                                             y={y}
                                             width={segmentWidth}
                                             height={barHeight}
+                                            rx={4}
+                                            ry={4}
                                             fill={GRAVEDAD_COLORS[gravedad]}
                                             opacity={hoveredBar === `${item.category}-${gravedad}` ? 1 : 0.85}
                                             onMouseEnter={(e) => handleMouseEnter(item.category, gravedad, count, e)}
