@@ -32,16 +32,16 @@ export type ClasificacionGravedad = 'Leves' | 'Graves' | 'Gravísimas';
 
 // Data row structure for faltas
 export interface FaltaDataRow {
-  id_fdc: string;
-  region: string;
-  categoria_economica: string;
-  subcategoria_economica: string;
   clasificacion_gravedad: ClasificacionGravedad;
-  ano: number;
-  subtipo_compromiso: string;
-  subcomponente: string;
-  instrumento_infringido_norm: string;
-  etiqueta_legal: string;
+  instrumento_infringido_norm: string | null;
+  etiqueta_tema_falta: string | null;
+  subcomponente: string | null;
+  subtipo_compromiso: string | null;
+  region: string | null;
+  tipo_proceso_sancion: string | null;
+  categoria_economica: string | null;
+  subcategoria_economica: string | null;
+  cantidad_casos: number;
 }
 
 // Aggregated data for charts
@@ -74,13 +74,9 @@ export interface DashboardState {
   activeView: 'faltas' | 'detalle';
   theme: 'light' | 'dark';
   filters: {
-    instrumento_infringido_norm: string[];
-    subtipo_compromiso: string[];
+    region: string[];
     categoria_economica: string[];
     subcategoria_economica: string[];
-    region: string[];
-    subcomponente: string[];
-    etiqueta_legal: string[];
   };
 }
 
@@ -90,13 +86,9 @@ export interface GPTFaltasOutput {
   totalFaltas: number;
   data: FaltaDataRow[];
   filters: {
-    instrumento_infringido_norm: string[];
-    subtipo_compromiso: string[];
+    region: string[];
     categoria_economica: string[];
     subcategoria_economica: string[];
-    region: string[];
-    subcomponente: string[];
-    etiqueta_legal: string[];
   };
 }
 
@@ -107,11 +99,11 @@ export interface DashboardData {
   availableFilters: DashboardState['filters'];
 }
 
-// Severity colors matching the charts - Pink to Purple gradient
+// Severity colors matching the charts - White-pink to Pink to Purple-white gradient
 export const GRAVEDAD_COLORS: Record<ClasificacionGravedad, string> = {
-  'Leves': '#FFB3D9',       // Light pink
-  'Graves': '#E63C77',      // Darker pink
-  'Gravísimas': '#8B4789',  // Purple
+  'Leves': '#FFE5F0',       // White-pink (very light pink)
+  'Graves': '#FF69B4',      // Hot pink
+  'Gravísimas': '#D8BFD8',  // Thistle (purple-white)
 };
 
 // Severity order for stacking (light to dark)

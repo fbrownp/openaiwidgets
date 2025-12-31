@@ -35,13 +35,13 @@ export const HorizontalStackedBarplot: React.FC<HorizontalStackedBarplotProps> =
     // Calculate max total for scaling
     const maxTotal = Math.max(...data.map(d => d.count));
 
-    // Chart dimensions
-    const chartWidth = 800;
-    const chartHeight = Math.max(height, data.length * 30);
-    const barHeight = 20;
-    const barSpacing = 8;
-    const labelWidth = 200;
-    const chartPadding = { top: 40, right: 80, bottom: 20, left: labelWidth };
+    // Chart dimensions - responsive for 2-column grid
+    const chartWidth = 600;
+    const chartHeight = Math.min(Math.max(height, data.length * 25), 400);
+    const barHeight = 18;
+    const barSpacing = 6;
+    const labelWidth = 150;
+    const chartPadding = { top: 40, right: 60, bottom: 20, left: labelWidth };
 
     const handleMouseEnter = (category: string, gravedad: string, count: number, event: React.MouseEvent) => {
         setHoveredBar(`${category}-${gravedad}`);
@@ -75,8 +75,8 @@ export const HorizontalStackedBarplot: React.FC<HorizontalStackedBarplotProps> =
                 {title}
             </div>
 
-            <div style={{ position: 'relative', overflowX: 'auto' }}>
-                <svg width={chartWidth} height={chartHeight} style={{ display: 'block' }}>
+            <div style={{ position: 'relative', overflowX: 'auto', maxWidth: '100%' }}>
+                <svg width={chartWidth} height={chartHeight} style={{ display: 'block', maxWidth: '100%' }}>
                     {/* Title and legend */}
                     <text
                         x={chartPadding.left}
@@ -120,12 +120,12 @@ export const HorizontalStackedBarplot: React.FC<HorizontalStackedBarplotProps> =
                                     x={chartPadding.left - 10}
                                     y={y + barHeight / 2}
                                     fill={themeColors.text}
-                                    fontSize={11}
+                                    fontSize={10}
                                     textAnchor="end"
                                     dominantBaseline="middle"
                                 >
-                                    {item.category.length > 25
-                                        ? item.category.substring(0, 25) + '...'
+                                    {item.category.length > 18
+                                        ? item.category.substring(0, 18) + '...'
                                         : item.category}
                                 </text>
 
@@ -142,6 +142,8 @@ export const HorizontalStackedBarplot: React.FC<HorizontalStackedBarplotProps> =
                                             y={y}
                                             width={segmentWidth}
                                             height={barHeight}
+                                            rx={4}
+                                            ry={4}
                                             fill={GRAVEDAD_COLORS[gravedad]}
                                             opacity={hoveredBar === `${item.category}-${gravedad}` ? 1 : 0.85}
                                             onMouseEnter={(e) => handleMouseEnter(item.category, gravedad, count, e)}
