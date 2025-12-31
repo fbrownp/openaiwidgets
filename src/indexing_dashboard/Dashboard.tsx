@@ -80,6 +80,18 @@ export function Dashboard() {
     const [theme, setTheme] = React.useState<Theme>('dark');
     const themeColors = getThemeColors(theme);
 
+    // Handler for expand button
+    const handleExpand = async () => {
+        try {
+            if (typeof window !== 'undefined' && window.openai?.requestDisplayMode) {
+                const result = await window.openai.requestDisplayMode({ mode: 'fullscreen' });
+                console.log('Display mode changed to:', result.mode);
+            }
+        } catch (error) {
+            console.error('Failed to request fullscreen mode:', error);
+        }
+    };
+
     // Hook into OpenAI global state using existing hooks
     const toolOutput = useOpenAiGlobal('toolOutput') as GPTRawOutput | null;
     const toolResponseMetadata = useOpenAiGlobal('toolResponseMetadata');
@@ -223,8 +235,57 @@ export function Dashboard() {
             fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
             backgroundColor: themeColors.background,
             minHeight: '100vh',
-            padding: '24px'
+            padding: '24px',
+            position: 'relative'
         }}>
+            {/* Expand Button - Fixed top-right corner */}
+            <button
+                onClick={handleExpand}
+                style={{
+                    position: 'fixed',
+                    top: 20,
+                    right: 20,
+                    padding: '10px',
+                    borderRadius: 8,
+                    border: `1px solid ${themeColors.border}`,
+                    backgroundColor: themeColors.cardBackground,
+                    color: themeColors.textSecondary,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 4,
+                    transition: 'all 0.2s ease',
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                    zIndex: 1000
+                }}
+                onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = themeColors.buttonHover || '#f3f4f6';
+                    e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
+                }}
+                onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = themeColors.cardBackground;
+                    e.currentTarget.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+                }}
+                title="Expand to fullscreen"
+            >
+                <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path
+                        d="M2 2L6 2M6 2L6 6M6 2L2 6M14 2L10 2M10 2L10 6M10 2L14 6M2 14L6 14M6 14L6 10M6 14L2 10M14 14L10 14M10 14L10 10M10 14L14 10"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    />
+                </svg>
+            </button>
+
             <div style={{ maxWidth: 1400, margin: '0 auto' }}>
                 {/* Header */}
                 <div style={{

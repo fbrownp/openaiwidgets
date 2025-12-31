@@ -15,18 +15,6 @@ export const EnhancedBarplot: React.FC<BarplotProps> = ({
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
     const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
 
-    // Handler for expand button
-    const handleExpand = async () => {
-        try {
-            if (typeof window !== 'undefined' && window.openai?.requestDisplayMode) {
-                const result = await window.openai.requestDisplayMode({ mode: 'fullscreen' });
-                console.log('Display mode changed to:', result.mode);
-            }
-        } catch (error) {
-            console.error('Failed to request fullscreen mode:', error);
-        }
-    };
-
     // Default to light theme colors if not provided
     const colors = themeColors || {
         cardBackground: 'white',
@@ -115,44 +103,6 @@ export const EnhancedBarplot: React.FC<BarplotProps> = ({
                     {title}
                     <span style={{ fontSize: 10, color: colors.textSecondary }}>¹</span>
                 </div>
-                <button
-                    onClick={handleExpand}
-                    style={{
-                        padding: '6px 8px',
-                        borderRadius: 6,
-                        border: 'none',
-                        backgroundColor: 'transparent',
-                        color: colors.textSecondary,
-                        cursor: 'pointer',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 4,
-                        transition: 'all 0.2s ease'
-                    }}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = colors.buttonHover || '#f3f4f6';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                    }}
-                    title="Expand to fullscreen"
-                >
-                    <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 16 16"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M2 2L6 2M6 2L6 6M6 2L2 6M14 2L10 2M10 2L10 6M10 2L14 6M2 14L6 14M6 14L6 10M6 14L2 10M14 14L10 14M10 14L10 10M10 14L14 10"
-                            stroke="currentColor"
-                            strokeWidth="1.5"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                        />
-                    </svg>
-                </button>
             </div>
 
             {/* Chart Container */}
