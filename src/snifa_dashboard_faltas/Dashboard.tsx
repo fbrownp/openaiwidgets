@@ -3,7 +3,7 @@
  * Displays attendance/violations data with multiple views and filters
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
     ThemeColors,
     DashboardState,
@@ -11,12 +11,28 @@ import {
     FaltaDataRow,
     AggregatedData,
     ClasificacionGravedad,
-    GRAVEDAD_ORDER
+    GRAVEDAD_ORDER,
+    DashboardData
 } from './types';
-import { getInitialData } from './gpt-adapter';
+import { parseGPTOutput } from './gpt-adapter';
 import { DropdownFilter } from './DropdownFilter';
 import { WidgetCard } from './WidgetCard';
 import { HorizontalStackedBarplot } from './HorizontalStackedBarplot';
+
+// Import hooks from parent directory
+import { useOpenAiGlobal } from '../use-openai-global';
+import { useWidgetState } from '../use-widget-state';
+
+// Create default dashboard state
+const createDefaultDashboardState = (): DashboardData => ({
+    totalFaltas: 0,
+    data: [],
+    availableFilters: {
+        region: ['Todas'],
+        categoria_economica: ['Todas'],
+        subcategoria_economica: ['Todas']
+    }
+});
 
 // Theme color definitions
 const getThemeColors = (theme: 'light' | 'dark'): ThemeColors => {
@@ -69,11 +85,7 @@ const getThemeColors = (theme: 'light' | 'dark'): ThemeColors => {
     };
 };
 
-interface DashboardProps {
-    initialData?: any;
-}
-
-export const Dashboard: React.FC<DashboardProps> = ({ initialData }) => {
+export const Dashboard: React.FC = () => {
     console.log('SNIFA Dashboard Faltas rendering...');
 
     // State management
@@ -84,21 +96,75 @@ export const Dashboard: React.FC<DashboardProps> = ({ initialData }) => {
         subcategoria_economica: []
     });
 
-    // Load initial data
-    const dashboardData = useMemo(() => {
-        const data = getInitialData(initialData);
-        console.log('Dashboard data loaded:', {
-            totalFaltas: data.totalFaltas,
-            dataRows: data.data.length,
-            availableFilters: Object.keys(data.availableFilters),
-            filterValues: {
-                regions: data.availableFilters.region.length,
-                categorias: data.availableFilters.categoria_economica.length,
-                subcategorias: data.availableFilters.subcategoria_economica.length
+    // Hook into OpenAI global state
+    const toolOutput = useOpenAiGlobal('toolOutput') as any;
+    const toolResponseMetadata = useOpenAiGlobal('toolResponseMetadata');
+    const widgetStateFromGlobal = useOpenAiGlobal('widgetState') as DashboardData | null;
+
+    // Local widget state management
+    const [dashboardState, setDashboardState] = useWidgetState<DashboardData>(
+        createDefaultDashboardState
+    );
+
+    const lastToolOutputRef = useRef<string>("__tool_output_unset__");
+
+    // Process toolOutput whenever it changes
+    useEffect(() => {
+        if (toolOutput == null) {
+            console.log('No toolOutput available, using default state');
+            return;
+        }
+
+        // Serialize to check if actually changed
+        const serializedToolOutput = (() => {
+            try {
+                return JSON.stringify({ toolOutput, toolResponseMetadata });
+            } catch (error) {
+                console.warn("Unable to serialize toolOutput", error);
+                return "__tool_output_error__";
             }
-        });
-        return data;
-    }, [initialData]);
+        })();
+
+        if (serializedToolOutput === lastToolOutputRef.current) {
+            console.log('toolOutput unchanged, skipping update');
+            return;
+        }
+        lastToolOutputRef.current = serializedToolOutput;
+
+        console.log('Processing new toolOutput:', toolOutput);
+
+        try {
+            // Parse the tool output
+            const incomingData = parseGPTOutput(toolOutput);
+
+            // Merge with existing widgetState (from previous turn)
+            const baseState = widgetStateFromGlobal ?? dashboardState ?? createDefaultDashboardState();
+
+            // Create next state by merging
+            const nextState: DashboardData = {
+                totalFaltas: incomingData.totalFaltas,
+                data: incomingData.data.length > 0 ? incomingData.data : baseState.data,
+                availableFilters: {
+                    region: incomingData.availableFilters.region.length > 0
+                        ? incomingData.availableFilters.region
+                        : baseState.availableFilters.region,
+                    categoria_economica: incomingData.availableFilters.categoria_economica.length > 0
+                        ? incomingData.availableFilters.categoria_economica
+                        : baseState.availableFilters.categoria_economica,
+                    subcategoria_economica: incomingData.availableFilters.subcategoria_economica.length > 0
+                        ? incomingData.availableFilters.subcategoria_economica
+                        : baseState.availableFilters.subcategoria_economica
+                }
+            };
+
+            console.log('Updating dashboard state:', nextState);
+            setDashboardState(nextState);
+        } catch (error) {
+            console.error('Error processing toolOutput:', error);
+        }
+    }, [toolOutput, toolResponseMetadata, widgetStateFromGlobal]);
+
+    const dashboardData = dashboardState ?? createDefaultDashboardState();
     const themeColors = useMemo(() => getThemeColors(theme), [theme]);
 
     // Apply filters to data
