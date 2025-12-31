@@ -33,6 +33,12 @@ export const parseGPTOutput = (rawOutput: any): DashboardData => {
     if (rawOutput && Array.isArray(rawOutput.data) && rawOutput.data.length > 0) {
       const data: FaltaDataRow[] = rawOutput.data;
 
+      console.log('Parsing GPT output:', {
+        totalRows: data.length,
+        firstRow: data[0],
+        sampleCantidadCasos: data.slice(0, 5).map(r => r.cantidad_casos)
+      });
+
       // Calculate total casos from data
       const totalFaltas = data.reduce((sum, row) => sum + (row.cantidad_casos || 0), 0);
 
@@ -42,6 +48,13 @@ export const parseGPTOutput = (rawOutput: any): DashboardData => {
         categoria_economica: getUniqueValues(data, 'categoria_economica'),
         subcategoria_economica: getUniqueValues(data, 'subcategoria_economica'),
       };
+
+      console.log('Generated filters:', {
+        regions: availableFilters.region.length,
+        categorias: availableFilters.categoria_economica.length,
+        subcategorias: availableFilters.subcategoria_economica.length,
+        totalCalculated: totalFaltas
+      });
 
       return {
         totalFaltas,

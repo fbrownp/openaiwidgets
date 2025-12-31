@@ -17,10 +17,23 @@ if (!rootElement) {
     throw new Error('Missing snifa_dashboard_faltas-root element');
 }
 
+// Get initial data from window object if available
+// This is set by the GPT endpoint
+const initialData = (window as any).__SNIFA_DASHBOARD_DATA__ || null;
+
+if (initialData) {
+    console.log('Received data from endpoint:', {
+        dataRows: initialData.data?.length,
+        sample: initialData.data?.[0]
+    });
+} else {
+    console.log('No data from endpoint, will use placeholder data');
+}
+
 console.log('Mounting SNIFA Dashboard...');
 createRoot(rootElement).render(
     <React.StrictMode>
-        <Dashboard />
+        <Dashboard initialData={initialData} />
     </React.StrictMode>
 );
 

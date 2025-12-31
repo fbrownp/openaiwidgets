@@ -69,7 +69,11 @@ const getThemeColors = (theme: 'light' | 'dark'): ThemeColors => {
     };
 };
 
-export const Dashboard: React.FC = () => {
+interface DashboardProps {
+    initialData?: any;
+}
+
+export const Dashboard: React.FC<DashboardProps> = ({ initialData }) => {
     console.log('SNIFA Dashboard Faltas rendering...');
 
     // State management
@@ -82,14 +86,19 @@ export const Dashboard: React.FC = () => {
 
     // Load initial data
     const dashboardData = useMemo(() => {
-        const data = getInitialData();
+        const data = getInitialData(initialData);
         console.log('Dashboard data loaded:', {
             totalFaltas: data.totalFaltas,
             dataRows: data.data.length,
-            availableFilters: Object.keys(data.availableFilters)
+            availableFilters: Object.keys(data.availableFilters),
+            filterValues: {
+                regions: data.availableFilters.region.length,
+                categorias: data.availableFilters.categoria_economica.length,
+                subcategorias: data.availableFilters.subcategoria_economica.length
+            }
         });
         return data;
-    }, []);
+    }, [initialData]);
     const themeColors = useMemo(() => getThemeColors(theme), [theme]);
 
     // Apply filters to data
@@ -212,7 +221,13 @@ export const Dashboard: React.FC = () => {
 
     // Calculate widget values
     const totalCasos = useMemo(() => {
-        return filteredData.reduce((sum, row) => sum + row.cantidad_casos, 0);
+        const total = filteredData.reduce((sum, row) => sum + row.cantidad_casos, 0);
+        console.log('Total casos calculated:', {
+            filteredRows: filteredData.length,
+            totalCasos: total,
+            sampleCasos: filteredData.slice(0, 3).map(r => r.cantidad_casos)
+        });
+        return total;
     }, [filteredData]);
     const mostAffectedSubcomponente = useMemo(() => {
         if (aggregateBySubcomponente.length === 0) return 'N/A';
