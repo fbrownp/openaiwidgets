@@ -305,10 +305,25 @@ export const Dashboard: React.FC = () => {
         return aggregateBySubtipoCompromiso[0].category;
     }, [aggregateBySubtipoCompromiso]);
 
-    // Build filter configurations
+    // Build filter configurations with dynamic options based on current selections
     const buildFilterConfigs = (): FilterConfig[] => {
         const configs: FilterConfig[] = [];
 
+        // Helper function to get unique values from filtered data
+        const getUniqueValuesFromData = (data: FaltaDataRow[], field: keyof FaltaDataRow): string[] => {
+            const values = new Set<string>();
+            data.forEach(row => {
+                const value = row[field];
+                if (typeof value === 'string') {
+                    values.add(value);
+                } else if (value === null) {
+                    values.add('Sin Información');
+                }
+            });
+            return ['Todas', ...Array.from(values).sort()];
+        };
+
+        // Region filter - always shows all regions
         configs.push({
             label: 'region',
             options: dashboardData.availableFilters.region,
@@ -316,16 +331,42 @@ export const Dashboard: React.FC = () => {
             multiSelect: true
         });
 
+        // Categoria economica filter - filtered by region if selected
+        let dataForCategoriaEconomica = dashboardData.data;
+        if (filterState.region.length > 0 && !filterState.region.includes('Todas')) {
+            dataForCategoriaEconomica = dashboardData.data.filter(row => {
+                const regionValue = row.region || 'Sin Información';
+                return filterState.region.includes(regionValue);
+            });
+        }
+        const categoriaEconomicaOptions = getUniqueValuesFromData(dataForCategoriaEconomica, 'categoria_economica');
+
         configs.push({
             label: 'categoria_economica',
-            options: dashboardData.availableFilters.categoria_economica,
+            options: categoriaEconomicaOptions,
             selectedValues: filterState.categoria_economica,
             multiSelect: true
         });
 
+        // Subcategoria economica filter - filtered by region AND categoria_economica if selected
+        let dataForSubcategoriaEconomica = dashboardData.data;
+        if (filterState.region.length > 0 && !filterState.region.includes('Todas')) {
+            dataForSubcategoriaEconomica = dataForSubcategoriaEconomica.filter(row => {
+                const regionValue = row.region || 'Sin Información';
+                return filterState.region.includes(regionValue);
+            });
+        }
+        if (filterState.categoria_economica.length > 0 && !filterState.categoria_economica.includes('Todas')) {
+            dataForSubcategoriaEconomica = dataForSubcategoriaEconomica.filter(row => {
+                const categoriaValue = row.categoria_economica || 'Sin Información';
+                return filterState.categoria_economica.includes(categoriaValue);
+            });
+        }
+        const subcategoriaEconomicaOptions = getUniqueValuesFromData(dataForSubcategoriaEconomica, 'subcategoria_economica');
+
         configs.push({
             label: 'subcategoria_economica',
-            options: dashboardData.availableFilters.subcategoria_economica,
+            options: subcategoriaEconomicaOptions,
             selectedValues: filterState.subcategoria_economica,
             multiSelect: true
         });
