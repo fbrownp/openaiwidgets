@@ -2,8 +2,9 @@
 
 ## How to Pass Data to the Dashboard
 
-The dashboard expects data to be set on the window object before the widget loads:
+The dashboard expects data to be set on the window object **before the widget loads**.
 
+### Option 1: Object format (recommended)
 ```javascript
 window.__SNIFA_DASHBOARD_DATA__ = {
   data: [
@@ -22,6 +23,48 @@ window.__SNIFA_DASHBOARD_DATA__ = {
     // ... more records
   ]
 };
+```
+
+### Option 2: Polars DataFrame format (Python)
+```javascript
+window.__SNIFA_DASHBOARD_DATA__ = {
+  text: "Ask the user to explore the data.",
+  data: [
+    // Array from df.to_dicts()
+    {
+      clasificacion_gravedad: "Leves",
+      instrumento_infringido_norm: "RCA",
+      // ... other fields
+    },
+    // ... more records
+  ]
+};
+```
+
+In Python with Polars:
+```python
+import polars as pl
+
+# Your DataFrame
+df = pl.DataFrame(...)
+
+# Pass to widget
+widget_data = {
+    'text': "Ask the user to explore the data.",
+    'data': df.to_dicts(),
+}
+```
+
+### Option 3: Direct array format
+```javascript
+window.__SNIFA_DASHBOARD_DATA__ = [
+  {
+    clasificacion_gravedad: "Leves",
+    instrumento_infringido_norm: "RCA",
+    // ... other fields
+  },
+  // ... more records
+];
 ```
 
 ## Data Schema

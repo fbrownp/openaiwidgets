@@ -25,14 +25,38 @@ const getUniqueValues = (data: FaltaDataRow[], field: keyof FaltaDataRow): strin
 
 /**
  * Parse GPT output and convert to dashboard data
- * Accepts input in format: {data: [{...}, {...}, ...]}
+ * Accepts input in formats:
+ * - {text: "...", data: [{...}]} (Polars DataFrame format)
+ * - {data: [{...}]}
+ * - [{...}]
  */
 export const parseGPTOutput = (rawOutput: any): DashboardData => {
   try {
-    // Check if rawOutput has data array
-    if (rawOutput && Array.isArray(rawOutput.data) && rawOutput.data.length > 0) {
-      const data: FaltaDataRow[] = rawOutput.data;
+    let data: FaltaDataRow[] = [];
 
+    console.log('Raw output received:', {
+      type: typeof rawOutput,
+      isArray: Array.isArray(rawOutput),
+      hasData: rawOutput?.data !== undefined,
+      hasText: rawOutput?.text !== undefined,
+      keys: rawOutput ? Object.keys(rawOutput) : []
+    });
+
+    // Handle multiple input formats
+    if (Array.isArray(rawOutput)) {
+      // Direct array format: [{...}, {...}]
+      data = rawOutput;
+      console.log('Detected direct array format');
+    } else if (rawOutput && Array.isArray(rawOutput.data)) {
+      // Object with data property: {data: [...]} or {text: "...", data: [...]}
+      data = rawOutput.data;
+      console.log('Detected object format with data property');
+      if (rawOutput.text) {
+        console.log('Text message:', rawOutput.text);
+      }
+    }
+
+    if (data.length > 0) {
       console.log('Parsing GPT output:', {
         totalRows: data.length,
         firstRow: data[0],
@@ -84,15 +108,25 @@ export const parseGPTOutput = (rawOutput: any): DashboardData => {
 /**
  * Validate GPT output structure
  * This will be used when integrating with actual GPT apps
+ * Accepts both {data: [...]} and [...] formats
  */
 export const validateGPTOutput = (output: any): boolean => {
-  if (!output || typeof output !== 'object') return false;
+  if (!output) return false;
+
+  let dataArray: any[] = [];
+
+  // Handle both array and object formats
+  if (Array.isArray(output)) {
+    dataArray = output;
+  } else if (typeof output === 'object' && Array.isArray(output.data)) {
+    dataArray = output.data;
+  }
 
   // Check if data array exists and is valid
-  if (!Array.isArray(output.data) || output.data.length === 0) return false;
+  if (dataArray.length === 0) return false;
 
   // Validate first data row has required fields
-  const firstRow = output.data[0];
+  const firstRow = dataArray[0];
   if (!firstRow.clasificacion_gravedad || typeof firstRow.cantidad_casos !== 'number') {
     return false;
   }
