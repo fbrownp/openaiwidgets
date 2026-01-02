@@ -20,6 +20,8 @@ export function createDefaultBrechasData(): GPTBrechasData {
  */
 export function parseGPTOutput(toolOutput: GPTRawOutput): GPTBrechasData {
     try {
+        console.log('Parsing toolOutput:', toolOutput);
+
         // Handle different possible structures
         if (toolOutput.data) {
             // If data is a string, try to parse it
@@ -32,6 +34,29 @@ export function parseGPTOutput(toolOutput: GPTRawOutput): GPTBrechasData {
                     return createDefaultBrechasData();
                 }
             }
+
+            // If data is an array (List[Dict] format)
+            if (Array.isArray(toolOutput.data)) {
+                console.log('Data is an array with length:', toolOutput.data.length);
+
+                // If array is empty, return default
+                if (toolOutput.data.length === 0) {
+                    return createDefaultBrechasData();
+                }
+
+                // Take the first element if it exists
+                const firstElement = toolOutput.data[0];
+                console.log('First element:', firstElement);
+
+                // Check if first element has analisis_brechas
+                if (firstElement && typeof firstElement === 'object' && 'analisis_brechas' in firstElement) {
+                    return validateAndNormalize(firstElement);
+                }
+
+                // Otherwise, assume the array itself might be the analisis_brechas
+                return validateAndNormalize({ analisis_brechas: toolOutput.data });
+            }
+
             // If data is already an object, validate and normalize
             return validateAndNormalize(toolOutput.data);
         }
