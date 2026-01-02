@@ -1,0 +1,71 @@
+/* Brechas Widget Styles */
+
+.brechas-widget {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Custom scrollbar for dark theme */
+.brechas-widget *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.brechas-widget *::-webkit-scrollbar-track {
+    background: #2d2d2d;
+    border-radius: 4px;
+}
+
+.brechas-widget *::-webkit-scrollbar-thumb {
+    background: #8b5cf6;
+    border-radius: 4px;
+}
+
+.brechas-widget *::-webkit-scrollbar-thumb:hover {
+    background: #a78bfa;
+}
+
+/* Smooth transitions */
+.brechas-widget * {
+    box-sizing: border-box;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.brechas-widget .fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Focus styles for accessibility */
+.brechas-widget button:focus,
+.brechas-widget select:focus {
+    outline: 2px solid #8b5cf6;
+    outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+    .brechas-widget {
+        background: white !important;
+    }
+
+    .brechas-widget button {
+        display: none !important;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .brechas-widget {
+        padding: 12px !important;
+    }
+}
