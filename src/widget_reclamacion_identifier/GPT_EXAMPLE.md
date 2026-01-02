@@ -4,11 +4,11 @@ This document shows how ChatGPT should structure its output for the Observation 
 
 ## Expected Output Format
 
-ChatGPT should output a JSON object matching the `ObservationsIdentifier` Pydantic model:
+ChatGPT should output a JSON object following the standard schema format `data: List[Dict]`:
 
 ```json
 {
-  "observations_reference": [
+  "data": [
     {
       "identifier": "Usuario_Consulta_001",
       "first_level_trace": "EIA_Proyecto_Minero_2023.pdf",
@@ -125,7 +125,7 @@ If no similar observations are found:
 
 ```json
 {
-  "observations_reference": []
+  "data": []
 }
 ```
 
@@ -135,8 +135,8 @@ When ChatGPT responds with this widget, it should:
 
 1. Analyze the user's query about observations
 2. Search for similar or identical observations in the database/context
-3. Structure the results according to the Pydantic model
-4. Return the JSON with all required fields
+3. Structure the results using the standard schema format: `data: List[Dict]`
+4. Return the JSON with all required fields in each dictionary
 
 ## Example ChatGPT Response
 
@@ -145,7 +145,7 @@ I found 5 observations that are similar or identical to your query about groundw
 
 <observation_widget>
 {
-  "observations_reference": [
+  "data": [
     {
       "identifier": "Usuario_Consulta_001",
       "first_level_trace": "EIA_Proyecto_Minero_2023.pdf",

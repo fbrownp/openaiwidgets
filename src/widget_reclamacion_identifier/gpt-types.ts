@@ -1,19 +1,19 @@
-import { ObservationIdentifier, ObservationsIdentifier, Similitud, InstanciaObservacion } from './types';
+import { ObservationIdentifier, Similitud, InstanciaObservacion } from './types';
 
 /**
  * Interface for data received from ChatGPT
- * This matches the Pydantic model format from the backend
+ * This matches the standard schema format: data: List[Dict]
  */
 export interface GPTObservationsData {
-    observations_reference: ObservationIdentifier[];
+    data: ObservationIdentifier[];
 }
 
 /**
  * Raw GPT output format (as it comes from GPT)
- * GPT will output based on the Pydantic BaseModel structure
+ * GPT will output based on the standard schema: data: List[Dict]
  */
 export interface GPTRawOutput {
-    observations_reference?: Array<{
+    data?: Array<{
         identifier: string;
         first_level_trace: string;
         original_name: string;

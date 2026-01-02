@@ -102,9 +102,9 @@ export function Dashboard() {
 
             // Create next state by merging
             const nextState: GPTObservationsData = {
-                observations_reference: incomingData.observations_reference.length > 0
-                    ? incomingData.observations_reference
-                    : baseState.observations_reference
+                data: incomingData.data.length > 0
+                    ? incomingData.data
+                    : baseState.data
             };
 
             console.log('Updating observations state:', nextState);
@@ -119,10 +119,10 @@ export function Dashboard() {
     // Development mode: Load sample data if no data is available
     const isDevelopment = import.meta.env.DEV;
     React.useEffect(() => {
-        if (isDevelopment && (!data.observations_reference || data.observations_reference.length === 0)) {
+        if (isDevelopment && (!data.data || data.data.length === 0)) {
             // Load sample data for development
             const sampleData: GPTObservationsData = {
-                observations_reference: [
+                data: [
                     {
                         identifier: "Usuario_Consulta_001",
                         first_level_trace: "EIA_Proyecto_Minero_2023.pdf",
@@ -241,7 +241,7 @@ export function Dashboard() {
                 </div>
 
                 {/* Statistics */}
-                {data.observations_reference.length > 0 && (
+                {data.data.length > 0 && (
                     <div style={{
                         backgroundColor: themeColors.cardBackground,
                         borderRadius: 8,
@@ -265,7 +265,7 @@ export function Dashboard() {
                                 fontWeight: 700,
                                 color: themeColors.text
                             }}>
-                                {data.observations_reference.length}
+                                {data.data.length}
                             </div>
                         </div>
 
@@ -287,7 +287,7 @@ export function Dashboard() {
                                 fontWeight: 700,
                                 color: '#10b981'
                             }}>
-                                {data.observations_reference.filter(obs => obs.similitud === 'Identica').length}
+                                {data.data.filter(obs => obs.similitud === 'Identica').length}
                             </div>
                         </div>
 
@@ -309,7 +309,7 @@ export function Dashboard() {
                                 fontWeight: 700,
                                 color: '#3b82f6'
                             }}>
-                                {data.observations_reference.filter(obs => obs.similitud === 'Similar').length}
+                                {data.data.filter(obs => obs.similitud === 'Similar').length}
                             </div>
                         </div>
                     </div>
@@ -324,7 +324,7 @@ export function Dashboard() {
                     boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
                 }}>
                     <ObservationCarousel
-                        observations={data.observations_reference}
+                        observations={data.data}
                         themeColors={themeColors}
                     />
                 </div>

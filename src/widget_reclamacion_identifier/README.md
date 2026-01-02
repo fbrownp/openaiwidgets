@@ -36,9 +36,11 @@ class ObservationIdentifier(BaseModel):
     tipificacion_materia: str = "Descripción del tema al cual hace referencia la observación en una frase corta de 3 palabras"
 
 class ObservationsIdentifier(BaseModel):
-    """Observations references."""
-    observations_reference: List[ObservationIdentifier]
+    """Observations references - standard schema format."""
+    data: List[ObservationIdentifier]
 ```
+
+**Note:** The response follows the standard schema format where data is always named `data` with type `List[Dict]`.
 
 ## Card Layout
 
@@ -65,9 +67,11 @@ import { useWidgetState } from '../use-widget-state';
 
 ### Expected GPT Output Format
 
+Standard schema format with `data: List[Dict]`:
+
 ```json
 {
-  "observations_reference": [
+  "data": [
     {
       "identifier": "Usuario_123",
       "first_level_trace": "archivo_consulta.pdf",

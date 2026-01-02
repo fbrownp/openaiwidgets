@@ -7,9 +7,9 @@ import { ObservationIdentifier } from './types';
 export function parseGPTOutput(gptOutput: GPTRawOutput): GPTObservationsData {
     console.log('Parsing GPT output:', gptOutput);
 
-    // Parse observations array
-    const observations_reference: ObservationIdentifier[] =
-        gptOutput.observations_reference?.map(obs => ({
+    // Parse data array (standard schema: data: List[Dict])
+    const data: ObservationIdentifier[] =
+        gptOutput.data?.map(obs => ({
             identifier: obs.identifier || 'Unknown',
             first_level_trace: obs.first_level_trace || '',
             original_name: obs.original_name || '',
@@ -20,7 +20,7 @@ export function parseGPTOutput(gptOutput: GPTRawOutput): GPTObservationsData {
         })) || [];
 
     const result: GPTObservationsData = {
-        observations_reference
+        data
     };
 
     console.log('Parsed observations data:', result);
@@ -33,6 +33,6 @@ export function parseGPTOutput(gptOutput: GPTRawOutput): GPTObservationsData {
  */
 export function createDefaultObservationsData(): GPTObservationsData {
     return {
-        observations_reference: []
+        data: []
     };
 }
