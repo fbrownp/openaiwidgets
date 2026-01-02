@@ -3,10 +3,10 @@ import { createRoot } from 'react-dom/client';
 import { Dashboard } from './Dashboard';
 import './widget.css';
 
-const rootElement = document.getElementById('widget-reclamacion-identifier-root');
+const rootElement = document.getElementById('widget_reclamacion_identifier-root');
 
 if (!rootElement) {
-    throw new Error('Missing widget-reclamacion-identifier-root element');
+    throw new Error('Missing widget_reclamacion_identifier-root element');
 }
 
 console.log('Mounting Observation Identifier Widget Dashboard...');
