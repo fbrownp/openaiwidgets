@@ -16,7 +16,8 @@ export function parseGPTOutput(gptOutput: GPTRawOutput): GPTObservationsData {
             cita_encontrada: obs.cita_encontrada || '',
             similitud: obs.similitud || 'Similar',
             instancia_observacion: obs.instancia_observacion || 'PAC_1',
-            tipificacion_materia: obs.tipificacion_materia || ''
+            tipificacion_materia: obs.tipificacion_materia || '',
+            url: obs.url || ''
         })) || [];
 
     const result: GPTObservationsData = {

@@ -21,5 +21,6 @@ export interface GPTRawOutput {
         similitud: Similitud;
         instancia_observacion: InstanciaObservacion;
         tipificacion_materia: string;
+        url: string;
     }>;
 }

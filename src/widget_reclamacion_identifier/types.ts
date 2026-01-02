@@ -15,6 +15,7 @@ export interface ObservationIdentifier {
     similitud: Similitud;
     instancia_observacion: InstanciaObservacion;
     tipificacion_materia: string;
+    url: string;
 }
 
 /**
@@ -44,6 +45,7 @@ export type ThemeColors = {
     chipTipificacionBg: string;
     citeBorder: string;
     citeBackground: string;
+    purple: string;
 };
 
 /**

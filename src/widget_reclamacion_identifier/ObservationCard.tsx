@@ -156,7 +156,7 @@ export const ObservationCard: React.FC<ObservationCardProps> = ({
                     </div>
                 </div>
 
-                {/* Original name chip */}
+                {/* Original name chip - clickable link */}
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -171,23 +171,39 @@ export const ObservationCard: React.FC<ObservationCardProps> = ({
                     }}>
                         Ruta:
                     </span>
-                    <div style={{
-                        backgroundColor: themeColors.chipBackground,
-                        color: themeColors.chipText,
-                        padding: '4px 10px',
-                        borderRadius: 8,
-                        fontSize: 11,
-                        fontWeight: 500,
-                        fontFamily: 'monospace',
-                        maxWidth: 250,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap'
-                    }}
-                    title={observation.original_name}
+                    <a
+                        href={observation.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                            backgroundColor: themeColors.chipBackground,
+                            color: themeColors.chipText,
+                            padding: '4px 10px',
+                            borderRadius: 8,
+                            fontSize: 11,
+                            fontWeight: 500,
+                            fontFamily: 'monospace',
+                            maxWidth: 250,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            textDecoration: 'none',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s',
+                            display: 'inline-block'
+                        }}
+                        title={observation.original_name}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = themeColors.purple;
+                            e.currentTarget.style.color = 'white';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = themeColors.chipBackground;
+                            e.currentTarget.style.color = themeColors.chipText;
+                        }}
                     >
                         {observation.original_name}
-                    </div>
+                    </a>
                 </div>
             </div>
 

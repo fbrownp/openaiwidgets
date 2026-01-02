@@ -34,6 +34,9 @@ class ObservationIdentifier(BaseModel):
         description="Instancia donde se generó la observación."
     )
     tipificacion_materia: str = "Descripción del tema al cual hace referencia la observación en una frase corta de 3 palabras"
+    url: str = Field(
+        description="URL del documento donde se encontró la observación"
+    )
 
 class ObservationsIdentifier(BaseModel):
     """Observations references - standard schema format."""
@@ -48,11 +51,12 @@ Each observation card displays:
 
 - **identifier**: Title at the top of the card
 - **first_level_trace**: Chip showing the file where it was found
-- **original_name**: Chip below first_level_trace showing the full path
+- **original_name**: Clickable chip (Ruta) below first_level_trace showing the full path, linked to the document URL
 - **cita_encontrada**: Italic text citation at the bottom of the card
 - **similitud**: Chip indicating if observation is 'Similar' (blue) or 'Identica' (green)
 - **instancia_observacion**: Chip in upper right corner (PAC_1=purple, PAC_2=orange, PCPI=red)
 - **tipificacion_materia**: Chip in upper right corner below instancia_observacion
+- **url**: Used as href for the Ruta (original_name) chip, opens in new tab
 
 ## Usage
 
@@ -79,7 +83,8 @@ Standard schema format with `data: List[Dict]`:
       "cita_encontrada": "Esta es la cita textual de la observación encontrada en el documento.",
       "similitud": "Identica",
       "instancia_observacion": "PAC_1",
-      "tipificacion_materia": "contaminación de napa"
+      "tipificacion_materia": "contaminación de napa",
+      "url": "https://example.com/path/to/archivo_consulta.pdf"
     },
     {
       "identifier": "Usuario_456",
@@ -88,7 +93,8 @@ Standard schema format with `data: List[Dict]`:
       "cita_encontrada": "Texto similar pero no idéntico a la consulta original.",
       "similitud": "Similar",
       "instancia_observacion": "PCPI",
-      "tipificacion_materia": "emisiones electromagnéticas comunidad"
+      "tipificacion_materia": "emisiones electromagnéticas comunidad",
+      "url": "https://example.com/documentos/2024/observacion_2024.pdf"
     }
   ]
 }

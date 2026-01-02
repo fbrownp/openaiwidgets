@@ -28,7 +28,8 @@ const getThemeColors = (theme: Theme): ThemeColors => {
             chipPCPIBg: '#ef4444',          // Red for PCPI
             chipTipificacionBg: '#6366f1',  // Indigo for tipificacion
             citeBorder: '#8b5cf6',
-            citeBackground: '#f9fafb'
+            citeBackground: '#f9fafb',
+            purple: '#8b5cf6'               // Purple for hover effects
         };
     } else {
         return {
@@ -46,7 +47,8 @@ const getThemeColors = (theme: Theme): ThemeColors => {
             chipPCPIBg: '#f87171',
             chipTipificacionBg: '#818cf8',
             citeBorder: '#8b5cf6',
-            citeBackground: '#1f1f1f'
+            citeBackground: '#1f1f1f',
+            purple: '#a78bfa'               // Purple for hover effects
         };
     }
 };
@@ -130,7 +132,8 @@ export function Dashboard() {
                         cita_encontrada: "Se observa contaminación potencial de napas subterráneas debido a infiltraciones desde el tranque de relaves ubicado en zona de alta pluviosidad.",
                         similitud: "Identica",
                         instancia_observacion: "PAC_1",
-                        tipificacion_materia: "contaminación napa infiltraciones"
+                        tipificacion_materia: "contaminación napa infiltraciones",
+                        url: "https://example.com/evaluaciones/2023/mineria/EIA_Proyecto_Minero_2023.pdf"
                     },
                     {
                         identifier: "Usuario_Consulta_045",
@@ -139,7 +142,8 @@ export function Dashboard() {
                         cita_encontrada: "La comunidad manifiesta preocupación por posibles infiltraciones que podrían afectar las fuentes de agua subterránea utilizadas para consumo.",
                         similitud: "Similar",
                         instancia_observacion: "PCPI",
-                        tipificacion_materia: "riesgo salud agua"
+                        tipificacion_materia: "riesgo salud agua",
+                        url: "https://example.com/consultas/comunidades/2023/Observaciones_Comunidad_Sur.pdf"
                     },
                     {
                         identifier: "Usuario_Consulta_078",
@@ -148,7 +152,8 @@ export function Dashboard() {
                         cita_encontrada: "Se requiere evaluación de riesgo a la salud de receptores sensibles ubicados a 500m de la planta debido a material particulado.",
                         similitud: "Similar",
                         instancia_observacion: "PAC_2",
-                        tipificacion_materia: "riesgo salud MP"
+                        tipificacion_materia: "riesgo salud MP",
+                        url: "https://example.com/evaluaciones/2024/industria/DIA_Planta_Industrial_2024.pdf"
                     }
                 ]
             };

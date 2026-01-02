@@ -16,7 +16,8 @@ ChatGPT should output a JSON object following the standard schema format `data: 
       "cita_encontrada": "Se observa contaminación potencial de napas subterráneas debido a infiltraciones desde el tranque de relaves ubicado en zona de alta pluviosidad.",
       "similitud": "Identica",
       "instancia_observacion": "PAC_1",
-      "tipificacion_materia": "contaminación napa infiltraciones"
+      "tipificacion_materia": "contaminación napa infiltraciones",
+      "url": "https://example.com/evaluaciones/2023/mineria/EIA_Proyecto_Minero_2023.pdf"
     },
     {
       "identifier": "Usuario_Consulta_045",
@@ -25,7 +26,8 @@ ChatGPT should output a JSON object following the standard schema format `data: 
       "cita_encontrada": "La comunidad manifiesta preocupación por posibles infiltraciones que podrían afectar las fuentes de agua subterránea utilizadas para consumo.",
       "similitud": "Similar",
       "instancia_observacion": "PCPI",
-      "tipificacion_materia": "riesgo salud agua"
+      "tipificacion_materia": "riesgo salud agua",
+      "url": "https://example.com/consultas/comunidades/2023/Observaciones_Comunidad_Sur.pdf"
     },
     {
       "identifier": "Usuario_Consulta_078",
@@ -34,7 +36,8 @@ ChatGPT should output a JSON object following the standard schema format `data: 
       "cita_encontrada": "Se requiere evaluación de riesgo a la salud de receptores sensibles ubicados a 500m de la planta debido a material particulado.",
       "similitud": "Similar",
       "instancia_observacion": "PAC_2",
-      "tipificacion_materia": "riesgo salud MP"
+      "tipificacion_materia": "riesgo salud MP",
+      "url": "https://example.com/evaluaciones/2024/industria/DIA_Planta_Industrial_2024.pdf"
     },
     {
       "identifier": "Usuario_Consulta_112",
@@ -43,7 +46,8 @@ ChatGPT should output a JSON object following the standard schema format `data: 
       "cita_encontrada": "Comunidad ubicada a 2 km de la línea de transmisión expresa preocupación por emisiones electromagnéticas y sus efectos en la salud.",
       "similitud": "Identica",
       "instancia_observacion": "PAC_1",
-      "tipificacion_materia": "emisiones electromagnéticas comunidad"
+      "tipificacion_materia": "emisiones electromagnéticas comunidad",
+      "url": "https://example.com/evaluaciones/2022/energia/EIA_Linea_Transmision_2022.pdf"
     },
     {
       "identifier": "Usuario_Consulta_203",
@@ -52,7 +56,8 @@ ChatGPT should output a JSON object following the standard schema format `data: 
       "cita_encontrada": "Se solicita estudio de línea base de ruido considerando receptores sensibles como escuela y centro de salud en área de influencia.",
       "similitud": "Similar",
       "instancia_observacion": "PCPI",
-      "tipificacion_materia": "contaminación acústica receptores"
+      "tipificacion_materia": "contaminación acústica receptores",
+      "url": "https://example.com/consultas/sanitarias/Observaciones_Sanitarias_2023.pdf"
     }
   ]
 }
@@ -104,6 +109,11 @@ ChatGPT should output a JSON object following the standard schema format `data: 
   - "emisiones electromagnéticas comunidad"
   - "contaminación acústica receptores"
 
+### `url`
+- **Type**: string
+- **Description**: URL to the document where the observation was found. Used as href for the clickable Ruta (original_name) chip
+- **Example**: "https://example.com/evaluaciones/2023/mineria/EIA_Proyecto_Minero_2023.pdf"
+
 ## Common Subject Matter Types
 
 Here are examples of typical `tipificacion_materia` values:
@@ -153,7 +163,8 @@ I found 5 observations that are similar or identical to your query about groundw
       "cita_encontrada": "Se observa contaminación potencial de napas subterráneas debido a infiltraciones desde el tranque de relaves ubicado en zona de alta pluviosidad.",
       "similitud": "Identica",
       "instancia_observacion": "PAC_1",
-      "tipificacion_materia": "contaminación napa infiltraciones"
+      "tipificacion_materia": "contaminación napa infiltraciones",
+      "url": "https://example.com/evaluaciones/2023/mineria/EIA_Proyecto_Minero_2023.pdf"
     },
     ...
   ]
