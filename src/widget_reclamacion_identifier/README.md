@@ -50,12 +50,12 @@ class ObservationsIdentifier(BaseModel):
 Each observation card displays:
 
 - **identifier**: Title at the top of the card
+- **similitud**: Chip indicating if observation is 'Similar' (blue) or 'Identica' (green), displayed below identifier
+- **tipificacion_materia**: Chip displayed next to similitud chip showing the subject matter
+- **instancia_observacion**: Chip in upper right corner (PAC_1=purple, PAC_2=orange, PCPI=red)
 - **first_level_trace**: Chip showing the file where it was found
 - **original_name**: Clickable chip (Ruta) below first_level_trace showing the full path, linked to the document URL
 - **cita_encontrada**: Italic text citation at the bottom of the card
-- **similitud**: Chip indicating if observation is 'Similar' (blue) or 'Identica' (green)
-- **instancia_observacion**: Chip in upper right corner (PAC_1=purple, PAC_2=orange, PCPI=red)
-- **tipificacion_materia**: Chip in upper right corner below instancia_observacion
 - **url**: Used as href for the Ruta (original_name) chip, opens in new tab
 
 ## Usage

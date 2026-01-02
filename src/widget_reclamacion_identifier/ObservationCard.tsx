@@ -56,15 +56,11 @@ export const ObservationCard: React.FC<ObservationCardProps> = ({
             e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
         }}
         >
-            {/* Upper right corner chips */}
+            {/* Upper right corner chip */}
             <div style={{
                 position: 'absolute',
                 top: 16,
-                right: 16,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 6,
-                alignItems: 'flex-end'
+                right: 16
             }}>
                 {/* Instancia Observacion chip */}
                 <div style={{
@@ -79,21 +75,6 @@ export const ObservationCard: React.FC<ObservationCardProps> = ({
                 }}>
                     {observation.instancia_observacion}
                 </div>
-
-                {/* Tipificacion Materia chip */}
-                <div style={{
-                    backgroundColor: themeColors.chipTipificacionBg,
-                    color: 'white',
-                    padding: '4px 12px',
-                    borderRadius: 12,
-                    fontSize: 10,
-                    fontWeight: 500,
-                    maxWidth: 180,
-                    textAlign: 'right',
-                    lineHeight: 1.3
-                }}>
-                    {observation.tipificacion_materia}
-                </div>
             </div>
 
             {/* Identifier - Title */}
@@ -107,8 +88,15 @@ export const ObservationCard: React.FC<ObservationCardProps> = ({
                 {observation.identifier}
             </div>
 
-            {/* Similitud chip */}
-            <div style={{ marginTop: -8 }}>
+            {/* Similitud and Tipificacion Materia chips - side by side */}
+            <div style={{
+                marginTop: -8,
+                display: 'flex',
+                gap: 8,
+                flexWrap: 'wrap',
+                alignItems: 'center'
+            }}>
+                {/* Similitud chip */}
                 <div style={{
                     display: 'inline-block',
                     backgroundColor: getSimilitudColor(),
@@ -119,6 +107,20 @@ export const ObservationCard: React.FC<ObservationCardProps> = ({
                     fontWeight: 600
                 }}>
                     {observation.similitud}
+                </div>
+
+                {/* Tipificacion Materia chip */}
+                <div style={{
+                    display: 'inline-block',
+                    backgroundColor: themeColors.chipTipificacionBg,
+                    color: 'white',
+                    padding: '6px 14px',
+                    borderRadius: 14,
+                    fontSize: 11,
+                    fontWeight: 500,
+                    lineHeight: 1.3
+                }}>
+                    {observation.tipificacion_materia}
                 </div>
             </div>
 
