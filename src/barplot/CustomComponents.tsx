@@ -94,6 +94,85 @@ export const Select = ({
     );
 };
 
+// Custom Button Component
+export const Button = ({
+    onClick,
+    children,
+    variant = 'default',
+    size = 'md'
+}: {
+    onClick?: () => void;
+    children: React.ReactNode;
+    variant?: 'default' | 'ghost' | 'outline';
+    size?: 'sm' | 'md' | 'lg';
+}) => {
+    const getVariantStyles = () => {
+        switch (variant) {
+            case 'ghost':
+                return {
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    color: '#6b7280',
+                    hover: '#f3f4f6'
+                };
+            case 'outline':
+                return {
+                    backgroundColor: 'white',
+                    border: '1px solid #d1d5db',
+                    color: '#374151',
+                    hover: '#f9fafb'
+                };
+            default:
+                return {
+                    backgroundColor: '#3b82f6',
+                    border: 'none',
+                    color: 'white',
+                    hover: '#2563eb'
+                };
+        }
+    };
+
+    const getPadding = () => {
+        switch (size) {
+            case 'sm':
+                return '4px 8px';
+            case 'lg':
+                return '12px 20px';
+            default:
+                return '6px 12px';
+        }
+    };
+
+    const styles = getVariantStyles();
+
+    return (
+        <button
+            onClick={onClick}
+            style={{
+                padding: getPadding(),
+                borderRadius: 6,
+                border: styles.border,
+                backgroundColor: styles.backgroundColor,
+                color: styles.color,
+                fontSize: size === 'sm' ? 12 : 14,
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4
+            }}
+            onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = styles.hover;
+            }}
+            onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = styles.backgroundColor;
+            }}
+        >
+            {children}
+        </button>
+    );
+};
+
 // Custom Chart Component (simplified version using canvas or SVG)
 export const Chart = ({
     data,
