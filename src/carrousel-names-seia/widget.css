@@ -1,0 +1,11 @@
+/* SEIA Projects Carousel Widget Styles */
+
+/* Hide scrollbar for carousel container */
+.seia-carousel-container::-webkit-scrollbar {
+    display: none;
+}
+
+.seia-carousel-container {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
