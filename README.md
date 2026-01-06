@@ -1,232 +1,412 @@
-# Apps SDK Examples Gallery
+# OpenAI Widgets
 
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+A collection of custom data visualization widgets built with React and TypeScript for integration with OpenAI's Apps SDK. This project provides interactive dashboard components for data analysis and visualization.
 
-This repository showcases example UI components to be used with the [Apps SDK](https://developers.openai.com/apps-sdk), as well as example MCP servers that expose a collection of components as tools.
-It is meant to be used as a starting point and source of inspiration to build your own apps for ChatGPT.
+## Project Overview
 
-Note: If you are on Chrome and have recently updated to version 142, you will need to disable the [`local-network-access` flag](https://developer.chrome.com/release-notes/142#local_network_access_restrictions) to see the widget UI.
+This repository contains four custom widgets:
 
-How to disable it:
+1. **Widget Reclamación Identifier** - Carousel widget for displaying observation identifiers with similarity matching
+2. **Barplot** - Enhanced bar plot components including horizontal, box plots, and candlestick charts
+3. **Indexing Dashboard** - Dashboard for displaying indexed data with filtering capabilities
+4. **SNIFA Dashboard Faltas** - Dashboard for visualizing attendance violations with severity classification
 
-1. Go to chrome://flags/
-2. Find #local-network-access-check
-3. Set it to Disabled
-
-⚠️ **Note 🚨 Make sure to restart Chrome after changing this flag for the update to take effect.**
-
-## MCP + Apps SDK overview
-
-The Model Context Protocol (MCP) is an open specification for connecting large language model clients to external tools, data, and user interfaces. An MCP server exposes tools that a model can call during a conversation and returns results according to the tool contracts. Those results can include extra metadata—such as inline HTML—that the Apps SDK uses to render rich UI components (widgets) alongside assistant messages.
-
-Within the Apps SDK, MCP keeps the server, model, and UI in sync. By standardizing the wire format, authentication, and metadata, it lets ChatGPT reason about your connector the same way it reasons about built-in tools. A minimal MCP integration for Apps SDK implements three capabilities:
-
-1. **List tools** – Your server advertises the tools it supports, including their JSON Schema input/output contracts and optional annotations (for example, `readOnlyHint`).
-2. **Call tools** – When a model selects a tool, it issues a `call_tool` request with arguments that match the user intent. Your server executes the action and returns structured content the model can parse.
-3. **Return widgets** – Alongside structured content, return embedded resources in the response metadata so the Apps SDK can render the interface inline in the Apps SDK client (ChatGPT).
-
-Because the protocol is transport agnostic, you can host the server over Server-Sent Events or streaming HTTP—Apps SDK supports both.
-
-The MCP servers in this demo highlight how each tool can light up widgets by combining structured payloads with `_meta.openai/outputTemplate` metadata returned from the MCP servers.
-
-## Repository structure
-
-- `src/` – Source for each widget example.
-- `assets/` – Generated HTML, JS, and CSS bundles after running the build step.
-- `shopping_cart_python/` – Python MCP server that demonstrates how `_meta["widgetSessionId"]` keeps `widgetState` in sync across turns for a shopping-cart widget.
-- `pizzaz_server_node/` – MCP server implemented with the official TypeScript SDK.
-- `pizzaz_server_python/` – Python MCP server that returns the Pizzaz widgets.
-- `solar-system_server_python/` – Python MCP server for the 3D solar system widget.
-- `kitchen_sink_server_node/` – Node MCP server for the kitchen-sink-lite widget.
-- `kitchen_sink_server_python/` – Python MCP server for the kitchen-sink-lite widget.
-- `authenticated_server_python/` – Python MCP server that demonstrates authenticated tool calls.
-- `build-all.mts` – Vite build orchestrator that produces hashed bundles for every widget entrypoint.
-
-### Pizzaz overview
-
-This example contains multiple components showing multiple types of views and interactions: a list view, a carousel view, a map view. It also contains a "pizzaz shop" showing interactive flows and a checkout page.
-
-This example uses the [Apps SDK UI library](https://github.com/openai/apps-sdk-ui) for simple components such as images, buttons, and badges.
-
-### Kitchen sink lite overview
-
-The kitchen sink lite sample shows the full `window.openai` surface working together:
-
-- Reads host state (`toolInput`, `toolOutput`, `displayMode`, `theme`, `widgetState`).
-- Writes host state with `setWidgetState`.
-- Calls another MCP tool from the widget with `callTool`.
-- Uses host helpers like `requestDisplayMode`, `openExternal`, and `sendFollowUpMessage`.
-
-Use it as a reference for how to wire UI to MCP tool responses and host APIs with the Apps SDK UI components.
+Each widget is built as a standalone bundle (HTML, JS, CSS) that can be served independently and integrated into ChatGPT through OpenAI's Apps SDK.
 
 ## Prerequisites
 
-- Node.js 18+
-- pnpm (recommended) or npm/yarn
-- Python 3.10+ (for the Python MCP server)
-- pre-commit for formatting
+Before running this project, ensure you have the following installed:
 
-## Install dependencies
+- **Node.js** version 18 or higher
+- **pnpm** version 10.24.0 (recommended package manager)
+  - Alternative: npm or yarn can be used, but pnpm is recommended
+- **Git** for version control
 
-Clone the repository and install the workspace dependencies:
+### Installing pnpm
+
+If you don't have pnpm installed:
+
+```bash
+npm install -g pnpm@10.24.0
+```
+
+## Installation
+
+### 1. Clone the Repository
+
+```bash
+git clone <repository-url>
+cd openaiwidgets
+```
+
+### 2. Install Dependencies
+
+Install all project dependencies using pnpm:
 
 ```bash
 pnpm install
+```
+
+This will install all dependencies defined in `package.json`, including:
+- React 19 and React DOM
+- Vite build tool
+- TypeScript
+- Tailwind CSS
+- Chart libraries (recharts via custom components)
+- OpenAI Apps SDK UI components
+
+### 3. Install Pre-commit Hooks (Optional)
+
+For code formatting consistency:
+
+```bash
 pre-commit install
 ```
 
-> Using npm or yarn? Install the root dependencies with your preferred client and adjust the commands below accordingly.
+## Building the Widgets
 
-## Build the components gallery
+The widgets must be built before they can be used. The build process:
+1. Bundles each widget with its CSS and dependencies
+2. Generates hashed filenames for cache busting
+3. Creates HTML entry points for each widget
+4. Outputs all files to the `assets/` directory
 
-The components are bundled into standalone assets that the MCP servers serve as reusable UI resources.
+### Build All Widgets
+
+To build all widgets for production:
 
 ```bash
 pnpm run build
 ```
 
-This command runs `build-all.mts`, producing versioned `.html`, `.js`, and `.css` files inside `assets/`. Each widget is wrapped with the CSS it needs so you can host the bundles directly or ship them with your own server.
+This command:
+- Runs the `build-all.mts` script
+- Builds all 4 widgets: `barplot`, `indexing_dashboard`, `snifa_dashboard_faltas`, `widget_reclamacion_identifier`
+- Creates versioned files in the `assets/` directory with hash suffixes (e.g., `barplot-a1b2.js`)
+- Generates HTML files for each widget
 
-To iterate on your components locally, you can also launch the Vite dev server:
+### Build Output
 
-```bash
-pnpm run dev
+After building, the `assets/` directory will contain:
+
+```
+assets/
+├── barplot-<hash>.js
+├── barplot-<hash>.css
+├── barplot-<hash>.html
+├── barplot.html (non-hashed version)
+├── indexing_dashboard-<hash>.js
+├── indexing_dashboard-<hash>.css
+├── indexing_dashboard-<hash>.html
+├── indexing_dashboard.html
+├── snifa_dashboard_faltas-<hash>.js
+├── snifa_dashboard_faltas-<hash>.css
+├── snifa_dashboard_faltas-<hash>.html
+├── snifa_dashboard_faltas.html
+├── widget_reclamacion_identifier-<hash>.js
+├── widget_reclamacion_identifier-<hash>.css
+├── widget_reclamacion_identifier-<hash>.html
+└── widget_reclamacion_identifier.html
 ```
 
-## Serve the static assets
+### Environment Variables
 
-All of the MCP servers expect the bundled HTML, JS, and CSS to be served from the local static file server. After every build, start the server before launching any MCP processes:
+You can customize the base URL for assets:
+
+```bash
+BASE_URL=https://your-domain.com pnpm run build
+```
+
+Default: `http://localhost:4444`
+
+## Running the Project
+
+### Serve Built Assets
+
+After building, serve the static assets locally:
 
 ```bash
 pnpm run serve
 ```
 
-The assets are exposed at [`http://localhost:4444`](http://localhost:4444) with CORS enabled so that local tooling (including MCP inspectors) can fetch them.
+This command:
+- Starts a static file server on port 4444
+- Serves files from the `assets/` directory
+- Enables CORS for local development
+- Makes widgets accessible at `http://localhost:4444`
 
-> **Note:** The Python Pizzaz server caches widget HTML with `functools.lru_cache`. If you rebuild or manually edit files in `assets/`, restart the MCP server so it picks up the updated markup.
+The server must be running for widgets to load properly in any application or testing environment.
 
-## Run the MCP servers
+### Development Mode
 
-The repository ships several demo MCP servers that highlight different widget bundles:
-
-- **Pizzaz (Node & Python)** – pizza-inspired collection of tools and components
-- **Solar system (Python)** – 3D solar system viewer
-- **Authenticated (Python)** – set of tools that require different levels of OAuth
-- **Kitchen sink lite (Node & Python)** – minimal widget + server pairing that demonstrates tool output, widget state, `callTool`, and host helpers
-- **Shopping cart (Python)** – simple shopping cart widget that demonstrates how to use `widgetSessionId` to keep state between tool calls
-
-### Pizzaz Node server
+For active development with hot module replacement:
 
 ```bash
-cd pizzaz_server_node
-pnpm start
+pnpm run dev
 ```
 
-### Pizzaz Python server
+This command:
+- Starts the Vite development server
+- Enables hot module replacement (HMR)
+- Watches for file changes and auto-reloads
+- Useful for iterating on widget code
+
+**Note:** In development mode, you may need to access specific widget entry points through the Vite dev server URLs.
+
+### Host Development Mode
+
+To develop with the host application:
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r pizzaz_server_python/requirements.txt
-uvicorn pizzaz_server_python.main:app --port 8000
+pnpm run dev:host
 ```
 
-### Authenticated Python server
+This uses the `vite.host.config.mts` configuration for testing widgets in a host environment.
+
+## Accessing Widgets
+
+After building and serving, access widgets at:
+
+- **Barplot**: http://localhost:4444/barplot.html
+- **Indexing Dashboard**: http://localhost:4444/indexing_dashboard.html
+- **SNIFA Dashboard**: http://localhost:4444/snifa_dashboard_faltas.html
+- **Reclamación Identifier**: http://localhost:4444/widget_reclamacion_identifier.html
+
+## Project Structure
+
+```
+openaiwidgets/
+├── src/                              # Source code for all widgets
+│   ├── barplot/                      # Bar plot widget components
+│   │   ├── index.tsx                 # Entry point
+│   │   ├── barplot.tsx               # Main component
+│   │   ├── EnhancedBarplot.tsx       # Enhanced version
+│   │   ├── HorizontalBarplot.tsx     # Horizontal layout
+│   │   ├── BoxPlot.tsx               # Box plot component
+│   │   ├── CandlestickChart.tsx      # Candlestick chart
+│   │   ├── types.ts                  # TypeScript types
+│   │   ├── gpt-types.ts              # GPT integration types
+│   │   ├── gpt-adapter.ts            # Data adapter
+│   │   └── barplot.css               # Styles
+│   ├── indexing_dashboard/           # Indexing dashboard widget
+│   │   ├── index.tsx
+│   │   ├── IndexBarplot.tsx
+│   │   ├── types.ts
+│   │   └── ...
+│   ├── snifa_dashboard_faltas/       # SNIFA violations dashboard
+│   │   ├── index.tsx
+│   │   ├── HorizontalStackedBarplot.tsx
+│   │   ├── LineChart.tsx
+│   │   ├── types.ts
+│   │   └── ...
+│   ├── widget_reclamacion_identifier/ # Observation identifier widget
+│   │   ├── index.tsx
+│   │   ├── ObservationCarousel.tsx
+│   │   ├── ObservationCard.tsx
+│   │   ├── types.ts
+│   │   └── ...
+│   ├── widget_styles/                # Shared widget styles
+│   ├── index.css                     # Global styles
+│   ├── types.ts                      # Shared TypeScript types
+│   └── use-*.ts                      # React hooks for widget state
+├── assets/                           # Built widget bundles (generated)
+├── build-all.mts                     # Build orchestrator script
+├── vite.config.mts                   # Vite configuration
+├── vite.host.config.mts              # Host environment config
+├── tailwind.config.ts                # Tailwind CSS configuration
+├── tsconfig.json                     # TypeScript configuration
+├── package.json                      # Project dependencies and scripts
+├── pnpm-lock.yaml                    # Locked dependency versions
+└── README.md                         # This file
+```
+
+## Development Workflow
+
+### Complete Development Cycle
+
+1. **Install dependencies** (first time only):
+   ```bash
+   pnpm install
+   ```
+
+2. **Start development server** for live editing:
+   ```bash
+   pnpm run dev
+   ```
+
+3. **Build widgets** when ready to test:
+   ```bash
+   pnpm run build
+   ```
+
+4. **Serve built assets**:
+   ```bash
+   pnpm run serve
+   ```
+
+5. **Access widgets** in browser at `http://localhost:4444/<widget-name>.html`
+
+### Making Changes to Widgets
+
+1. Edit widget source files in `src/<widget-name>/`
+2. Save your changes
+3. If in dev mode, changes will hot-reload
+4. If serving built assets, rebuild with `pnpm run build`
+
+### Adding a New Widget
+
+1. Create a new directory in `src/` (e.g., `src/my_new_widget/`)
+2. Create an `index.tsx` entry point
+3. Add the widget name to the `targets` array in `build-all.mts`
+4. Build with `pnpm run build`
+5. Access at `http://localhost:4444/my_new_widget.html`
+
+## Widget Features
+
+### Common Features Across All Widgets
+
+- **Theme Support**: All widgets support light and dark themes
+- **Responsive Design**: Adapts to different screen sizes
+- **OpenAI Integration**: Built to work with OpenAI's Apps SDK
+- **Interactive Visualizations**: Charts with hover states and tooltips
+- **Data Filtering**: Most widgets include filtering capabilities
+
+### Widget-Specific Features
+
+#### Barplot Widget
+- Multiple chart types: bar, horizontal bar, box plot, candlestick
+- Dropdown filters for data dimensions
+- Custom styling with theme support
+
+#### Indexing Dashboard
+- Index-based data visualization
+- Multi-dimensional filtering
+- Bar plot visualizations
+
+#### SNIFA Dashboard Faltas
+- Severity classification (Leves, Graves, Gravísimas)
+- Two views: Overview and Detail
+- Time series analysis
+- Regional and categorical breakdowns
+- Advanced filtering system
+
+#### Reclamación Identifier Widget
+- Carousel navigation
+- Similarity matching (Similar/Identical)
+- Document citation display
+- Color-coded categorization
+- Statistics dashboard
+
+## TypeScript Compilation
+
+Check TypeScript types without building:
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r authenticated_server_python/requirements.txt
-uvicorn authenticated_python_server.main:app --port 8000
+# Check all TypeScript files
+pnpm run tsc
+
+# Check only app files
+pnpm run tsc:app
+
+# Check only node/config files
+pnpm run tsc:node
 ```
 
-### Solar system Python server
+## Testing Locally
 
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r solar-system_server_python/requirements.txt
-uvicorn solar-system_server_python.main:app --port 8000
-```
+Two test HTML files are provided for quick widget testing:
 
-### Kitchen sink lite Node server
+- `test-indexing.html` - Test the indexing dashboard widget
+- `test-snifa.html` - Test the SNIFA dashboard widget
 
-```bash
-pnpm --filter kitchen-sink-mcp-node start
-```
+Open these files in a browser after building and serving the assets.
 
-### Kitchen sink lite Python server
+## Integrating with ChatGPT
 
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r kitchen_sink_server_python/requirements.txt
-uvicorn kitchen_sink_server_python.main:app --port 8000
-```
+To use these widgets in ChatGPT:
 
-### Shopping cart Python server
+1. **Build the widgets**: `pnpm run build`
+2. **Serve the assets**: `pnpm run serve`
+3. **Expose locally** using a tool like [ngrok](https://ngrok.com/):
+   ```bash
+   ngrok http 4444
+   ```
+4. **Get the public URL** from ngrok (e.g., `https://abc123.ngrok-free.app`)
+5. **Update BASE_URL** and rebuild:
+   ```bash
+   BASE_URL=https://abc123.ngrok-free.app pnpm run build
+   ```
+6. **Configure in ChatGPT**:
+   - Enable developer mode in ChatGPT settings
+   - Add your connector in Settings > Connectors
+   - Use the ngrok URL to connect
 
-Use this example to learn how `_meta["widgetSessionId"]` can carry `widgetState` between tool calls so the model and widget share the same shopping cart. The widget merges tool responses with prior `widgetState`, and UI actions (like incrementing quantities) feed back into that shared state so the assistant always sees the latest cart.
+## Troubleshooting
 
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r shopping_cart_python/requirements.txt
-uvicorn shopping_cart_python.main:app --port 8000
-```
+### Widgets Not Loading
 
-> [!NOTE]
-> In production you should persist the cart server-side (see [shopping_cart_python/README.md](shopping_cart_python/README.md)), but this demo shows the mechanics of keeping state through `widgetSessionId`.
+1. Ensure assets are built: `pnpm run build`
+2. Ensure server is running: `pnpm run serve`
+3. Check that port 4444 is not in use by another process
+4. Verify the BASE_URL matches your serving location
 
----
+### Build Errors
 
-You can reuse the same virtual environment for all Python servers—install the dependencies once and run whichever entry point you need.
+1. Clear node_modules and reinstall:
+   ```bash
+   rm -rf node_modules pnpm-lock.yaml
+   pnpm install
+   ```
+2. Clear the assets directory:
+   ```bash
+   rm -rf assets
+   pnpm run build
+   ```
 
-## Testing in ChatGPT
+### CORS Issues
 
-To add these apps to ChatGPT, enable [developer mode](https://platform.openai.com/docs/guides/developer-mode), and add your apps in Settings > Connectors.
+The serve command includes `--cors` flag. If you still have CORS issues:
+- Ensure you're accessing from the correct origin
+- Check browser console for specific CORS errors
+- Verify the static server is running with CORS enabled
 
-To add your local server without deploying it, you can use a tool like [ngrok](https://ngrok.com/) to expose your local server to the internet.
+### Chrome Local Network Access (Version 142+)
 
-For example, once your mcp servers are running, you can run:
+If using Chrome 142+, you may need to disable the local network access flag:
 
-```bash
-ngrok http 8000
-```
+1. Navigate to `chrome://flags/`
+2. Find `#local-network-access-check`
+3. Set it to **Disabled**
+4. **Restart Chrome**
 
-You will get a public URL that you can use to add your local server to ChatGPT in Settings > Connectors.
+## Technologies Used
 
-For example: `https://<custom_endpoint>.ngrok-free.app/mcp`
-
-Once you add a connector, you can use it in ChatGPT conversations.
-
-You can add your app to the conversation context by selecting it in the "More" options.
-
-![more-chatgpt](https://github.com/user-attachments/assets/26852b36-7f9e-4f48-a515-aebd87173399)
-
-You can then invoke tools by asking something related. For example, for the Pizzaz app, you can ask "What are the best pizzas in town?".
-
-## Next steps
-
-- Customize the widget data: edit the handlers in `pizzaz_server_node/src`, `pizzaz_server_python/main.py`, or the solar system server to fetch data from your systems.
-- Create your own components and add them to the gallery: drop new entries into `src/` and they will be picked up automatically by the build script.
-
-### Deploy your MCP server
-
-You can use the cloud environment of your choice to deploy your MCP server.
-
-Include this in the environment variables:
-
-```
-BASE_URL=https://your-server.com
-```
-
-This will be used to generate the HTML for the widgets so that they can serve static assets from this hosted url.
-
-## Contributing
-
-You are welcome to open issues or submit PRs to improve this app, however, please note that we may not review all suggestions.
+- **React 19** - UI framework
+- **TypeScript 5.9** - Type-safe JavaScript
+- **Vite 7** - Build tool and dev server
+- **Tailwind CSS 4** - Utility-first CSS framework
+- **OpenAI Apps SDK UI** - OpenAI's official UI components
+- **Framer Motion** - Animation library
+- **Lucide React** - Icon library
+- **Embla Carousel** - Carousel functionality
+- **Three.js & React Three Fiber** - 3D graphics (if needed)
 
 ## License
 
 This project is licensed under the MIT License. See [LICENSE](./LICENSE) for details.
+
+## Contributing
+
+Contributions are welcome! Please ensure:
+
+1. Code follows TypeScript best practices
+2. All widgets build successfully
+3. Changes are tested in both light and dark themes
+4. Pre-commit hooks pass (if installed)
+
+## Support
+
+For issues or questions about:
+- **Widget functionality**: Check individual widget README files in `src/<widget-name>/`
+- **Build issues**: Review this README's Troubleshooting section
+- **OpenAI Apps SDK**: Refer to [OpenAI Apps SDK Documentation](https://developers.openai.com/apps-sdk)
