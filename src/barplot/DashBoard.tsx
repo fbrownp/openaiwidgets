@@ -87,15 +87,17 @@ const getThemeColors = (theme: Theme): ThemeColors => {
 };
 
 export function Dashboard() {
-    // Theme state
-    const [theme, setTheme] = React.useState<Theme>('light');
+    // Theme state - start in dark mode
+    const [theme, setTheme] = React.useState<Theme>('dark');
     const themeColors = getThemeColors(theme);
 
-    // Handler for expand button
+    // Handler for expand button - toggle between fullscreen and inline
     const handleExpand = async () => {
         try {
             if (typeof window !== 'undefined' && window.openai?.requestDisplayMode) {
-                const result = await window.openai.requestDisplayMode({ mode: 'fullscreen' });
+                const currentMode = window.openai.displayMode;
+                const newMode = currentMode === 'fullscreen' ? 'inline' : 'fullscreen';
+                const result = await window.openai.requestDisplayMode({ mode: newMode });
                 console.log('Display mode changed to:', result.mode);
             }
         } catch (error) {
