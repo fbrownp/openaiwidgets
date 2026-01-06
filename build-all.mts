@@ -18,7 +18,8 @@ const targets: string[] = [
   "barplot",
   "indexing_dashboard",
   "snifa_dashboard_faltas",
-  "widget_reclamacion_identifier"
+  "widget_reclamacion_identifier",
+  "carrousel-names-seia"
 ];
 const builtNames: string[] = [];
 
