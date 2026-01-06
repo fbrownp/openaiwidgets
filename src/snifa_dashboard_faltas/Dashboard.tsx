@@ -489,7 +489,7 @@ export const Dashboard: React.FC = () => {
                         <button
                             onClick={() => setTheme('light')}
                             style={{
-                                padding: '6px 12px',
+                                padding: '6px 14px',
                                 borderRadius: 6,
                                 border: 'none',
                                 backgroundColor: theme === 'light'
@@ -499,17 +499,17 @@ export const Dashboard: React.FC = () => {
                                     ? themeColors.buttonActiveText
                                     : themeColors.buttonText,
                                 cursor: 'pointer',
-                                fontSize: 16,
+                                fontSize: 13,
+                                fontWeight: 500,
                                 transition: 'all 0.2s'
                             }}
-                            title="Light mode"
                         >
-                            ☀️
+                            Claro
                         </button>
                         <button
                             onClick={() => setTheme('dark')}
                             style={{
-                                padding: '6px 12px',
+                                padding: '6px 14px',
                                 borderRadius: 6,
                                 border: 'none',
                                 backgroundColor: theme === 'dark'
@@ -519,12 +519,12 @@ export const Dashboard: React.FC = () => {
                                     ? themeColors.buttonActiveText
                                     : themeColors.buttonText,
                                 cursor: 'pointer',
-                                fontSize: 16,
+                                fontSize: 13,
+                                fontWeight: 500,
                                 transition: 'all 0.2s'
                             }}
-                            title="Dark mode"
                         >
-                            🌙
+                            Oscuro
                         </button>
                     </div>
                 </div>
