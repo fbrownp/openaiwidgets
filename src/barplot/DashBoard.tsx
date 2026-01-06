@@ -548,7 +548,7 @@ export function Dashboard() {
                                 transition: 'all 0.2s'
                             }}
                         >
-                            Blanco
+                            Claro
                         </button>
                         <button
                             onClick={() => setTheme('dark')}
