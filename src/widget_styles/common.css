@@ -1,0 +1,233 @@
+/**
+ * Common Widget Styles
+ *
+ * This file contains shared CSS classes and styles used across all widgets.
+ * Import this file in your widget to ensure consistent styling.
+ */
+
+/* Widget Container */
+.widget-container {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    min-height: 100vh;
+    padding: 24px;
+    position: relative;
+}
+
+/* Expand Button - Fixed top-right corner */
+.expand-button {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.expand-button:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Theme Toggle Container */
+.theme-toggle {
+    display: flex;
+    gap: 6px;
+    padding: 4px;
+    border-radius: 8px;
+    width: fit-content;
+    margin-bottom: 20px;
+}
+
+.theme-toggle-button {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+/* Card Styles */
+.widget-card {
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.widget-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Header Styles */
+.widget-header {
+    margin-bottom: 24px;
+}
+
+.widget-title {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.widget-subtitle {
+    margin: 0;
+    font-size: 14px;
+}
+
+/* Grid Layouts */
+.widget-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.widget-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+/* Chart Container */
+.chart-container {
+    border-radius: 12px;
+    padding: 24px;
+    border: 1px solid;
+}
+
+/* Dropdown Filter */
+.dropdown-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+/* Buttons */
+.widget-button {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: none;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Loading State */
+.widget-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+}
+
+.widget-loading::after {
+    content: '';
+    width: 24px;
+    height: 24px;
+    border: 3px solid #e5e7eb;
+    border-top-color: #8b5cf6;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+/* Empty State */
+.widget-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    color: #9ca3af;
+    font-size: 14px;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .widget-grid-3 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .widget-grid-2 {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .widget-container {
+        padding: 16px;
+    }
+
+    .widget-grid-3 {
+        grid-template-columns: 1fr;
+    }
+
+    .widget-title {
+        font-size: 24px;
+    }
+
+    .expand-button {
+        top: 12px;
+        right: 12px;
+        padding: 8px;
+    }
+}
+
+/* Smooth Scrolling */
+.smooth-scroll {
+    scroll-behavior: smooth;
+}
+
+/* Hide Scrollbar */
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Transitions */
+.transition-all {
+    transition: all 0.2s ease;
+}
+
+.transition-transform {
+    transition: transform 0.2s ease;
+}
+
+.transition-colors {
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}

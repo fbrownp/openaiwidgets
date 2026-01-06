@@ -96,11 +96,13 @@ export const Dashboard: React.FC = () => {
         subcategoria_economica: []
     });
 
-    // Handler for expand button
+    // Handler for expand button - toggle between fullscreen and inline
     const handleExpand = async () => {
         try {
             if (typeof window !== 'undefined' && window.openai?.requestDisplayMode) {
-                const result = await window.openai.requestDisplayMode({ mode: 'fullscreen' });
+                const currentMode = window.openai.displayMode;
+                const newMode = currentMode === 'fullscreen' ? 'inline' : 'fullscreen';
+                const result = await window.openai.requestDisplayMode({ mode: newMode });
                 console.log('Display mode changed to:', result.mode);
             }
         } catch (error) {
@@ -452,9 +454,6 @@ export const Dashboard: React.FC = () => {
             <div style={{ maxWidth: 1400, margin: '0 auto' }}>
                 {/* Header */}
                 <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-start',
                     marginBottom: 20
                 }}>
                     <div>
@@ -470,63 +469,63 @@ export const Dashboard: React.FC = () => {
                         <p style={{
                             fontSize: 14,
                             color: themeColors.textSecondary,
-                            margin: 0
+                            margin: 0,
+                            marginBottom: 12
                         }}>
                             Sistema de seguimiento de faltas y clasificación de gravedad
                         </p>
                     </div>
 
-                    <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                        {/* Theme Toggle */}
-                        <div style={{
-                            display: 'flex',
-                            gap: 6,
-                            backgroundColor: themeColors.buttonBackground,
-                            padding: 4,
-                            borderRadius: 8,
-                            border: `1px solid ${themeColors.border}`
-                        }}>
-                            <button
-                                onClick={() => setTheme('light')}
-                                style={{
-                                    padding: '6px 12px',
-                                    borderRadius: 6,
-                                    border: 'none',
-                                    backgroundColor: theme === 'light'
-                                        ? themeColors.buttonActiveBg
-                                        : 'transparent',
-                                    color: theme === 'light'
-                                        ? themeColors.buttonActiveText
-                                        : themeColors.buttonText,
-                                    cursor: 'pointer',
-                                    fontSize: 16,
-                                    transition: 'all 0.2s'
-                                }}
-                                title="Light mode"
-                            >
-                                ☀️
-                            </button>
-                            <button
-                                onClick={() => setTheme('dark')}
-                                style={{
-                                    padding: '6px 12px',
-                                    borderRadius: 6,
-                                    border: 'none',
-                                    backgroundColor: theme === 'dark'
-                                        ? themeColors.buttonActiveBg
-                                        : 'transparent',
-                                    color: theme === 'dark'
-                                        ? themeColors.buttonActiveText
-                                        : themeColors.buttonText,
-                                    cursor: 'pointer',
-                                    fontSize: 16,
-                                    transition: 'all 0.2s'
-                                }}
-                                title="Dark mode"
-                            >
-                                🌙
-                            </button>
-                        </div>
+                    {/* Theme Toggle - Below title on left */}
+                    <div style={{
+                        display: 'flex',
+                        gap: 6,
+                        backgroundColor: themeColors.cardBackground,
+                        padding: 4,
+                        borderRadius: 8,
+                        border: `1px solid ${themeColors.border}`,
+                        width: 'fit-content'
+                    }}>
+                        <button
+                            onClick={() => setTheme('light')}
+                            style={{
+                                padding: '6px 14px',
+                                borderRadius: 6,
+                                border: 'none',
+                                backgroundColor: theme === 'light'
+                                    ? themeColors.buttonActiveBg
+                                    : 'transparent',
+                                color: theme === 'light'
+                                    ? themeColors.buttonActiveText
+                                    : themeColors.buttonText,
+                                cursor: 'pointer',
+                                fontSize: 13,
+                                fontWeight: 500,
+                                transition: 'all 0.2s'
+                            }}
+                        >
+                            Claro
+                        </button>
+                        <button
+                            onClick={() => setTheme('dark')}
+                            style={{
+                                padding: '6px 14px',
+                                borderRadius: 6,
+                                border: 'none',
+                                backgroundColor: theme === 'dark'
+                                    ? themeColors.buttonActiveBg
+                                    : 'transparent',
+                                color: theme === 'dark'
+                                    ? themeColors.buttonActiveText
+                                    : themeColors.buttonText,
+                                cursor: 'pointer',
+                                fontSize: 13,
+                                fontWeight: 500,
+                                transition: 'all 0.2s'
+                            }}
+                        >
+                            Oscuro
+                        </button>
                     </div>
                 </div>
 
