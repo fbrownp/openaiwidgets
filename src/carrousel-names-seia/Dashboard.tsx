@@ -7,7 +7,7 @@ import { SeiaProjectCarousel } from './SeiaProjectCarousel';
 import { useOpenAiGlobal } from '../use-openai-global';
 
 // Import shared theme
-import { getThemeColors, DEFAULT_THEME, Theme } from '../../widget_styles/theme';
+import { getThemeColors, DEFAULT_THEME, Theme } from '../widget_styles/theme';
 
 export function Dashboard() {
     // Theme state - start with default theme
