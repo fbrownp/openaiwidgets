@@ -14,35 +14,40 @@ This widget is designed to display SEIA projects with similarity scores. From GP
       "nombre_proyecto": "Línea de Transmisión Eléctrica HVDC Kimal - Lo Aguirre",
       "inversion": 1480.0,
       "region": "Interregional",
-      "cosine_similarity": 0.6665445168885888
+      "cosine_similarity": 0.6665445168885888,
+      "estado_proyecto": "Aprobado"
     },
     {
       "expediente_seia": 6124,
       "nombre_proyecto": "Linea 2 (110 KV) Cardones- Los Lirios",
       "inversion": 0.26,
       "region": "Región de Atacama",
-      "cosine_similarity": 0.6654693483235876
+      "cosine_similarity": 0.6654693483235876,
+      "estado_proyecto": "En Calificación"
     },
     {
       "expediente_seia": 3257,
       "nombre_proyecto": "Línea de Transmisión Tap El Llano - Los Quilos",
       "inversion": 8.0,
       "region": "Interregional",
-      "cosine_similarity": 0.6634976663290075
+      "cosine_similarity": 0.6634976663290075,
+      "estado_proyecto": "Aprobado"
     },
     {
       "expediente_seia": 2904232,
       "nombre_proyecto": "LÍNEA DE TRANSMISIÓN 2X220 KV GUACOLDA - MAITENCILLO (e-seia)",
       "inversion": 11.0,
       "region": "Región de Atacama",
-      "cosine_similarity": 0.6605195999145508
+      "cosine_similarity": 0.6605195999145508,
+      "estado_proyecto": "Desistido"
     },
     {
       "expediente_seia": 184,
       "nombre_proyecto": "Línea A.T. 66 KV  Coronel-Corcovado-Ecuadron",
       "inversion": 0.36,
       "region": "Región del Biobío",
-      "cosine_similarity": 0.6596277153270087
+      "cosine_similarity": 0.6596277153270087,
+      "estado_proyecto": "En Evaluación"
     }
   ]
 }
@@ -57,6 +62,7 @@ This widget is designed to display SEIA projects with similarity scores. From GP
 | `inversion` | number | Investment in millions USD | Shown as "Inversión MMU$ : {value}" with locale formatting |
 | `region` | string | Geographic region | Displayed with location icon 📍 |
 | `cosine_similarity` | number | Similarity score (0-1) | Prominently displayed as percentage in purple badge |
+| `estado_proyecto` | string | Project state/status | Shown as chip next to similarity badge (value only) |
 
 ## Example Use Cases
 
@@ -87,7 +93,7 @@ Each card shows:
 ```
 ┌─────────────────────────────────────┐
 │                 [Expediente: 123456]│
-│  [Similitud: 66.7%]                 │
+│  [Similitud: 66.7%] [Aprobado]      │
 │                                     │
 │  Proyecto Name Here                 │
 │  Can span multiple lines            │

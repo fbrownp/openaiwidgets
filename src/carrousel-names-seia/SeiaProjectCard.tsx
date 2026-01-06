@@ -58,13 +58,15 @@ export const SeiaProjectCard: React.FC<SeiaProjectCardProps> = ({
                 </div>
             </div>
 
-            {/* Cosine Similarity - Upper part, emphasized */}
+            {/* Cosine Similarity and Estado Proyecto - Upper part, emphasized */}
             <div style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: 8,
-                marginTop: 36 // Space for the expediente chip
+                marginTop: 36, // Space for the expediente chip
+                flexWrap: 'wrap'
             }}>
+                {/* Similarity badge */}
                 <div style={{
                     backgroundColor: themeColors.purple,
                     color: 'white',
@@ -78,6 +80,18 @@ export const SeiaProjectCard: React.FC<SeiaProjectCardProps> = ({
                 }}>
                     <span style={{ fontSize: 12, opacity: 0.9 }}>Similitud:</span>
                     <span style={{ fontSize: 18 }}>{similarityPercentage}%</span>
+                </div>
+
+                {/* Estado Proyecto chip */}
+                <div style={{
+                    backgroundColor: themeColors.chipBackground,
+                    color: themeColors.chipText,
+                    padding: '6px 14px',
+                    borderRadius: 14,
+                    fontSize: 12,
+                    fontWeight: 600
+                }}>
+                    {project.estado_proyecto}
                 </div>
             </div>
 

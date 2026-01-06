@@ -10,6 +10,7 @@ export interface SeiaProject {
     inversion: number;
     region: string;
     cosine_similarity: number;
+    estado_proyecto: string;
 }
 
 /**

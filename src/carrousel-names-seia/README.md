@@ -26,7 +26,8 @@ The widget expects data in the following format:
       "nombre_proyecto": "Línea de Transmisión Eléctrica HVDC Kimal - Lo Aguirre",
       "inversion": 1480.0,
       "region": "Interregional",
-      "cosine_similarity": 0.6665445168885888
+      "cosine_similarity": 0.6665445168885888,
+      "estado_proyecto": "Aprobado"
     }
   ]
 }
@@ -39,13 +40,16 @@ The widget expects data in the following format:
 - **inversion** (number): Investment amount in millions of USD
 - **region** (string): Geographic region
 - **cosine_similarity** (number): Similarity score (0-1 range)
+- **estado_proyecto** (string): Project state/status
 
 ## Card Layout
 
 Each project card displays:
 
 1. **Upper Right**: Expediente SEIA chip
-2. **Top Section**: Similarity percentage (prominent purple badge)
+2. **Top Section**:
+   - Similarity percentage (prominent purple badge)
+   - Estado Proyecto chip (project status)
 3. **Title**: Project name
 4. **Bottom Section**:
    - Investment amount (Inversión MMU$)
