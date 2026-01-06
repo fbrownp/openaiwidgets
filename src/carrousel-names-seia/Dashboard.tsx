@@ -15,7 +15,7 @@ export function Dashboard() {
     const themeColors = getThemeColors(theme) as ThemeColors;
 
     // Get tool output from OpenAI
-    const { toolOutput } = useOpenAiGlobal();
+    const toolOutput = useOpenAiGlobal('toolOutput');
 
     // Parse GPT output into projects
     const projects = useMemo(() => {
