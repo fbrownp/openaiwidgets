@@ -66,6 +66,17 @@ export function TreeCard({
                             return { type, id };
                         });
 
+                    // Get chip color based on expediente type
+                    const getChipColor = (type: string) => {
+                        const colorMap: Record<string, { bg: string; text: string }> = {
+                            'expediente_seia': { bg: '#3B82F620', text: '#3B82F6' },
+                            'expediente_medida': { bg: '#D9770620', text: '#D97706' },
+                            'expediente_snifa': { bg: '#F9731620', text: '#F97316' },
+                            'expediente_fiscalizacion': { bg: '#10B98120', text: '#10B981' }
+                        };
+                        return colorMap[type] || { bg: themeColors.purple + '20', text: themeColors.purple };
+                    };
+
                     return (
                         <div
                             key={index}
@@ -112,21 +123,24 @@ export function TreeCard({
                                     paddingTop: 8,
                                     borderTop: `1px solid ${themeColors.cardBorder}`
                                 }}>
-                                    {relatedDocs.map((rel, relIdx) => (
-                                        <div
-                                            key={relIdx}
-                                            style={{
-                                                fontSize: 9,
-                                                padding: '2px 6px',
-                                                backgroundColor: themeColors.purple + '20',
-                                                color: themeColors.purple,
-                                                borderRadius: 4,
-                                                fontWeight: 600
-                                            }}
-                                        >
-                                            {rel.id}
-                                        </div>
-                                    ))}
+                                    {relatedDocs.map((rel, relIdx) => {
+                                        const colors = getChipColor(rel.type);
+                                        return (
+                                            <div
+                                                key={relIdx}
+                                                style={{
+                                                    fontSize: 9,
+                                                    padding: '2px 6px',
+                                                    backgroundColor: colors.bg,
+                                                    color: colors.text,
+                                                    borderRadius: 4,
+                                                    fontWeight: 600
+                                                }}
+                                            >
+                                                {rel.id}
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             )}
                         </div>
