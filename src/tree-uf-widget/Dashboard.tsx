@@ -2,7 +2,6 @@ import React, { useMemo, useState, useRef } from 'react';
 import { parseGPTOutput, getNodeTypeDisplayName, buildConnectionPath } from './gpt-adapter';
 import { ThemeColors, NodeData } from './types';
 import { TreeCard } from './TreeCard';
-import { ConnectionLines } from './ConnectionLines';
 
 // Import hooks from parent directory
 import { useOpenAiGlobal } from '../use-openai-global';
@@ -263,27 +262,30 @@ export function Dashboard() {
             {fiscalizacionNodes.length > 0 && (
                 <div style={{
                     marginBottom: 20,
-                    padding: 12,
-                    backgroundColor: themeColors.cardBackground,
-                    border: `1px solid ${themeColors.cardBorder}`,
-                    borderRadius: 10,
-                    width: '100%'
+                    display: 'inline-block',
+                    minWidth: 0
                 }}>
-                    <h3 style={{
-                        margin: 0,
-                        marginBottom: 10,
-                        fontSize: 14,
-                        fontWeight: 600,
-                        color: themeColors.text
-                    }}>
-                        Expediente Fiscalización
-                    </h3>
                     <div style={{
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        gap: 8
+                        padding: 12,
+                        backgroundColor: themeColors.cardBackground,
+                        border: `1px solid ${themeColors.cardBorder}`,
+                        borderRadius: 10
                     }}>
-                        {fiscalizacionNodes.map((node, idx) => {
+                        <h3 style={{
+                            margin: 0,
+                            marginBottom: 10,
+                            fontSize: 14,
+                            fontWeight: 600,
+                            color: themeColors.text
+                        }}>
+                            Expediente Fiscalización
+                        </h3>
+                        <div style={{
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            gap: 8
+                        }}>
+                            {fiscalizacionNodes.map((node, idx) => {
                             const itemKey = `${node.name}:${node.id}`;
                             const isHighlighted = highlightedItems.has(itemKey);
                             const isHovered = hoveredItems.has(itemKey);
@@ -362,7 +364,8 @@ export function Dashboard() {
                                     )}
                                 </div>
                             );
-                        })}
+                            })}
+                        </div>
                     </div>
                 </div>
             )}
@@ -371,18 +374,11 @@ export function Dashboard() {
             <div
                 ref={containerRef}
                 style={{
-                    position: 'relative'
+                    position: 'relative',
+                    display: 'inline-block',
+                    minWidth: 0
                 }}
             >
-                {/* Connection Lines */}
-                <ConnectionLines
-                    edges={treeData.edges}
-                    themeColors={themeColors}
-                    containerRef={containerRef}
-                    hoveredNode={hoveredNode}
-                    selectedNode={selectedNode}
-                />
-
                 {/* Tree Cards - Responsive Layout */}
                 <div style={{
                     position: 'relative',
