@@ -381,8 +381,15 @@ export function Dashboard() {
                 </div>
             )}
 
-            {/* Tree Cards Container */}
-            <div style={{ maxWidth: '900px' }}>
+            {/* Tree Cards Container - Wrapped like other sections */}
+            <div style={{
+                marginBottom: 20,
+                padding: 12,
+                backgroundColor: themeColors.cardBackground,
+                border: `1px solid ${themeColors.cardBorder}`,
+                borderRadius: 10,
+                maxWidth: '900px'
+            }}>
                 <div
                     ref={containerRef}
                     style={{
@@ -395,8 +402,7 @@ export function Dashboard() {
                         zIndex: 0,
                         display: 'flex',
                         flexWrap: 'wrap',
-                        gap: 12,
-                        paddingBottom: 8
+                        gap: 12
                     }}>
                         {nodeTypeOrder.map(nodeType => {
                             const nodes = treeData.nodes.get(nodeType);
