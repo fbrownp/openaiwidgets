@@ -133,47 +133,9 @@ export function Dashboard() {
                 </p>
             </div>
 
-            {/* Cards Container with Connection Lines */}
-            <div
-                ref={containerRef}
-                style={{
-                    position: 'relative',
-                    zIndex: 1
-                }}
-            >
-                {/* Connection Lines SVG */}
-                <ConnectionLines
-                    highlightedItems={highlightedItems}
-                    themeColors={themeColors}
-                    containerRef={containerRef}
-                />
-
-                {/* Tree Cards */}
-                <div style={{ position: 'relative', zIndex: 1 }}>
-                    {nodeTypeOrder.map(nodeType => {
-                        const nodes = treeData.nodes.get(nodeType);
-                        if (!nodes || nodes.length === 0) {
-                            return null;
-                        }
-
-                        return (
-                            <TreeCard
-                                key={nodeType}
-                                title={getNodeTypeDisplayName(nodeType)}
-                                items={nodes}
-                                themeColors={themeColors}
-                                onItemClick={handleItemClick}
-                                selectedItem={selectedNode}
-                                highlightedItems={highlightedItems}
-                            />
-                        );
-                    })}
-                </div>
-            </div>
-
             {/* Summary Statistics */}
             <div style={{
-                marginTop: 24,
+                marginBottom: 24,
                 padding: 16,
                 backgroundColor: themeColors.cardBackground,
                 border: `1px solid ${themeColors.cardBorder}`,
@@ -190,7 +152,7 @@ export function Dashboard() {
                 </h3>
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
                     gap: 12
                 }}>
                     {Array.from(treeData.nodes.entries()).map(([type, nodes]) => (
@@ -235,6 +197,51 @@ export function Dashboard() {
                             {treeData.edges.length}
                         </div>
                     </div>
+                </div>
+            </div>
+
+            {/* Cards Container with Connection Lines */}
+            <div
+                ref={containerRef}
+                style={{
+                    position: 'relative',
+                    zIndex: 1
+                }}
+            >
+                {/* Connection Lines SVG */}
+                <ConnectionLines
+                    highlightedItems={highlightedItems}
+                    themeColors={themeColors}
+                    containerRef={containerRef}
+                />
+
+                {/* Tree Cards - Horizontal Layout */}
+                <div style={{
+                    position: 'relative',
+                    zIndex: 1,
+                    display: 'flex',
+                    gap: 16,
+                    overflowX: 'auto',
+                    paddingBottom: 8
+                }}>
+                    {nodeTypeOrder.map(nodeType => {
+                        const nodes = treeData.nodes.get(nodeType);
+                        if (!nodes || nodes.length === 0) {
+                            return null;
+                        }
+
+                        return (
+                            <TreeCard
+                                key={nodeType}
+                                title={getNodeTypeDisplayName(nodeType)}
+                                items={nodes}
+                                themeColors={themeColors}
+                                onItemClick={handleItemClick}
+                                selectedItem={selectedNode}
+                                highlightedItems={highlightedItems}
+                            />
+                        );
+                    })}
                 </div>
             </div>
         </div>

@@ -212,36 +212,23 @@ export function parseGPTOutput(toolOutput: unknown): TreeData {
 }
 
 /**
- * Build the path of connected nodes from a starting node
+ * Build direct connections for a selected node
+ * Only returns directly connected nodes, not the full path
  */
 export function buildConnectionPath(
     startNode: NodeData,
     allNodes: Map<string, NodeData[]>
 ): Set<string> {
-    const visited = new Set<string>();
-    const queue: string[] = [`${startNode.name}:${startNode.id}`];
+    const highlighted = new Set<string>();
+    const startKey = `${startNode.name}:${startNode.id}`;
 
-    while (queue.length > 0) {
-        const currentKey = queue.shift()!;
-        if (visited.has(currentKey)) continue;
+    // Add the selected node itself
+    highlighted.add(startKey);
 
-        visited.add(currentKey);
+    // Add only direct connections (one level deep)
+    startNode.connections.forEach(connKey => {
+        highlighted.add(connKey);
+    });
 
-        // Find the node
-        const [type, id] = currentKey.split(':');
-        const nodeGroup = allNodes.get(type);
-        if (!nodeGroup) continue;
-
-        const node = nodeGroup.find(n => n.id === id);
-        if (!node) continue;
-
-        // Add all connected nodes to queue
-        node.connections.forEach(connKey => {
-            if (!visited.has(connKey)) {
-                queue.push(connKey);
-            }
-        });
-    }
-
-    return visited;
+    return highlighted;
 }

@@ -23,7 +23,9 @@ export function TreeCard({
             border: `1px solid ${themeColors.cardBorder}`,
             borderRadius: 12,
             padding: 16,
-            marginBottom: 16
+            minWidth: 280,
+            maxWidth: 320,
+            flexShrink: 0
         }}>
             {/* Card Title */}
             <h3 style={{
@@ -31,7 +33,10 @@ export function TreeCard({
                 marginBottom: 12,
                 fontSize: 16,
                 fontWeight: 600,
-                color: themeColors.text
+                color: themeColors.text,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
             }}>
                 {title}
             </h3>
@@ -40,7 +45,9 @@ export function TreeCard({
             <div style={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 8
+                gap: 8,
+                maxHeight: 500,
+                overflowY: 'auto'
             }}>
                 {items.map((item, index) => {
                     const itemKey = `${item.name}:${item.id}`;
