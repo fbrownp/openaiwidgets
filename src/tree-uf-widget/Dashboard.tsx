@@ -382,43 +382,44 @@ export function Dashboard() {
             )}
 
             {/* Tree Cards Container */}
-            <div
-                ref={containerRef}
-                style={{
-                    position: 'relative',
-                    maxWidth: '900px'
-                }}
-            >
-                {/* Tree Cards - Responsive Layout */}
-                <div style={{
-                    position: 'relative',
-                    zIndex: 0,
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: 12,
-                    paddingBottom: 8
-                }}>
-                    {nodeTypeOrder.map(nodeType => {
-                        const nodes = treeData.nodes.get(nodeType);
-                        if (!nodes || nodes.length === 0) {
-                            return null;
-                        }
+            <div style={{ maxWidth: '900px' }}>
+                <div
+                    ref={containerRef}
+                    style={{
+                        position: 'relative'
+                    }}
+                >
+                    {/* Tree Cards - Responsive Layout */}
+                    <div style={{
+                        position: 'relative',
+                        zIndex: 0,
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        gap: 12,
+                        paddingBottom: 8
+                    }}>
+                        {nodeTypeOrder.map(nodeType => {
+                            const nodes = treeData.nodes.get(nodeType);
+                            if (!nodes || nodes.length === 0) {
+                                return null;
+                            }
 
-                        return (
-                            <TreeCard
-                                key={nodeType}
-                                title={getNodeTypeDisplayName(nodeType)}
-                                items={nodes}
-                                themeColors={themeColors}
-                                onItemClick={handleItemClick}
-                                onItemHover={handleItemHover}
-                                selectedItem={null}
-                                highlightedItems={highlightedItems}
-                                hoveredItems={hoveredItems}
-                                allNodes={treeData.nodes}
-                            />
-                        );
-                    })}
+                            return (
+                                <TreeCard
+                                    key={nodeType}
+                                    title={getNodeTypeDisplayName(nodeType)}
+                                    items={nodes}
+                                    themeColors={themeColors}
+                                    onItemClick={handleItemClick}
+                                    onItemHover={handleItemHover}
+                                    selectedItem={null}
+                                    highlightedItems={highlightedItems}
+                                    hoveredItems={hoveredItems}
+                                    allNodes={treeData.nodes}
+                                />
+                            );
+                        })}
+                    </div>
                 </div>
             </div>
         </div>
