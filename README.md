@@ -4,12 +4,13 @@ A collection of custom data visualization widgets built with React and TypeScrip
 
 ## Project Overview
 
-This repository contains four custom widgets:
+This repository contains five custom widgets:
 
 1. **Widget Reclamación Identifier** - Carousel widget for displaying observation identifiers with similarity matching
 2. **Barplot** - Enhanced bar plot components including horizontal, box plots, and candlestick charts
 3. **Indexing Dashboard** - Dashboard for displaying indexed data with filtering capabilities
 4. **SNIFA Dashboard Faltas** - Dashboard for visualizing attendance violations with severity classification
+5. **Tree UF Widget** - Hierarchical visualization of expediente relationships for a specific UF
 
 Each widget is built as a standalone bundle (HTML, JS, CSS) that can be served independently and integrated into ChatGPT through OpenAI's Apps SDK.
 
@@ -81,7 +82,7 @@ pnpm run build
 
 This command:
 - Runs the `build-all.mts` script
-- Builds all 4 widgets: `barplot`, `indexing_dashboard`, `snifa_dashboard_faltas`, `widget_reclamacion_identifier`
+- Builds all 5 widgets: `barplot`, `indexing_dashboard`, `snifa_dashboard_faltas`, `widget_reclamacion_identifier`, `tree-uf-widget`
 - Creates versioned files in the `assets/` directory with hash suffixes (e.g., `barplot-a1b2.js`)
 - Generates HTML files for each widget
 
@@ -171,6 +172,7 @@ After building and serving, access widgets at:
 - **Indexing Dashboard**: http://localhost:4444/indexing_dashboard.html
 - **SNIFA Dashboard**: http://localhost:4444/snifa_dashboard_faltas.html
 - **Reclamación Identifier**: http://localhost:4444/widget_reclamacion_identifier.html
+- **Tree UF Widget**: http://localhost:4444/tree-uf-widget.html
 
 ## Project Structure
 

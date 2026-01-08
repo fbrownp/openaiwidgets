@@ -19,7 +19,8 @@ const targets: string[] = [
   "indexing_dashboard",
   "snifa_dashboard_faltas",
   "widget_reclamacion_identifier",
-  "carrousel-names-seia"
+  "carrousel-names-seia",
+  "tree-uf-widget"
 ];
 const builtNames: string[] = [];
 
