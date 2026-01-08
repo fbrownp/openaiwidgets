@@ -7,6 +7,92 @@ import { EdgeData, NodeData, TreeData } from './types';
 import { GPTOutput } from './gpt-types';
 
 /**
+ * Dummy data for demonstration when no GPT output is available
+ */
+const DUMMY_DATA: GPTOutput = [
+    {
+        src_name: 'id_uf',
+        src_id: '2456',
+        dst_name: 'expediente_snifa',
+        dst_id: 'F-034-2016',
+        src_hierarchy_level: 1,
+        dst_hierarchy_level: 5
+    },
+    {
+        src_name: 'expediente_seia',
+        src_id: '2718775-2456',
+        dst_name: 'expediente_snifa',
+        dst_id: 'F-034-2016',
+        src_hierarchy_level: 2,
+        dst_hierarchy_level: 5
+    },
+    {
+        src_name: 'expediente_seia',
+        src_id: '6336-2456',
+        dst_name: 'expediente_snifa',
+        dst_id: 'F-034-2016',
+        src_hierarchy_level: 2,
+        dst_hierarchy_level: 5
+    },
+    {
+        src_name: 'expediente_fiscalizacion',
+        src_id: 'DFZ-2017-5452-IX-PC-EI',
+        dst_name: 'expediente_seia',
+        dst_id: '2718775',
+        src_hierarchy_level: 4,
+        dst_hierarchy_level: 2
+    },
+    {
+        src_name: 'expediente_fiscalizacion',
+        src_id: 'DFZ-2017-5452-IX-PC-EI',
+        dst_name: 'expediente_seia',
+        dst_id: '6336',
+        src_hierarchy_level: 4,
+        dst_hierarchy_level: 2
+    },
+    {
+        src_name: 'id_uf',
+        src_id: '2456',
+        dst_name: 'expediente_seia',
+        dst_id: '6336',
+        src_hierarchy_level: 1,
+        dst_hierarchy_level: 2
+    },
+    {
+        src_name: 'id_uf',
+        src_id: '2456',
+        dst_name: 'expediente_seia',
+        dst_id: '2718775',
+        src_hierarchy_level: 1,
+        dst_hierarchy_level: 2
+    },
+    {
+        src_name: 'NE:46/2002',
+        src_id: 'NE:46/2002-2456',
+        dst_name: 'expediente_snifa',
+        dst_id: 'F-034-2023',
+        src_hierarchy_level: 2,
+        dst_hierarchy_level: 5
+    },
+    {
+        src_name: 'id_uf',
+        src_id: '2456',
+        dst_name: 'expediente_snifa',
+        dst_id: 'F-034-2023',
+        src_hierarchy_level: 1,
+        dst_hierarchy_level: 5
+    },
+    {
+        src_name: 'expediente_fiscalizacion',
+        src_id: 'DFZ-2017-5452-IX-PC-EI',
+        dst_name: 'expediente_snifa',
+        dst_id: 'F-034-2016',
+        src_hierarchy_level: 4,
+        dst_hierarchy_level: 5
+    }
+];
+
+/**
  * Normalize node type names according to hierarchy rules
  */
 function normalizeNodeType(name: string): string {
@@ -45,18 +131,15 @@ export function getNodeTypeDisplayName(type: string): string {
  * Parse GPT output and build tree data structure
  */
 export function parseGPTOutput(toolOutput: unknown): TreeData {
-    const defaultData: TreeData = {
-        id_uf: '',
-        nodes: new Map(),
-        edges: []
-    };
+    // Use dummy data if no valid tool output is provided
+    let edges: GPTOutput;
 
     if (!toolOutput || !Array.isArray(toolOutput)) {
-        console.warn('Invalid tool output:', toolOutput);
-        return defaultData;
+        console.warn('Invalid tool output:', toolOutput, '- Using dummy data for demonstration');
+        edges = DUMMY_DATA;
+    } else {
+        edges = toolOutput as GPTOutput;
     }
-
-    const edges = toolOutput as GPTOutput;
     const nodesMap = new Map<string, NodeData>();
     let idUfValue = '';
 
