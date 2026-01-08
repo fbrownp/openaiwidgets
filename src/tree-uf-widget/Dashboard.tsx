@@ -2,7 +2,7 @@ import React, { useMemo, useState, useRef } from 'react';
 import { parseGPTOutput, getNodeTypeDisplayName, buildConnectionPath } from './gpt-adapter';
 import { ThemeColors, NodeData } from './types';
 import { TreeCard } from './TreeCard';
-import { RelationshipPanel } from './RelationshipPanel';
+import { ConnectionLines } from './ConnectionLines';
 
 // Import hooks from parent directory
 import { useOpenAiGlobal } from '../use-openai-global';
@@ -58,16 +58,18 @@ export function Dashboard() {
         setHoveredNode(item);
     };
 
-    // Define the order of node types to display (excluding id_uf and instrumento_aplicable)
+    // Define the order of node types to display (excluding id_uf, instrumento_aplicable, and expediente_fiscalizacion)
     const nodeTypeOrder = [
         'expediente_seia',
         'expediente_medida',
-        'expediente_fiscalizacion',
         'expediente_snifa'
     ];
 
     // Get instrumento_aplicable nodes for chips
     const instrumentoNodes = treeData.nodes.get('instrumento_aplicable') || [];
+
+    // Get expediente_fiscalizacion nodes for separate section
+    const fiscalizacionNodes = treeData.nodes.get('expediente_fiscalizacion') || [];
 
     return (
         <div style={{
@@ -257,59 +259,158 @@ export function Dashboard() {
                 </div>
             </div>
 
-            {/* Main Content Area - Panel on Left, Cards on Right */}
-            <div style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: 20,
-                alignItems: 'flex-start'
-            }}>
-                {/* Relationship Panel - Left Side */}
-                <RelationshipPanel
-                    selectedNode={selectedNode}
-                    allNodes={treeData.nodes}
-                    themeColors={themeColors}
-                />
-
-                {/* Cards Container - Right Side */}
-                <div
-                    ref={containerRef}
-                    style={{
-                        flex: '1 1 400px',
-                        position: 'relative',
-                        minWidth: 300
-                    }}
-                >
-                    {/* Tree Cards - Responsive Layout */}
+            {/* Expediente Fiscalizacion Section - Horizontal */}
+            {fiscalizacionNodes.length > 0 && (
+                <div style={{
+                    marginBottom: 20,
+                    padding: 12,
+                    backgroundColor: themeColors.cardBackground,
+                    border: `1px solid ${themeColors.cardBorder}`,
+                    borderRadius: 10
+                }}>
+                    <h3 style={{
+                        margin: 0,
+                        marginBottom: 10,
+                        fontSize: 14,
+                        fontWeight: 600,
+                        color: themeColors.text
+                    }}>
+                        Expediente Fiscalización
+                    </h3>
                     <div style={{
-                        position: 'relative',
-                        zIndex: 1,
                         display: 'flex',
                         flexWrap: 'wrap',
-                        gap: 12,
-                        paddingBottom: 8
+                        gap: 8
                     }}>
-                        {nodeTypeOrder.map(nodeType => {
-                            const nodes = treeData.nodes.get(nodeType);
-                            if (!nodes || nodes.length === 0) {
-                                return null;
-                            }
+                        {fiscalizacionNodes.map((node, idx) => {
+                            const itemKey = `${node.name}:${node.id}`;
+                            const isHighlighted = highlightedItems.has(itemKey);
+                            const isHovered = hoveredItems.has(itemKey);
+
+                            // Get related expedientes (excluding id_uf)
+                            const relatedExpedientes = node.connections
+                                .filter(connKey => !connKey.startsWith('id_uf:'))
+                                .map(connKey => {
+                                    const [type, id] = connKey.split(':');
+                                    return { type, id };
+                                });
 
                             return (
-                                <TreeCard
-                                    key={nodeType}
-                                    title={getNodeTypeDisplayName(nodeType)}
-                                    items={nodes}
-                                    themeColors={themeColors}
-                                    onItemClick={handleItemClick}
-                                    onItemHover={handleItemHover}
-                                    selectedItem={null}
-                                    highlightedItems={highlightedItems}
-                                    hoveredItems={hoveredItems}
-                                />
+                                <div
+                                    key={idx}
+                                    data-node-key={itemKey}
+                                    onClick={() => handleItemClick(node)}
+                                    onMouseEnter={() => handleItemHover(node)}
+                                    onMouseLeave={() => handleItemHover(null)}
+                                    style={{
+                                        padding: '10px 12px',
+                                        backgroundColor: isHighlighted
+                                            ? themeColors.purple + '10'
+                                            : isHovered
+                                            ? themeColors.purple + '05'
+                                            : themeColors.background,
+                                        border: `2px solid ${
+                                            isHighlighted
+                                                ? themeColors.purple
+                                                : isHovered
+                                                ? themeColors.purple + '40'
+                                                : themeColors.cardBorder
+                                        }`,
+                                        borderRadius: 8,
+                                        minWidth: 140,
+                                        flex: '0 0 auto',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s ease',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: 6
+                                    }}
+                                >
+                                    <div style={{
+                                        fontSize: 12,
+                                        fontWeight: 500,
+                                        color: themeColors.text
+                                    }}>
+                                        {node.id}
+                                    </div>
+                                    {relatedExpedientes.length > 0 && (
+                                        <div style={{
+                                            display: 'flex',
+                                            flexWrap: 'wrap',
+                                            gap: 4,
+                                            paddingTop: 4,
+                                            borderTop: `1px solid ${themeColors.cardBorder}`
+                                        }}>
+                                            {relatedExpedientes.map((rel, relIdx) => (
+                                                <div
+                                                    key={relIdx}
+                                                    style={{
+                                                        fontSize: 9,
+                                                        padding: '2px 6px',
+                                                        backgroundColor: themeColors.purple + '20',
+                                                        color: themeColors.purple,
+                                                        borderRadius: 4,
+                                                        fontWeight: 600
+                                                    }}
+                                                >
+                                                    {rel.id}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                             );
                         })}
                     </div>
+                </div>
+            )}
+
+            {/* Tree Cards Container */}
+            <div
+                ref={containerRef}
+                style={{
+                    position: 'relative'
+                }}
+            >
+                {/* Connection Lines */}
+                <ConnectionLines
+                    edges={treeData.edges}
+                    themeColors={themeColors}
+                    containerRef={containerRef}
+                    hoveredNode={hoveredNode}
+                    selectedNode={selectedNode}
+                />
+
+                {/* Tree Cards - Responsive Layout */}
+                <div style={{
+                    position: 'relative',
+                    zIndex: 1,
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: 12,
+                    paddingBottom: 8
+                }}>
+                    {nodeTypeOrder.map(nodeType => {
+                        const nodes = treeData.nodes.get(nodeType);
+                        if (!nodes || nodes.length === 0) {
+                            return null;
+                        }
+
+                        return (
+                            <TreeCard
+                                key={nodeType}
+                                title={getNodeTypeDisplayName(nodeType)}
+                                items={nodes}
+                                themeColors={themeColors}
+                                onItemClick={handleItemClick}
+                                onItemHover={handleItemHover}
+                                selectedItem={null}
+                                highlightedItems={highlightedItems}
+                                hoveredItems={hoveredItems}
+                                allNodes={treeData.nodes}
+                            />
+                        );
+                    })}
                 </div>
             </div>
         </div>

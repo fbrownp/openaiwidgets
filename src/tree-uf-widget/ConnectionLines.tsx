@@ -1,170 +1,120 @@
-import React, { useEffect, useState } from 'react';
-import { ThemeColors, NodeData } from './types';
+import React, { useEffect, useState, useCallback } from 'react';
+import { ThemeColors, NodeData, EdgeData } from './types';
 
 interface ConnectionLinesProps {
-    highlightedItems: Set<string>;
-    hoveredItems: Set<string>;
+    edges: EdgeData[];
     themeColors: ThemeColors;
     containerRef: React.RefObject<HTMLDivElement>;
-    selectedNode: NodeData | null;
     hoveredNode: NodeData | null;
+    selectedNode: NodeData | null;
 }
 
-interface LineCoordinates {
-    x1: number;
-    y1: number;
-    x2: number;
-    y2: number;
-    key: string;
-    isHover: boolean;
-}
-
-/**
- * Calculate the intersection point on the border of a rectangle
- */
-function getBorderPoint(
-    centerX: number,
-    centerY: number,
-    width: number,
-    height: number,
-    targetX: number,
-    targetY: number
-): { x: number; y: number } {
-    const dx = targetX - centerX;
-    const dy = targetY - centerY;
-
-    // Calculate angle
-    const angle = Math.atan2(dy, dx);
-
-    // Calculate intersection with rectangle border
-    const cos = Math.cos(angle);
-    const sin = Math.sin(angle);
-
-    let x: number, y: number;
-
-    // Check which edge the line intersects
-    if (Math.abs(cos) > Math.abs(sin * (width / height))) {
-        // Intersects left or right edge
-        x = centerX + (width / 2) * Math.sign(cos);
-        y = centerY + (width / 2) * Math.tan(angle) * Math.sign(cos);
-    } else {
-        // Intersects top or bottom edge
-        y = centerY + (height / 2) * Math.sign(sin);
-        x = centerX + (height / 2) / Math.tan(angle) * Math.sign(sin);
-    }
-
-    return { x, y };
+interface LineData {
+    path: string;
+    sourceKey: string;
+    targetKey: string;
+    isHovered: boolean;
 }
 
 /**
  * ConnectionLines Component
- * Renders SVG lines between connected nodes
+ * Draws SVG lines with 90-degree corners and arrows between connected nodes
  */
 export function ConnectionLines({
-    highlightedItems,
-    hoveredItems,
+    edges,
     themeColors,
     containerRef,
-    selectedNode,
-    hoveredNode
+    hoveredNode,
+    selectedNode
 }: ConnectionLinesProps) {
-    const [lines, setLines] = useState<LineCoordinates[]>([]);
+    const [lines, setLines] = useState<LineData[]>([]);
+
+    const calculateLines = useCallback(() => {
+        if (!containerRef.current) return;
+
+        const container = containerRef.current;
+        const containerRect = container.getBoundingClientRect();
+        const newLines: LineData[] = [];
+
+        edges.forEach(edge => {
+            // Skip id_uf connections
+            if (edge.src_name === 'id_uf' || edge.dst_name === 'id_uf') return;
+
+            const sourceKey = `${edge.src_name}:${edge.src_id}`;
+            const targetKey = `${edge.dst_name}:${edge.dst_id}`;
+
+            // Find source and target elements
+            const sourceElement = container.querySelector(`[data-node-key="${sourceKey}"]`) as HTMLElement;
+            const targetElement = container.querySelector(`[data-node-key="${targetKey}"]`) as HTMLElement;
+
+            if (!sourceElement || !targetElement) return;
+
+            const sourceRect = sourceElement.getBoundingClientRect();
+            const targetRect = targetElement.getBoundingClientRect();
+
+            // Calculate center points relative to container
+            const sourceX = sourceRect.left + sourceRect.width / 2 - containerRect.left;
+            const sourceY = sourceRect.top + sourceRect.height / 2 - containerRect.top;
+            const targetX = targetRect.left + targetRect.width / 2 - containerRect.left;
+            const targetY = targetRect.top + targetRect.height / 2 - containerRect.top;
+
+            // Determine if connection is hovered
+            const hoveredKey = hoveredNode ? `${hoveredNode.name}:${hoveredNode.id}` : null;
+            const selectedKey = selectedNode ? `${selectedNode.name}:${selectedNode.id}` : null;
+            const activeKey = selectedKey || hoveredKey;
+            const isHovered = activeKey === sourceKey || activeKey === targetKey;
+
+            // Create path with 90-degree corners
+            let path: string;
+
+            // Calculate midpoint for the corner
+            const midY = (sourceY + targetY) / 2;
+
+            if (Math.abs(sourceX - targetX) < 50) {
+                // Vertical connection
+                path = `M ${sourceX},${sourceY} L ${targetX},${targetY}`;
+            } else {
+                // Use 90-degree corners
+                // Go down/up from source, then horizontal, then down/up to target
+                path = `M ${sourceX},${sourceY} L ${sourceX},${midY} L ${targetX},${midY} L ${targetX},${targetY}`;
+            }
+
+            newLines.push({
+                path,
+                sourceKey,
+                targetKey,
+                isHovered
+            });
+        });
+
+        setLines(newLines);
+    }, [edges, containerRef, hoveredNode, selectedNode]);
 
     useEffect(() => {
-        const hasSelection = selectedNode && highlightedItems.size > 0;
-        const hasHover = hoveredNode && hoveredItems.size > 0 && !selectedNode;
+        calculateLines();
 
-        if (!containerRef.current || (!hasSelection && !hasHover)) {
-            setLines([]);
-            return;
+        // Recalculate on window resize and scroll
+        const handleUpdate = () => calculateLines();
+        window.addEventListener('resize', handleUpdate);
+        window.addEventListener('scroll', handleUpdate, true);
+
+        // Also listen for container scroll
+        const scrollHandler = () => calculateLines();
+        const scrollableContainer = containerRef.current;
+        if (scrollableContainer) {
+            scrollableContainer.addEventListener('scroll', scrollHandler, true);
         }
 
-        const updateLines = () => {
-            const container = containerRef.current;
-            if (!container) return;
-
-            const containerRect = container.getBoundingClientRect();
-            const newLines: LineCoordinates[] = [];
-
-            // Helper function to draw lines for a node
-            const drawLinesForNode = (node: NodeData, isHover: boolean) => {
-                const nodeKey = `${node.name}:${node.id}`;
-
-                // Only draw lines from node to its direct connections
-                node.connections.forEach(connKey => {
-                    // Skip if connection is to id_uf
-                    if (connKey.startsWith('id_uf:')) return;
-
-                    // Find the DOM elements
-                    const element1 = container.querySelector(`[data-node-key="${nodeKey}"]`);
-                    const element2 = container.querySelector(`[data-node-key="${connKey}"]`);
-
-                    if (element1 && element2) {
-                        const rect1 = element1.getBoundingClientRect();
-                        const rect2 = element2.getBoundingClientRect();
-
-                        // Calculate center points relative to container
-                        const center1X = rect1.left + rect1.width / 2 - containerRect.left;
-                        const center1Y = rect1.top + rect1.height / 2 - containerRect.top;
-                        const center2X = rect2.left + rect2.width / 2 - containerRect.left;
-                        const center2Y = rect2.top + rect2.height / 2 - containerRect.top;
-
-                        // Calculate border intersection points
-                        const point1 = getBorderPoint(
-                            center1X,
-                            center1Y,
-                            rect1.width,
-                            rect1.height,
-                            center2X,
-                            center2Y
-                        );
-
-                        const point2 = getBorderPoint(
-                            center2X,
-                            center2Y,
-                            rect2.width,
-                            rect2.height,
-                            center1X,
-                            center1Y
-                        );
-
-                        newLines.push({
-                            x1: point1.x,
-                            y1: point1.y,
-                            x2: point2.x,
-                            y2: point2.y,
-                            key: `${nodeKey}-${connKey}`,
-                            isHover
-                        });
-                    }
-                });
-            };
-
-            // Draw lines for selected node (higher priority)
-            if (selectedNode) {
-                drawLinesForNode(selectedNode, false);
+        return () => {
+            window.removeEventListener('resize', handleUpdate);
+            window.removeEventListener('scroll', handleUpdate, true);
+            if (scrollableContainer) {
+                scrollableContainer.removeEventListener('scroll', scrollHandler, true);
             }
-            // Draw lines for hovered node if no selection
-            else if (hoveredNode) {
-                drawLinesForNode(hoveredNode, true);
-            }
-
-            setLines(newLines);
         };
+    }, [calculateLines, containerRef]);
 
-        updateLines();
-
-        // Update lines on scroll
-        const scrollContainer = containerRef.current?.querySelector('[style*="overflowX"]');
-        if (scrollContainer) {
-            scrollContainer.addEventListener('scroll', updateLines);
-            return () => scrollContainer.removeEventListener('scroll', updateLines);
-        }
-    }, [highlightedItems, hoveredItems, containerRef, selectedNode, hoveredNode]);
-
-    if (lines.length === 0) {
-        return null;
-    }
+    if (!containerRef.current || lines.length === 0) return null;
 
     return (
         <svg
@@ -175,19 +125,57 @@ export function ConnectionLines({
                 width: '100%',
                 height: '100%',
                 pointerEvents: 'none',
-                zIndex: 10
+                zIndex: 0,
+                overflow: 'visible'
             }}
         >
-            {lines.map((line) => (
-                <line
-                    key={line.key}
-                    x1={line.x1}
-                    y1={line.y1}
-                    x2={line.x2}
-                    y2={line.y2}
+            {/* Define arrow markers */}
+            <defs>
+                <marker
+                    id="arrowhead"
+                    markerWidth="8"
+                    markerHeight="8"
+                    refX="7"
+                    refY="3"
+                    orient="auto"
+                    markerUnits="strokeWidth"
+                >
+                    <path
+                        d="M0,0 L0,6 L8,3 z"
+                        fill={themeColors.purple}
+                        opacity="0.3"
+                    />
+                </marker>
+                <marker
+                    id="arrowhead-hover"
+                    markerWidth="8"
+                    markerHeight="8"
+                    refX="7"
+                    refY="3"
+                    orient="auto"
+                    markerUnits="strokeWidth"
+                >
+                    <path
+                        d="M0,0 L0,6 L8,3 z"
+                        fill={themeColors.purple}
+                        opacity="0.7"
+                    />
+                </marker>
+            </defs>
+
+            {/* Draw lines */}
+            {lines.map((line, index) => (
+                <path
+                    key={index}
+                    d={line.path}
                     stroke={themeColors.purple}
-                    strokeWidth={line.isHover ? 1.5 : 2}
-                    strokeOpacity={line.isHover ? 0.25 : 0.6}
+                    strokeWidth={line.isHovered ? 2 : 1.5}
+                    fill="none"
+                    opacity={line.isHovered ? 0.7 : 0.3}
+                    markerEnd={line.isHovered ? "url(#arrowhead-hover)" : "url(#arrowhead)"}
+                    style={{
+                        transition: 'all 0.2s ease'
+                    }}
                 />
             ))}
         </svg>

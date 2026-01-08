@@ -46,6 +46,7 @@ export interface TreeCardProps {
     selectedItem: NodeData | null;
     highlightedItems: Set<string>;
     hoveredItems: Set<string>;
+    allNodes: Map<string, NodeData[]>;
 }
 
 /**

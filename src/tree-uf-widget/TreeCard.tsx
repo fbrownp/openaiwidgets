@@ -13,7 +13,8 @@ export function TreeCard({
     onItemHover,
     selectedItem,
     highlightedItems,
-    hoveredItems
+    hoveredItems,
+    allNodes
 }: TreeCardProps) {
     if (items.length === 0) {
         return null;
@@ -57,6 +58,14 @@ export function TreeCard({
                     const isHovered = hoveredItems.has(itemKey);
                     const isSelected = selectedItem?.id === item.id && selectedItem?.name === item.name;
 
+                    // Get related documents (excluding id_uf)
+                    const relatedDocs = item.connections
+                        .filter(connKey => !connKey.startsWith('id_uf:'))
+                        .map(connKey => {
+                            const [type, id] = connKey.split(':');
+                            return { type, id };
+                        });
+
                     return (
                         <div
                             key={index}
@@ -94,13 +103,30 @@ export function TreeCard({
                             }}>
                                 {item.id}
                             </div>
-                            {item.connections.length > 0 && (
+                            {relatedDocs.length > 0 && (
                                 <div style={{
-                                    fontSize: 12,
-                                    color: themeColors.textSecondary,
-                                    marginTop: 4
+                                    display: 'flex',
+                                    flexWrap: 'wrap',
+                                    gap: 4,
+                                    marginTop: 8,
+                                    paddingTop: 8,
+                                    borderTop: `1px solid ${themeColors.cardBorder}`
                                 }}>
-                                    {item.connections.length} {item.connections.length === 1 ? 'conexión' : 'conexiones'}
+                                    {relatedDocs.map((rel, relIdx) => (
+                                        <div
+                                            key={relIdx}
+                                            style={{
+                                                fontSize: 9,
+                                                padding: '2px 6px',
+                                                backgroundColor: themeColors.purple + '20',
+                                                color: themeColors.purple,
+                                                borderRadius: 4,
+                                                fontWeight: 600
+                                            }}
+                                        >
+                                            {rel.id}
+                                        </div>
+                                    ))}
                                 </div>
                             )}
                         </div>
