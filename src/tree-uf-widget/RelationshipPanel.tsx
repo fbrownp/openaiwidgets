@@ -248,30 +248,79 @@ export function RelationshipPanel({
                             flexWrap: 'wrap',
                             gap: 8
                         }}>
-                            {fiscalizacionNodes.map((node, idx) => (
-                                <div
-                                    key={idx}
-                                    style={{
-                                        padding: '10px 12px',
-                                        backgroundColor: node.id === selectedNode.id
-                                            ? themeColors.purple + '20'
-                                            : themeColors.background,
-                                        border: `2px solid ${
-                                            node.id === selectedNode.id
-                                                ? themeColors.purple
-                                                : themeColors.cardBorder
-                                        }`,
-                                        borderRadius: 8,
-                                        fontSize: 12,
-                                        fontWeight: 500,
-                                        color: themeColors.text,
-                                        minWidth: 120,
-                                        flex: '0 0 auto'
-                                    }}
-                                >
-                                    {node.id}
-                                </div>
-                            ))}
+                            {fiscalizacionNodes.map((node, idx) => {
+                                // Find related expedientes (excluding id_uf)
+                                const relatedExpedientes = node.connections
+                                    .filter(connKey => !connKey.startsWith('id_uf:'))
+                                    .map(connKey => {
+                                        const [type, id] = connKey.split(':');
+                                        const nodeGroup = allNodes.get(type);
+                                        if (!nodeGroup) return null;
+                                        return nodeGroup.find(n => n.id === id);
+                                    })
+                                    .filter(n => n !== null && n !== undefined);
+
+                                return (
+                                    <div
+                                        key={idx}
+                                        style={{
+                                            padding: '10px 12px',
+                                            backgroundColor: node.id === selectedNode.id
+                                                ? themeColors.purple + '20'
+                                                : themeColors.background,
+                                            border: `2px solid ${
+                                                node.id === selectedNode.id
+                                                    ? themeColors.purple
+                                                    : themeColors.cardBorder
+                                            }`,
+                                            borderRadius: 8,
+                                            minWidth: 120,
+                                            flex: '0 0 auto',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            gap: 6
+                                        }}
+                                    >
+                                        <div style={{
+                                            fontSize: 12,
+                                            fontWeight: 500,
+                                            color: themeColors.text
+                                        }}>
+                                            {node.id}
+                                        </div>
+                                        {relatedExpedientes.length > 0 && (
+                                            <div style={{
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                gap: 3,
+                                                paddingTop: 6,
+                                                borderTop: `1px solid ${themeColors.cardBorder}`
+                                            }}>
+                                                <div style={{
+                                                    fontSize: 9,
+                                                    color: themeColors.textSecondary,
+                                                    textTransform: 'uppercase',
+                                                    fontWeight: 600
+                                                }}>
+                                                    Inspeccionó:
+                                                </div>
+                                                {relatedExpedientes.map((relNode, relIdx) => (
+                                                    <div
+                                                        key={relIdx}
+                                                        style={{
+                                                            fontSize: 10,
+                                                            color: themeColors.purple,
+                                                            fontWeight: 600
+                                                        }}
+                                                    >
+                                                        {relNode!.id}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 )}
