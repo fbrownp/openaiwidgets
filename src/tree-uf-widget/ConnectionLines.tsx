@@ -3,9 +3,11 @@ import { ThemeColors, NodeData } from './types';
 
 interface ConnectionLinesProps {
     highlightedItems: Set<string>;
+    hoveredItems: Set<string>;
     themeColors: ThemeColors;
     containerRef: React.RefObject<HTMLDivElement>;
     selectedNode: NodeData | null;
+    hoveredNode: NodeData | null;
 }
 
 interface LineCoordinates {
@@ -14,6 +16,7 @@ interface LineCoordinates {
     x2: number;
     y2: number;
     key: string;
+    isHover: boolean;
 }
 
 /**
@@ -59,14 +62,19 @@ function getBorderPoint(
  */
 export function ConnectionLines({
     highlightedItems,
+    hoveredItems,
     themeColors,
     containerRef,
-    selectedNode
+    selectedNode,
+    hoveredNode
 }: ConnectionLinesProps) {
     const [lines, setLines] = useState<LineCoordinates[]>([]);
 
     useEffect(() => {
-        if (!containerRef.current || highlightedItems.size === 0 || !selectedNode) {
+        const hasSelection = selectedNode && highlightedItems.size > 0;
+        const hasHover = hoveredNode && hoveredItems.size > 0 && !selectedNode;
+
+        if (!containerRef.current || (!hasSelection && !hasHover)) {
             setLines([]);
             return;
         }
@@ -78,56 +86,68 @@ export function ConnectionLines({
             const containerRect = container.getBoundingClientRect();
             const newLines: LineCoordinates[] = [];
 
-            // Get the selected node's connections
-            const selectedKey = `${selectedNode.name}:${selectedNode.id}`;
+            // Helper function to draw lines for a node
+            const drawLinesForNode = (node: NodeData, isHover: boolean) => {
+                const nodeKey = `${node.name}:${node.id}`;
 
-            // Only draw lines from selected node to its direct connections
-            selectedNode.connections.forEach(connKey => {
-                // Skip if connection is to id_uf
-                if (connKey.startsWith('id_uf:')) return;
+                // Only draw lines from node to its direct connections
+                node.connections.forEach(connKey => {
+                    // Skip if connection is to id_uf
+                    if (connKey.startsWith('id_uf:')) return;
 
-                // Find the DOM elements
-                const element1 = container.querySelector(`[data-node-key="${selectedKey}"]`);
-                const element2 = container.querySelector(`[data-node-key="${connKey}"]`);
+                    // Find the DOM elements
+                    const element1 = container.querySelector(`[data-node-key="${nodeKey}"]`);
+                    const element2 = container.querySelector(`[data-node-key="${connKey}"]`);
 
-                if (element1 && element2) {
-                    const rect1 = element1.getBoundingClientRect();
-                    const rect2 = element2.getBoundingClientRect();
+                    if (element1 && element2) {
+                        const rect1 = element1.getBoundingClientRect();
+                        const rect2 = element2.getBoundingClientRect();
 
-                    // Calculate center points relative to container
-                    const center1X = rect1.left + rect1.width / 2 - containerRect.left;
-                    const center1Y = rect1.top + rect1.height / 2 - containerRect.top;
-                    const center2X = rect2.left + rect2.width / 2 - containerRect.left;
-                    const center2Y = rect2.top + rect2.height / 2 - containerRect.top;
+                        // Calculate center points relative to container
+                        const center1X = rect1.left + rect1.width / 2 - containerRect.left;
+                        const center1Y = rect1.top + rect1.height / 2 - containerRect.top;
+                        const center2X = rect2.left + rect2.width / 2 - containerRect.left;
+                        const center2Y = rect2.top + rect2.height / 2 - containerRect.top;
 
-                    // Calculate border intersection points
-                    const point1 = getBorderPoint(
-                        center1X,
-                        center1Y,
-                        rect1.width,
-                        rect1.height,
-                        center2X,
-                        center2Y
-                    );
+                        // Calculate border intersection points
+                        const point1 = getBorderPoint(
+                            center1X,
+                            center1Y,
+                            rect1.width,
+                            rect1.height,
+                            center2X,
+                            center2Y
+                        );
 
-                    const point2 = getBorderPoint(
-                        center2X,
-                        center2Y,
-                        rect2.width,
-                        rect2.height,
-                        center1X,
-                        center1Y
-                    );
+                        const point2 = getBorderPoint(
+                            center2X,
+                            center2Y,
+                            rect2.width,
+                            rect2.height,
+                            center1X,
+                            center1Y
+                        );
 
-                    newLines.push({
-                        x1: point1.x,
-                        y1: point1.y,
-                        x2: point2.x,
-                        y2: point2.y,
-                        key: `${selectedKey}-${connKey}`
-                    });
-                }
-            });
+                        newLines.push({
+                            x1: point1.x,
+                            y1: point1.y,
+                            x2: point2.x,
+                            y2: point2.y,
+                            key: `${nodeKey}-${connKey}`,
+                            isHover
+                        });
+                    }
+                });
+            };
+
+            // Draw lines for selected node (higher priority)
+            if (selectedNode) {
+                drawLinesForNode(selectedNode, false);
+            }
+            // Draw lines for hovered node if no selection
+            else if (hoveredNode) {
+                drawLinesForNode(hoveredNode, true);
+            }
 
             setLines(newLines);
         };
@@ -140,7 +160,7 @@ export function ConnectionLines({
             scrollContainer.addEventListener('scroll', updateLines);
             return () => scrollContainer.removeEventListener('scroll', updateLines);
         }
-    }, [highlightedItems, containerRef, selectedNode]);
+    }, [highlightedItems, hoveredItems, containerRef, selectedNode, hoveredNode]);
 
     if (lines.length === 0) {
         return null;
@@ -166,8 +186,8 @@ export function ConnectionLines({
                     x2={line.x2}
                     y2={line.y2}
                     stroke={themeColors.purple}
-                    strokeWidth={2}
-                    strokeOpacity={0.6}
+                    strokeWidth={line.isHover ? 1.5 : 2}
+                    strokeOpacity={line.isHover ? 0.25 : 0.6}
                 />
             ))}
         </svg>

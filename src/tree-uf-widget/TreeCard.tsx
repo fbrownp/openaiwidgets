@@ -10,8 +10,10 @@ export function TreeCard({
     items,
     themeColors,
     onItemClick,
+    onItemHover,
     selectedItem,
-    highlightedItems
+    highlightedItems,
+    hoveredItems
 }: TreeCardProps) {
     if (items.length === 0) {
         return null;
@@ -52,6 +54,7 @@ export function TreeCard({
                 {items.map((item, index) => {
                     const itemKey = `${item.name}:${item.id}`;
                     const isHighlighted = highlightedItems.has(itemKey);
+                    const isHovered = hoveredItems.has(itemKey);
                     const isSelected = selectedItem?.id === item.id && selectedItem?.name === item.name;
 
                     return (
@@ -59,28 +62,28 @@ export function TreeCard({
                             key={index}
                             data-node-key={itemKey}
                             onClick={() => onItemClick(item)}
+                            onMouseEnter={() => onItemHover(item)}
+                            onMouseLeave={() => onItemHover(null)}
                             style={{
                                 padding: 12,
                                 borderRadius: 8,
-                                border: `2px solid ${isHighlighted ? themeColors.purple : themeColors.cardBorder}`,
+                                border: `2px solid ${
+                                    isHighlighted
+                                        ? themeColors.purple
+                                        : isHovered
+                                        ? themeColors.purple + '40'
+                                        : themeColors.cardBorder
+                                }`,
                                 backgroundColor: isSelected
                                     ? themeColors.purple + '20'
                                     : isHighlighted
                                     ? themeColors.purple + '10'
+                                    : isHovered
+                                    ? themeColors.purple + '05'
                                     : 'transparent',
                                 cursor: 'pointer',
                                 transition: 'all 0.2s ease',
                                 position: 'relative'
-                            }}
-                            onMouseEnter={(e) => {
-                                if (!isHighlighted) {
-                                    e.currentTarget.style.backgroundColor = themeColors.buttonHover;
-                                }
-                            }}
-                            onMouseLeave={(e) => {
-                                if (!isHighlighted) {
-                                    e.currentTarget.style.backgroundColor = 'transparent';
-                                }
                             }}
                         >
                             <div style={{

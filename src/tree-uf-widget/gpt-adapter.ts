@@ -164,6 +164,7 @@ export function parseGPTOutput(toolOutput: unknown): TreeData {
 /**
  * Build direct connections for a selected node
  * Only returns directly connected nodes, not the full path
+ * Excludes id_uf connections
  */
 export function buildConnectionPath(
     startNode: NodeData,
@@ -175,9 +176,11 @@ export function buildConnectionPath(
     // Add the selected node itself
     highlighted.add(startKey);
 
-    // Add only direct connections (one level deep)
+    // Add only direct connections (one level deep), excluding id_uf
     startNode.connections.forEach(connKey => {
-        highlighted.add(connKey);
+        if (!connKey.startsWith('id_uf:')) {
+            highlighted.add(connKey);
+        }
     });
 
     return highlighted;

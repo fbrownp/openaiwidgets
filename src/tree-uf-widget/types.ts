@@ -42,8 +42,10 @@ export interface TreeCardProps {
     items: NodeData[];
     themeColors: ThemeColors;
     onItemClick: (item: NodeData) => void;
+    onItemHover: (item: NodeData | null) => void;
     selectedItem: NodeData | null;
     highlightedItems: Set<string>;
+    hoveredItems: Set<string>;
 }
 
 /**

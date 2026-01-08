@@ -18,6 +18,9 @@ export function Dashboard() {
     // Selected node state
     const [selectedNode, setSelectedNode] = useState<NodeData | null>(null);
 
+    // Hovered node state
+    const [hoveredNode, setHoveredNode] = useState<NodeData | null>(null);
+
     // Container ref for calculating line positions
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -37,6 +40,14 @@ export function Dashboard() {
         return buildConnectionPath(selectedNode, treeData.nodes);
     }, [selectedNode, treeData.nodes]);
 
+    // Calculate hovered items based on hovered node
+    const hoveredItems = useMemo(() => {
+        if (!hoveredNode || selectedNode) {
+            return new Set<string>();
+        }
+        return buildConnectionPath(hoveredNode, treeData.nodes);
+    }, [hoveredNode, selectedNode, treeData.nodes]);
+
     // Handle item click
     const handleItemClick = (item: NodeData) => {
         // If clicking the same item, deselect it
@@ -45,6 +56,11 @@ export function Dashboard() {
         } else {
             setSelectedNode(item);
         }
+    };
+
+    // Handle item hover
+    const handleItemHover = (item: NodeData | null) => {
+        setHoveredNode(item);
     };
 
     // Define the order of node types to display (excluding id_uf)
@@ -230,8 +246,10 @@ export function Dashboard() {
                                 items={nodes}
                                 themeColors={themeColors}
                                 onItemClick={handleItemClick}
+                                onItemHover={handleItemHover}
                                 selectedItem={selectedNode}
                                 highlightedItems={highlightedItems}
+                                hoveredItems={hoveredItems}
                             />
                         );
                     })}
@@ -240,9 +258,11 @@ export function Dashboard() {
                 {/* Connection Lines SVG - Rendered after cards to appear on top */}
                 <ConnectionLines
                     highlightedItems={highlightedItems}
+                    hoveredItems={hoveredItems}
                     themeColors={themeColors}
                     containerRef={containerRef}
                     selectedNode={selectedNode}
+                    hoveredNode={hoveredNode}
                 />
             </div>
         </div>
