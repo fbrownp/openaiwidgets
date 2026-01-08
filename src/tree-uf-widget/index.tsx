@@ -18,7 +18,7 @@ createRoot(rootElement).render(
 
 export { Dashboard };
 export { TreeCard } from './TreeCard';
-export { ConnectionLines } from './ConnectionLines';
+export { RelationshipPanel } from './RelationshipPanel';
 export * from './types';
 export * from './gpt-types';
 export * from './gpt-adapter';

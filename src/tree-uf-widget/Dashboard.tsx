@@ -2,7 +2,7 @@ import React, { useMemo, useState, useRef } from 'react';
 import { parseGPTOutput, getNodeTypeDisplayName, buildConnectionPath } from './gpt-adapter';
 import { ThemeColors, NodeData } from './types';
 import { TreeCard } from './TreeCard';
-import { ConnectionLines } from './ConnectionLines';
+import { RelationshipPanel } from './RelationshipPanel';
 
 // Import hooks from parent directory
 import { useOpenAiGlobal } from '../use-openai-global';
@@ -48,14 +48,14 @@ export function Dashboard() {
         return buildConnectionPath(hoveredNode, treeData.nodes);
     }, [hoveredNode, selectedNode, treeData.nodes]);
 
-    // Handle item click
+    // Handle item click - opens the relationship panel
     const handleItemClick = (item: NodeData) => {
-        // If clicking the same item, deselect it
-        if (selectedNode?.id === item.id && selectedNode?.name === item.name) {
-            setSelectedNode(null);
-        } else {
-            setSelectedNode(item);
-        }
+        setSelectedNode(item);
+    };
+
+    // Handle closing the relationship panel
+    const handleClosePanel = () => {
+        setSelectedNode(null);
     };
 
     // Handle item hover
@@ -247,24 +247,23 @@ export function Dashboard() {
                                 themeColors={themeColors}
                                 onItemClick={handleItemClick}
                                 onItemHover={handleItemHover}
-                                selectedItem={selectedNode}
-                                highlightedItems={highlightedItems}
+                                selectedItem={null}
+                                highlightedItems={new Set()}
                                 hoveredItems={hoveredItems}
                             />
                         );
                     })}
                 </div>
 
-                {/* Connection Lines SVG - Rendered after cards to appear on top */}
-                <ConnectionLines
-                    highlightedItems={highlightedItems}
-                    hoveredItems={hoveredItems}
-                    themeColors={themeColors}
-                    containerRef={containerRef}
-                    selectedNode={selectedNode}
-                    hoveredNode={hoveredNode}
-                />
             </div>
+
+            {/* Relationship Panel Modal */}
+            <RelationshipPanel
+                selectedNode={selectedNode}
+                allNodes={treeData.nodes}
+                themeColors={themeColors}
+                onClose={handleClosePanel}
+            />
         </div>
     );
 }
