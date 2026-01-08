@@ -24,7 +24,7 @@ export function RelationshipPanel({
     if (!selectedNode) {
         return (
             <div style={{
-                width: 350,
+                width: 500,
                 flexShrink: 0,
                 padding: 24,
                 backgroundColor: themeColors.cardBackground,
@@ -114,7 +114,7 @@ export function RelationshipPanel({
 
     return (
         <div style={{
-            width: 350,
+            width: 500,
             flexShrink: 0,
             padding: 20,
             backgroundColor: themeColors.cardBackground,
@@ -160,10 +160,11 @@ export function RelationshipPanel({
 
                         return (
                             <div key={level} style={{ marginBottom: 16 }}>
-                                {/* Level nodes */}
+                                {/* Level nodes - Horizontal layout */}
                                 <div style={{
                                     display: 'flex',
-                                    flexDirection: 'column',
+                                    flexDirection: 'row',
+                                    flexWrap: 'wrap',
                                     gap: 8,
                                     marginBottom: level < 3 ? 12 : 0
                                 }}>
@@ -180,7 +181,9 @@ export function RelationshipPanel({
                                                         ? themeColors.purple
                                                         : themeColors.cardBorder
                                                 }`,
-                                                borderRadius: 8
+                                                borderRadius: 8,
+                                                minWidth: 120,
+                                                flex: '0 0 auto'
                                             }}
                                         >
                                             <div style={{
@@ -224,7 +227,7 @@ export function RelationshipPanel({
                     })}
                 </div>
 
-                {/* Fiscalizacion section */}
+                {/* Fiscalizacion section - Horizontal layout */}
                 {fiscalizacionNodes.length > 0 && (
                     <div style={{
                         borderTop: `2px solid ${themeColors.cardBorder}`,
@@ -239,29 +242,37 @@ export function RelationshipPanel({
                         }}>
                             Fiscalización
                         </div>
-                        {fiscalizacionNodes.map((node, idx) => (
-                            <div
-                                key={idx}
-                                style={{
-                                    padding: '10px 12px',
-                                    backgroundColor: node.id === selectedNode.id
-                                        ? themeColors.purple + '20'
-                                        : themeColors.background,
-                                    border: `2px solid ${
-                                        node.id === selectedNode.id
-                                            ? themeColors.purple
-                                            : themeColors.cardBorder
-                                    }`,
-                                    borderRadius: 8,
-                                    marginBottom: 8,
-                                    fontSize: 12,
-                                    fontWeight: 500,
-                                    color: themeColors.text
-                                }}
-                            >
-                                {node.id}
-                            </div>
-                        ))}
+                        <div style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            flexWrap: 'wrap',
+                            gap: 8
+                        }}>
+                            {fiscalizacionNodes.map((node, idx) => (
+                                <div
+                                    key={idx}
+                                    style={{
+                                        padding: '10px 12px',
+                                        backgroundColor: node.id === selectedNode.id
+                                            ? themeColors.purple + '20'
+                                            : themeColors.background,
+                                        border: `2px solid ${
+                                            node.id === selectedNode.id
+                                                ? themeColors.purple
+                                                : themeColors.cardBorder
+                                        }`,
+                                        borderRadius: 8,
+                                        fontSize: 12,
+                                        fontWeight: 500,
+                                        color: themeColors.text,
+                                        minWidth: 120,
+                                        flex: '0 0 auto'
+                                    }}
+                                >
+                                    {node.id}
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 )}
             </div>
