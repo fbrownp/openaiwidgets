@@ -195,7 +195,8 @@ export function Dashboard() {
                 padding: 12,
                 backgroundColor: themeColors.cardBackground,
                 border: `1px solid ${themeColors.cardBorder}`,
-                borderRadius: 10
+                borderRadius: 10,
+                maxWidth: '900px'
             }}>
                 <h3 style={{
                     margin: 0,
