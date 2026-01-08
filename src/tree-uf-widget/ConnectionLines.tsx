@@ -17,6 +17,40 @@ interface LineData {
 }
 
 /**
+ * Get the exit/entry point on a box edge for 90-degree corner connections
+ */
+function getEdgePoint(
+    rectLeft: number,
+    rectTop: number,
+    rectWidth: number,
+    rectHeight: number,
+    targetCenterX: number,
+    targetCenterY: number,
+    isSource: boolean
+): { x: number; y: number } {
+    const centerX = rectLeft + rectWidth / 2;
+    const centerY = rectTop + rectHeight / 2;
+
+    // Determine if we're going up or down
+    const goingDown = targetCenterY > centerY;
+    const goingRight = targetCenterX > centerX;
+
+    if (isSource) {
+        // For source, exit from bottom or top edge
+        return {
+            x: centerX,
+            y: goingDown ? rectTop + rectHeight : rectTop
+        };
+    } else {
+        // For target, enter from top or bottom edge
+        return {
+            x: centerX,
+            y: goingDown ? rectTop : rectTop + rectHeight
+        };
+    }
+}
+
+/**
  * ConnectionLines Component
  * Draws SVG lines with 90-degree corners and arrows between connected nodes
  */
@@ -52,11 +86,32 @@ export function ConnectionLines({
             const sourceRect = sourceElement.getBoundingClientRect();
             const targetRect = targetElement.getBoundingClientRect();
 
-            // Calculate center points relative to container
-            const sourceX = sourceRect.left + sourceRect.width / 2 - containerRect.left;
-            const sourceY = sourceRect.top + sourceRect.height / 2 - containerRect.top;
-            const targetX = targetRect.left + targetRect.width / 2 - containerRect.left;
-            const targetY = targetRect.top + targetRect.height / 2 - containerRect.top;
+            // Calculate center points for direction determination
+            const sourceCenterX = sourceRect.left + sourceRect.width / 2 - containerRect.left;
+            const sourceCenterY = sourceRect.top + sourceRect.height / 2 - containerRect.top;
+            const targetCenterX = targetRect.left + targetRect.width / 2 - containerRect.left;
+            const targetCenterY = targetRect.top + targetRect.height / 2 - containerRect.top;
+
+            // Get edge points instead of center points
+            const sourceEdge = getEdgePoint(
+                sourceRect.left - containerRect.left,
+                sourceRect.top - containerRect.top,
+                sourceRect.width,
+                sourceRect.height,
+                targetCenterX,
+                targetCenterY,
+                true
+            );
+
+            const targetEdge = getEdgePoint(
+                targetRect.left - containerRect.left,
+                targetRect.top - containerRect.top,
+                targetRect.width,
+                targetRect.height,
+                sourceCenterX,
+                sourceCenterY,
+                false
+            );
 
             // Determine if connection is hovered
             const hoveredKey = hoveredNode ? `${hoveredNode.name}:${hoveredNode.id}` : null;
@@ -68,15 +123,15 @@ export function ConnectionLines({
             let path: string;
 
             // Calculate midpoint for the corner
-            const midY = (sourceY + targetY) / 2;
+            const midY = (sourceEdge.y + targetEdge.y) / 2;
 
-            if (Math.abs(sourceX - targetX) < 50) {
+            if (Math.abs(sourceEdge.x - targetEdge.x) < 50) {
                 // Vertical connection
-                path = `M ${sourceX},${sourceY} L ${targetX},${targetY}`;
+                path = `M ${sourceEdge.x},${sourceEdge.y} L ${targetEdge.x},${targetEdge.y}`;
             } else {
                 // Use 90-degree corners
                 // Go down/up from source, then horizontal, then down/up to target
-                path = `M ${sourceX},${sourceY} L ${sourceX},${midY} L ${targetX},${midY} L ${targetX},${targetY}`;
+                path = `M ${sourceEdge.x},${sourceEdge.y} L ${sourceEdge.x},${midY} L ${targetEdge.x},${midY} L ${targetEdge.x},${targetEdge.y}`;
             }
 
             newLines.push({
