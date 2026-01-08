@@ -107,12 +107,31 @@ export function TreeCard({
                             }}
                         >
                             <div style={{
-                                fontSize: 14,
-                                fontWeight: 500,
-                                color: themeColors.text,
-                                wordBreak: 'break-word'
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'flex-start',
+                                gap: 8
                             }}>
-                                {item.id}
+                                <div style={{
+                                    fontSize: 14,
+                                    fontWeight: 500,
+                                    color: themeColors.text,
+                                    wordBreak: 'break-word',
+                                    flex: 1
+                                }}>
+                                    {item.id}
+                                </div>
+                                <div style={{
+                                    fontSize: 10,
+                                    fontWeight: 600,
+                                    color: themeColors.purple,
+                                    backgroundColor: themeColors.purple + '15',
+                                    padding: '2px 6px',
+                                    borderRadius: 4,
+                                    flexShrink: 0
+                                }}>
+                                    {relatedDocs.length}
+                                </div>
                             </div>
                             {relatedDocs.length > 0 && (
                                 <div style={{

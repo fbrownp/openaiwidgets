@@ -213,7 +213,7 @@ export function Dashboard() {
                     gap: 8
                 }}>
                     {Array.from(treeData.nodes.entries())
-                        .filter(([type]) => type !== 'id_uf')
+                        .filter(([type]) => type !== 'id_uf' && type !== 'instrumento_aplicable')
                         .map(([type, nodes]) => (
                         <div key={type} style={{
                             padding: 8,
@@ -236,26 +236,6 @@ export function Dashboard() {
                             </div>
                         </div>
                     ))}
-                    <div style={{
-                        padding: 8,
-                        borderRadius: 6,
-                        backgroundColor: themeColors.background
-                    }}>
-                        <div style={{
-                            fontSize: 11,
-                            color: themeColors.textSecondary,
-                            marginBottom: 3
-                        }}>
-                            Conexiones Totales
-                        </div>
-                        <div style={{
-                            fontSize: 18,
-                            fontWeight: 600,
-                            color: themeColors.purple
-                        }}>
-                            {treeData.edges.length}
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -340,11 +320,27 @@ export function Dashboard() {
                                     }}
                                 >
                                     <div style={{
-                                        fontSize: 12,
-                                        fontWeight: 500,
-                                        color: themeColors.text
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'flex-start'
                                     }}>
-                                        {node.id}
+                                        <div style={{
+                                            fontSize: 12,
+                                            fontWeight: 500,
+                                            color: themeColors.text
+                                        }}>
+                                            {node.id}
+                                        </div>
+                                        <div style={{
+                                            fontSize: 10,
+                                            fontWeight: 600,
+                                            color: themeColors.purple,
+                                            backgroundColor: themeColors.purple + '15',
+                                            padding: '2px 6px',
+                                            borderRadius: 4
+                                        }}>
+                                            {node.connections.filter(conn => !conn.startsWith('id_uf:')).length}
+                                        </div>
                                     </div>
                                     {relatedExpedientes.length > 0 && (
                                         <div style={{
