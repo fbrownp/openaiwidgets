@@ -47,13 +47,12 @@ export function Dashboard() {
         }
     };
 
-    // Define the order of node types to display
+    // Define the order of node types to display (excluding id_uf)
     const nodeTypeOrder = [
-        'id_uf',
         'expediente_seia',
-        'expediente_snifa',
-        'expediente_fiscalizacion',
         'expediente_medida',
+        'expediente_fiscalizacion',
+        'expediente_snifa',
         'instrumento_aplicable'
     ];
 
@@ -155,7 +154,9 @@ export function Dashboard() {
                     gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
                     gap: 12
                 }}>
-                    {Array.from(treeData.nodes.entries()).map(([type, nodes]) => (
+                    {Array.from(treeData.nodes.entries())
+                        .filter(([type]) => type !== 'id_uf')
+                        .map(([type, nodes]) => (
                         <div key={type} style={{
                             padding: 12,
                             borderRadius: 8,
@@ -204,17 +205,9 @@ export function Dashboard() {
             <div
                 ref={containerRef}
                 style={{
-                    position: 'relative',
-                    zIndex: 1
+                    position: 'relative'
                 }}
             >
-                {/* Connection Lines SVG */}
-                <ConnectionLines
-                    highlightedItems={highlightedItems}
-                    themeColors={themeColors}
-                    containerRef={containerRef}
-                />
-
                 {/* Tree Cards - Horizontal Layout */}
                 <div style={{
                     position: 'relative',
@@ -243,6 +236,13 @@ export function Dashboard() {
                         );
                     })}
                 </div>
+
+                {/* Connection Lines SVG - Rendered after cards to appear on top */}
+                <ConnectionLines
+                    highlightedItems={highlightedItems}
+                    themeColors={themeColors}
+                    containerRef={containerRef}
+                />
             </div>
         </div>
     );
