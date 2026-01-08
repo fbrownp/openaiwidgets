@@ -262,15 +262,11 @@ export function Dashboard() {
             {fiscalizacionNodes.length > 0 && (
                 <div style={{
                     marginBottom: 20,
-                    display: 'inline-block',
-                    minWidth: 0
+                    padding: 12,
+                    backgroundColor: themeColors.cardBackground,
+                    border: `1px solid ${themeColors.cardBorder}`,
+                    borderRadius: 10
                 }}>
-                    <div style={{
-                        padding: 12,
-                        backgroundColor: themeColors.cardBackground,
-                        border: `1px solid ${themeColors.cardBorder}`,
-                        borderRadius: 10
-                    }}>
                         <h3 style={{
                             margin: 0,
                             marginBottom: 10,
@@ -366,7 +362,6 @@ export function Dashboard() {
                             );
                             })}
                         </div>
-                    </div>
                 </div>
             )}
 
@@ -374,9 +369,7 @@ export function Dashboard() {
             <div
                 ref={containerRef}
                 style={{
-                    position: 'relative',
-                    display: 'inline-block',
-                    minWidth: 0
+                    position: 'relative'
                 }}
             >
                 {/* Tree Cards - Responsive Layout */}
