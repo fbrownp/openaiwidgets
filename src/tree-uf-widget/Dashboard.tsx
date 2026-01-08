@@ -208,7 +208,7 @@ export function Dashboard() {
                 </h3>
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 130px))',
                     gap: 8
                 }}>
                     {Array.from(treeData.nodes.entries())
