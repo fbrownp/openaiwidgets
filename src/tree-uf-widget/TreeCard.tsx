@@ -26,9 +26,9 @@ export function TreeCard({
             border: `1px solid ${themeColors.cardBorder}`,
             borderRadius: 12,
             padding: 14,
-            flex: '1 1 200px',
-            minWidth: 180,
-            maxWidth: 300
+            flex: '1 1 150px',
+            minWidth: 140,
+            maxWidth: 220
         }}>
             {/* Card Title */}
             <h3 style={{

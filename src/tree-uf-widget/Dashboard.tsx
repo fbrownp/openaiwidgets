@@ -265,7 +265,8 @@ export function Dashboard() {
                     padding: 12,
                     backgroundColor: themeColors.cardBackground,
                     border: `1px solid ${themeColors.cardBorder}`,
-                    borderRadius: 10
+                    borderRadius: 10,
+                    maxWidth: '900px'
                 }}>
                         <h3 style={{
                             margin: 0,
@@ -327,9 +328,9 @@ export function Dashboard() {
                                                 : themeColors.cardBorder
                                         }`,
                                         borderRadius: 8,
-                                        flex: '1 1 200px',
-                                        minWidth: 180,
-                                        maxWidth: 300,
+                                        flex: '1 1 150px',
+                                        minWidth: 140,
+                                        maxWidth: 220,
                                         cursor: 'pointer',
                                         transition: 'all 0.2s ease',
                                         display: 'flex',
@@ -383,7 +384,8 @@ export function Dashboard() {
             <div
                 ref={containerRef}
                 style={{
-                    position: 'relative'
+                    position: 'relative',
+                    maxWidth: '900px'
                 }}
             >
                 {/* Tree Cards - Responsive Layout */}
