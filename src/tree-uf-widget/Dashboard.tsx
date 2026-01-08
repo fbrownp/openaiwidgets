@@ -190,16 +190,16 @@ export function Dashboard() {
 
             {/* Summary Statistics */}
             <div style={{
-                marginBottom: 24,
-                padding: 16,
+                marginBottom: 20,
+                padding: 12,
                 backgroundColor: themeColors.cardBackground,
                 border: `1px solid ${themeColors.cardBorder}`,
-                borderRadius: 12
+                borderRadius: 10
             }}>
                 <h3 style={{
                     margin: 0,
-                    marginBottom: 12,
-                    fontSize: 16,
+                    marginBottom: 10,
+                    fontSize: 14,
                     fontWeight: 600,
                     color: themeColors.text
                 }}>
@@ -207,26 +207,26 @@ export function Dashboard() {
                 </h3>
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-                    gap: 12
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))',
+                    gap: 8
                 }}>
                     {Array.from(treeData.nodes.entries())
                         .filter(([type]) => type !== 'id_uf')
                         .map(([type, nodes]) => (
                         <div key={type} style={{
-                            padding: 12,
-                            borderRadius: 8,
+                            padding: 8,
+                            borderRadius: 6,
                             backgroundColor: themeColors.background
                         }}>
                             <div style={{
-                                fontSize: 12,
+                                fontSize: 11,
                                 color: themeColors.textSecondary,
-                                marginBottom: 4
+                                marginBottom: 3
                             }}>
                                 {getNodeTypeDisplayName(type)}
                             </div>
                             <div style={{
-                                fontSize: 20,
+                                fontSize: 18,
                                 fontWeight: 600,
                                 color: themeColors.purple
                             }}>
@@ -235,19 +235,19 @@ export function Dashboard() {
                         </div>
                     ))}
                     <div style={{
-                        padding: 12,
-                        borderRadius: 8,
+                        padding: 8,
+                        borderRadius: 6,
                         backgroundColor: themeColors.background
                     }}>
                         <div style={{
-                            fontSize: 12,
+                            fontSize: 11,
                             color: themeColors.textSecondary,
-                            marginBottom: 4
+                            marginBottom: 3
                         }}>
                             Conexiones Totales
                         </div>
                         <div style={{
-                            fontSize: 20,
+                            fontSize: 18,
                             fontWeight: 600,
                             color: themeColors.purple
                         }}>
@@ -260,6 +260,7 @@ export function Dashboard() {
             {/* Main Content Area - Panel on Left, Cards on Right */}
             <div style={{
                 display: 'flex',
+                flexWrap: 'wrap',
                 gap: 20,
                 alignItems: 'flex-start'
             }}>
@@ -274,18 +275,18 @@ export function Dashboard() {
                 <div
                     ref={containerRef}
                     style={{
-                        flex: 1,
+                        flex: '1 1 400px',
                         position: 'relative',
-                        minWidth: 0
+                        minWidth: 300
                     }}
                 >
-                    {/* Tree Cards - Horizontal Layout */}
+                    {/* Tree Cards - Responsive Layout */}
                     <div style={{
                         position: 'relative',
                         zIndex: 1,
                         display: 'flex',
+                        flexWrap: 'wrap',
                         gap: 12,
-                        overflowX: 'auto',
                         paddingBottom: 8
                     }}>
                         {nodeTypeOrder.map(nodeType => {

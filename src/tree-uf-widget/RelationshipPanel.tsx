@@ -24,8 +24,9 @@ export function RelationshipPanel({
     if (!selectedNode) {
         return (
             <div style={{
-                width: 500,
-                flexShrink: 0,
+                flex: '0 1 500px',
+                minWidth: 300,
+                maxWidth: 600,
                 padding: 24,
                 backgroundColor: themeColors.cardBackground,
                 border: `1px solid ${themeColors.cardBorder}`,
@@ -114,8 +115,9 @@ export function RelationshipPanel({
 
     return (
         <div style={{
-            width: 500,
-            flexShrink: 0,
+            flex: '0 1 500px',
+            minWidth: 300,
+            maxWidth: 600,
             padding: 20,
             backgroundColor: themeColors.cardBackground,
             border: `1px solid ${themeColors.cardBorder}`,
