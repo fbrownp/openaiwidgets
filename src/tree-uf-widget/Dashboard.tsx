@@ -242,6 +242,7 @@ export function Dashboard() {
                     highlightedItems={highlightedItems}
                     themeColors={themeColors}
                     containerRef={containerRef}
+                    selectedNode={selectedNode}
                 />
             </div>
         </div>

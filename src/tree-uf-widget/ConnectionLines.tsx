@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { ThemeColors } from './types';
+import { ThemeColors, NodeData } from './types';
 
 interface ConnectionLinesProps {
     highlightedItems: Set<string>;
     themeColors: ThemeColors;
     containerRef: React.RefObject<HTMLDivElement>;
+    selectedNode: NodeData | null;
 }
 
 interface LineCoordinates {
@@ -16,62 +17,130 @@ interface LineCoordinates {
 }
 
 /**
+ * Calculate the intersection point on the border of a rectangle
+ */
+function getBorderPoint(
+    centerX: number,
+    centerY: number,
+    width: number,
+    height: number,
+    targetX: number,
+    targetY: number
+): { x: number; y: number } {
+    const dx = targetX - centerX;
+    const dy = targetY - centerY;
+
+    // Calculate angle
+    const angle = Math.atan2(dy, dx);
+
+    // Calculate intersection with rectangle border
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+
+    let x: number, y: number;
+
+    // Check which edge the line intersects
+    if (Math.abs(cos) > Math.abs(sin * (width / height))) {
+        // Intersects left or right edge
+        x = centerX + (width / 2) * Math.sign(cos);
+        y = centerY + (width / 2) * Math.tan(angle) * Math.sign(cos);
+    } else {
+        // Intersects top or bottom edge
+        y = centerY + (height / 2) * Math.sign(sin);
+        x = centerX + (height / 2) / Math.tan(angle) * Math.sign(sin);
+    }
+
+    return { x, y };
+}
+
+/**
  * ConnectionLines Component
  * Renders SVG lines between connected nodes
  */
 export function ConnectionLines({
     highlightedItems,
     themeColors,
-    containerRef
+    containerRef,
+    selectedNode
 }: ConnectionLinesProps) {
     const [lines, setLines] = useState<LineCoordinates[]>([]);
 
     useEffect(() => {
-        if (!containerRef.current || highlightedItems.size === 0) {
+        if (!containerRef.current || highlightedItems.size === 0 || !selectedNode) {
             setLines([]);
             return;
         }
 
-        const container = containerRef.current;
-        const containerRect = container.getBoundingClientRect();
-        const newLines: LineCoordinates[] = [];
+        const updateLines = () => {
+            const container = containerRef.current;
+            if (!container) return;
 
-        // Get all highlighted nodes
-        const highlightedNodes = Array.from(highlightedItems);
+            const containerRect = container.getBoundingClientRect();
+            const newLines: LineCoordinates[] = [];
 
-        // For each pair of highlighted nodes, check if they should be connected
-        for (let i = 0; i < highlightedNodes.length; i++) {
-            for (let j = i + 1; j < highlightedNodes.length; j++) {
-                const node1Key = highlightedNodes[i];
-                const node2Key = highlightedNodes[j];
+            // Get the selected node's connections
+            const selectedKey = `${selectedNode.name}:${selectedNode.id}`;
+
+            // Only draw lines from selected node to its direct connections
+            selectedNode.connections.forEach(connKey => {
+                // Skip if connection is to id_uf
+                if (connKey.startsWith('id_uf:')) return;
 
                 // Find the DOM elements
-                const element1 = container.querySelector(`[data-node-key="${node1Key}"]`);
-                const element2 = container.querySelector(`[data-node-key="${node2Key}"]`);
+                const element1 = container.querySelector(`[data-node-key="${selectedKey}"]`);
+                const element2 = container.querySelector(`[data-node-key="${connKey}"]`);
 
                 if (element1 && element2) {
                     const rect1 = element1.getBoundingClientRect();
                     const rect2 = element2.getBoundingClientRect();
 
                     // Calculate center points relative to container
-                    const x1 = rect1.left + rect1.width / 2 - containerRect.left;
-                    const y1 = rect1.top + rect1.height / 2 - containerRect.top;
-                    const x2 = rect2.left + rect2.width / 2 - containerRect.left;
-                    const y2 = rect2.top + rect2.height / 2 - containerRect.top;
+                    const center1X = rect1.left + rect1.width / 2 - containerRect.left;
+                    const center1Y = rect1.top + rect1.height / 2 - containerRect.top;
+                    const center2X = rect2.left + rect2.width / 2 - containerRect.left;
+                    const center2Y = rect2.top + rect2.height / 2 - containerRect.top;
+
+                    // Calculate border intersection points
+                    const point1 = getBorderPoint(
+                        center1X,
+                        center1Y,
+                        rect1.width,
+                        rect1.height,
+                        center2X,
+                        center2Y
+                    );
+
+                    const point2 = getBorderPoint(
+                        center2X,
+                        center2Y,
+                        rect2.width,
+                        rect2.height,
+                        center1X,
+                        center1Y
+                    );
 
                     newLines.push({
-                        x1,
-                        y1,
-                        x2,
-                        y2,
-                        key: `${node1Key}-${node2Key}`
+                        x1: point1.x,
+                        y1: point1.y,
+                        x2: point2.x,
+                        y2: point2.y,
+                        key: `${selectedKey}-${connKey}`
                     });
                 }
-            }
-        }
+            });
 
-        setLines(newLines);
-    }, [highlightedItems, containerRef]);
+            setLines(newLines);
+        };
+
+        updateLines();
+
+        // Update lines on scroll
+        const scrollContainer = containerRef.current?.querySelector('[style*="overflowX"]');
+        if (scrollContainer) {
+            scrollContainer.addEventListener('scroll', updateLines);
+            return () => scrollContainer.removeEventListener('scroll', updateLines);
+        }
+    }, [highlightedItems, containerRef, selectedNode]);
 
     if (lines.length === 0) {
         return null;
