@@ -53,24 +53,21 @@ export function Dashboard() {
         setSelectedNode(item);
     };
 
-    // Handle closing the relationship panel
-    const handleClosePanel = () => {
-        setSelectedNode(null);
-    };
-
     // Handle item hover
     const handleItemHover = (item: NodeData | null) => {
         setHoveredNode(item);
     };
 
-    // Define the order of node types to display (excluding id_uf)
+    // Define the order of node types to display (excluding id_uf and instrumento_aplicable)
     const nodeTypeOrder = [
         'expediente_seia',
         'expediente_medida',
         'expediente_fiscalizacion',
-        'expediente_snifa',
-        'instrumento_aplicable'
+        'expediente_snifa'
     ];
+
+    // Get instrumento_aplicable nodes for chips
+    const instrumentoNodes = treeData.nodes.get('instrumento_aplicable') || [];
 
     return (
         <div style={{
@@ -126,24 +123,67 @@ export function Dashboard() {
             </div>
 
             {/* Header */}
-            <div style={{ marginBottom: 24 }}>
+            <div style={{ marginBottom: 16 }}>
                 <h1 style={{
                     margin: 0,
                     fontSize: 28,
                     fontWeight: 700,
                     color: themeColors.text,
-                    marginBottom: 4
+                    marginBottom: 8
                 }}>
                     Árbol de Expedientes {treeData.id_uf ? `- UF ${treeData.id_uf}` : ''}
                 </h1>
+
+                {/* Instrumento Aplicable Chips */}
+                {instrumentoNodes.length > 0 && (
+                    <div style={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        gap: 8,
+                        marginBottom: 12
+                    }}>
+                        {instrumentoNodes.map((node, idx) => (
+                            <div
+                                key={idx}
+                                onClick={() => handleItemClick(node)}
+                                style={{
+                                    padding: '6px 12px',
+                                    backgroundColor: selectedNode?.id === node.id && selectedNode?.name === node.name
+                                        ? themeColors.purple
+                                        : hoveredNode?.id === node.id && hoveredNode?.name === node.name
+                                        ? themeColors.purple + '40'
+                                        : themeColors.cardBackground,
+                                    color: selectedNode?.id === node.id && selectedNode?.name === node.name
+                                        ? 'white'
+                                        : themeColors.text,
+                                    border: `1px solid ${
+                                        selectedNode?.id === node.id && selectedNode?.name === node.name
+                                            ? themeColors.purple
+                                            : themeColors.cardBorder
+                                    }`,
+                                    borderRadius: 20,
+                                    fontSize: 12,
+                                    fontWeight: 500,
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s ease'
+                                }}
+                                onMouseEnter={() => setHoveredNode(node)}
+                                onMouseLeave={() => setHoveredNode(null)}
+                            >
+                                {node.id}
+                            </div>
+                        ))}
+                    </div>
+                )}
+
                 <p style={{
                     margin: 0,
                     fontSize: 14,
                     color: themeColors.textSecondary
                 }}>
                     {selectedNode
-                        ? `Mostrando conexiones para: ${selectedNode.id}`
-                        : 'Haz clic en un elemento para ver sus conexiones'
+                        ? `Mostrando relaciones para: ${selectedNode.id}`
+                        : 'Haz clic en un elemento para ver sus relaciones'
                     }
                 </p>
             </div>
@@ -217,53 +257,60 @@ export function Dashboard() {
                 </div>
             </div>
 
-            {/* Cards Container with Connection Lines */}
-            <div
-                ref={containerRef}
-                style={{
-                    position: 'relative'
-                }}
-            >
-                {/* Tree Cards - Horizontal Layout */}
-                <div style={{
-                    position: 'relative',
-                    zIndex: 1,
-                    display: 'flex',
-                    gap: 16,
-                    overflowX: 'auto',
-                    paddingBottom: 8
-                }}>
-                    {nodeTypeOrder.map(nodeType => {
-                        const nodes = treeData.nodes.get(nodeType);
-                        if (!nodes || nodes.length === 0) {
-                            return null;
-                        }
+            {/* Main Content Area - Panel on Left, Cards on Right */}
+            <div style={{
+                display: 'flex',
+                gap: 20,
+                alignItems: 'flex-start'
+            }}>
+                {/* Relationship Panel - Left Side */}
+                <RelationshipPanel
+                    selectedNode={selectedNode}
+                    allNodes={treeData.nodes}
+                    themeColors={themeColors}
+                />
 
-                        return (
-                            <TreeCard
-                                key={nodeType}
-                                title={getNodeTypeDisplayName(nodeType)}
-                                items={nodes}
-                                themeColors={themeColors}
-                                onItemClick={handleItemClick}
-                                onItemHover={handleItemHover}
-                                selectedItem={null}
-                                highlightedItems={new Set()}
-                                hoveredItems={hoveredItems}
-                            />
-                        );
-                    })}
+                {/* Cards Container - Right Side */}
+                <div
+                    ref={containerRef}
+                    style={{
+                        flex: 1,
+                        position: 'relative',
+                        minWidth: 0
+                    }}
+                >
+                    {/* Tree Cards - Horizontal Layout */}
+                    <div style={{
+                        position: 'relative',
+                        zIndex: 1,
+                        display: 'flex',
+                        gap: 12,
+                        overflowX: 'auto',
+                        paddingBottom: 8
+                    }}>
+                        {nodeTypeOrder.map(nodeType => {
+                            const nodes = treeData.nodes.get(nodeType);
+                            if (!nodes || nodes.length === 0) {
+                                return null;
+                            }
+
+                            return (
+                                <TreeCard
+                                    key={nodeType}
+                                    title={getNodeTypeDisplayName(nodeType)}
+                                    items={nodes}
+                                    themeColors={themeColors}
+                                    onItemClick={handleItemClick}
+                                    onItemHover={handleItemHover}
+                                    selectedItem={null}
+                                    highlightedItems={highlightedItems}
+                                    hoveredItems={hoveredItems}
+                                />
+                            );
+                        })}
+                    </div>
                 </div>
-
             </div>
-
-            {/* Relationship Panel Modal */}
-            <RelationshipPanel
-                selectedNode={selectedNode}
-                allNodes={treeData.nodes}
-                themeColors={themeColors}
-                onClose={handleClosePanel}
-            />
         </div>
     );
 }

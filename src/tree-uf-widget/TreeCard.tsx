@@ -24,9 +24,9 @@ export function TreeCard({
             backgroundColor: themeColors.cardBackground,
             border: `1px solid ${themeColors.cardBorder}`,
             borderRadius: 12,
-            padding: 16,
-            minWidth: 280,
-            maxWidth: 320,
+            padding: 14,
+            minWidth: 220,
+            maxWidth: 260,
             flexShrink: 0
         }}>
             {/* Card Title */}

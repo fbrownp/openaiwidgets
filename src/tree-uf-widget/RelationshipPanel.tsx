@@ -5,7 +5,6 @@ interface RelationshipPanelProps {
     selectedNode: NodeData | null;
     allNodes: Map<string, NodeData[]>;
     themeColors: ThemeColors;
-    onClose: () => void;
 }
 
 interface HierarchyNode {
@@ -20,10 +19,32 @@ interface HierarchyNode {
 export function RelationshipPanel({
     selectedNode,
     allNodes,
-    themeColors,
-    onClose
+    themeColors
 }: RelationshipPanelProps) {
-    if (!selectedNode) return null;
+    if (!selectedNode) {
+        return (
+            <div style={{
+                width: 350,
+                flexShrink: 0,
+                padding: 24,
+                backgroundColor: themeColors.cardBackground,
+                border: `1px solid ${themeColors.cardBorder}`,
+                borderRadius: 12,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+            }}>
+                <p style={{
+                    color: themeColors.textSecondary,
+                    fontSize: 14,
+                    textAlign: 'center',
+                    margin: 0
+                }}>
+                    Selecciona un elemento para ver el mapa de relaciones
+                </p>
+            </div>
+        );
+    }
 
     // Define hierarchy levels
     const hierarchyLevels: Record<string, number> = {
@@ -93,183 +114,156 @@ export function RelationshipPanel({
 
     return (
         <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 1000,
-            padding: 24
+            width: 350,
+            flexShrink: 0,
+            padding: 20,
+            backgroundColor: themeColors.cardBackground,
+            border: `1px solid ${themeColors.cardBorder}`,
+            borderRadius: 12,
+            maxHeight: '80vh',
+            overflowY: 'auto',
+            transition: 'all 0.3s ease'
         }}>
-            <div style={{
-                backgroundColor: themeColors.cardBackground,
-                borderRadius: 16,
-                padding: 32,
-                maxWidth: 900,
-                maxHeight: '90vh',
-                width: '100%',
-                overflowY: 'auto',
-                position: 'relative',
-                boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)'
+            {/* Title */}
+            <h3 style={{
+                margin: 0,
+                marginBottom: 20,
+                fontSize: 16,
+                fontWeight: 700,
+                color: themeColors.text
             }}>
-                {/* Close button */}
-                <button
-                    onClick={onClose}
-                    style={{
-                        position: 'absolute',
-                        top: 16,
-                        right: 16,
-                        padding: '8px 16px',
-                        backgroundColor: themeColors.purple,
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: 8,
-                        cursor: 'pointer',
-                        fontSize: 14,
-                        fontWeight: 600
-                    }}
-                >
-                    Cerrar
-                </button>
+                Mapa de Relaciones
+            </h3>
 
-                {/* Title */}
-                <h2 style={{
-                    margin: 0,
-                    marginBottom: 32,
-                    fontSize: 24,
-                    fontWeight: 700,
-                    color: themeColors.text
-                }}>
-                    Mapa de Relaciones: {selectedNode.id}
-                </h2>
+            <div style={{
+                fontSize: 13,
+                color: themeColors.textSecondary,
+                marginBottom: 16,
+                padding: 10,
+                backgroundColor: themeColors.background,
+                borderRadius: 8
+            }}>
+                <strong style={{ color: themeColors.purple }}>{selectedNode.id}</strong>
+            </div>
 
-                {/* Main content area with hierarchy and fiscalizacion side by side */}
-                <div style={{
-                    display: 'flex',
-                    gap: 32,
-                    alignItems: 'flex-start'
-                }}>
-                    {/* Hierarchy tree */}
-                    <div style={{ flex: 1 }}>
-                        {[1, 2, 3].map(level => {
-                            const nodes = hierarchyNodes.get(level);
-                            if (!nodes || nodes.length === 0) return null;
+            {/* Main content area with hierarchy and fiscalizacion */}
+            <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 16
+            }}>
+                {/* Hierarchy tree */}
+                <div style={{ flex: 1 }}>
+                    {[1, 2, 3].map(level => {
+                        const nodes = hierarchyNodes.get(level);
+                        if (!nodes || nodes.length === 0) return null;
 
-                            return (
-                                <div key={level} style={{ marginBottom: 24 }}>
-                                    {/* Level nodes */}
-                                    <div style={{
-                                        display: 'flex',
-                                        flexWrap: 'wrap',
-                                        gap: 12,
-                                        justifyContent: 'center',
-                                        marginBottom: level < 3 ? 16 : 0
-                                    }}>
-                                        {nodes.map((item, idx) => (
-                                            <div
-                                                key={idx}
-                                                style={{
-                                                    padding: '12px 16px',
-                                                    backgroundColor: item.node.id === selectedNode.id
-                                                        ? themeColors.purple + '20'
-                                                        : themeColors.background,
-                                                    border: `2px solid ${
-                                                        item.node.id === selectedNode.id
-                                                            ? themeColors.purple
-                                                            : themeColors.cardBorder
-                                                    }`,
-                                                    borderRadius: 12,
-                                                    minWidth: 150,
-                                                    textAlign: 'center'
-                                                }}
-                                            >
-                                                <div style={{
-                                                    fontSize: 11,
-                                                    color: themeColors.textSecondary,
-                                                    marginBottom: 4,
-                                                    textTransform: 'uppercase',
-                                                    fontWeight: 600
-                                                }}>
-                                                    {item.node.name.replace('expediente_', '').replace('_', ' ')}
-                                                </div>
-                                                <div style={{
-                                                    fontSize: 13,
-                                                    fontWeight: 600,
-                                                    color: themeColors.text
-                                                }}>
-                                                    {item.node.id}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    {/* Connector line to next level */}
-                                    {level < 3 && hierarchyNodes.get(level + 1) && (
-                                        <div style={{
-                                            height: 40,
-                                            display: 'flex',
-                                            justifyContent: 'center',
-                                            alignItems: 'center'
-                                        }}>
+                        return (
+                            <div key={level} style={{ marginBottom: 16 }}>
+                                {/* Level nodes */}
+                                <div style={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: 8,
+                                    marginBottom: level < 3 ? 12 : 0
+                                }}>
+                                    {nodes.map((item, idx) => (
+                                        <div
+                                            key={idx}
+                                            style={{
+                                                padding: '10px 12px',
+                                                backgroundColor: item.node.id === selectedNode.id
+                                                    ? themeColors.purple + '20'
+                                                    : themeColors.background,
+                                                border: `2px solid ${
+                                                    item.node.id === selectedNode.id
+                                                        ? themeColors.purple
+                                                        : themeColors.cardBorder
+                                                }`,
+                                                borderRadius: 8
+                                            }}
+                                        >
                                             <div style={{
-                                                width: 2,
-                                                height: '100%',
-                                                backgroundColor: themeColors.purple,
-                                                opacity: 0.3
-                                            }} />
+                                                fontSize: 10,
+                                                color: themeColors.textSecondary,
+                                                marginBottom: 3,
+                                                textTransform: 'uppercase',
+                                                fontWeight: 600
+                                            }}>
+                                                {item.node.name.replace('expediente_', '').replace('_', ' ')}
+                                            </div>
+                                            <div style={{
+                                                fontSize: 12,
+                                                fontWeight: 600,
+                                                color: themeColors.text
+                                            }}>
+                                                {item.node.id}
+                                            </div>
                                         </div>
-                                    )}
+                                    ))}
                                 </div>
-                            );
-                        })}
-                    </div>
 
-                    {/* Fiscalizacion sidebar */}
-                    {fiscalizacionNodes.length > 0 && (
-                        <div style={{
-                            width: 200,
-                            borderLeft: `2px solid ${themeColors.cardBorder}`,
-                            paddingLeft: 24
-                        }}>
-                            <div style={{
-                                fontSize: 12,
-                                fontWeight: 600,
-                                color: themeColors.textSecondary,
-                                marginBottom: 16,
-                                textTransform: 'uppercase'
-                            }}>
-                                Fiscalización
+                                {/* Connector line to next level */}
+                                {level < 3 && hierarchyNodes.get(level + 1) && (
+                                    <div style={{
+                                        height: 20,
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center'
+                                    }}>
+                                        <div style={{
+                                            width: 2,
+                                            height: '100%',
+                                            backgroundColor: themeColors.purple,
+                                            opacity: 0.3
+                                        }} />
+                                    </div>
+                                )}
                             </div>
-                            {fiscalizacionNodes.map((node, idx) => (
-                                <div
-                                    key={idx}
-                                    style={{
-                                        padding: '10px 12px',
-                                        backgroundColor: node.id === selectedNode.id
-                                            ? themeColors.purple + '20'
-                                            : themeColors.background,
-                                        border: `2px solid ${
-                                            node.id === selectedNode.id
-                                                ? themeColors.purple
-                                                : themeColors.cardBorder
-                                        }`,
-                                        borderRadius: 10,
-                                        marginBottom: 12,
-                                        fontSize: 12,
-                                        fontWeight: 500,
-                                        color: themeColors.text
-                                    }}
-                                >
-                                    {node.id}
-                                </div>
-                            ))}
-                        </div>
-                    )}
+                        );
+                    })}
                 </div>
+
+                {/* Fiscalizacion section */}
+                {fiscalizacionNodes.length > 0 && (
+                    <div style={{
+                        borderTop: `2px solid ${themeColors.cardBorder}`,
+                        paddingTop: 16
+                    }}>
+                        <div style={{
+                            fontSize: 10,
+                            fontWeight: 600,
+                            color: themeColors.textSecondary,
+                            marginBottom: 12,
+                            textTransform: 'uppercase'
+                        }}>
+                            Fiscalización
+                        </div>
+                        {fiscalizacionNodes.map((node, idx) => (
+                            <div
+                                key={idx}
+                                style={{
+                                    padding: '10px 12px',
+                                    backgroundColor: node.id === selectedNode.id
+                                        ? themeColors.purple + '20'
+                                        : themeColors.background,
+                                    border: `2px solid ${
+                                        node.id === selectedNode.id
+                                            ? themeColors.purple
+                                            : themeColors.cardBorder
+                                    }`,
+                                    borderRadius: 8,
+                                    marginBottom: 8,
+                                    fontSize: 12,
+                                    fontWeight: 500,
+                                    color: themeColors.text
+                                }}
+                            >
+                                {node.id}
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );
