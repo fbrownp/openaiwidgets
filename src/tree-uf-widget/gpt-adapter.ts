@@ -4,7 +4,7 @@
  */
 
 import { EdgeData, NodeData, TreeData } from './types';
-import { GPTOutput } from './gpt-types';
+import { GPTOutput, GPTRawOutput } from './gpt-types';
 
 /**
  * Dummy data for demonstration when no GPT output is available
@@ -82,16 +82,34 @@ export function getNodeTypeDisplayName(type: string): string {
 
 /**
  * Parse GPT output and build tree data structure
+ * Accepts two formats:
+ * 1. New format: { data: [...] } - object with data field
+ * 2. Legacy format: [...] - direct array
  */
 export function parseGPTOutput(toolOutput: unknown): TreeData {
     // Use dummy data if no valid tool output is provided
     let edges: GPTOutput;
 
-    if (!toolOutput || !Array.isArray(toolOutput)) {
-        console.warn('Invalid tool output:', toolOutput, '- Using dummy data for demonstration');
+    if (!toolOutput) {
+        console.warn('No tool output provided - Using dummy data for demonstration');
         edges = DUMMY_DATA;
-    } else {
+    } else if (typeof toolOutput === 'object' && !Array.isArray(toolOutput) && 'data' in toolOutput) {
+        // New format: { data: [...] }
+        const rawOutput = toolOutput as GPTRawOutput;
+        if (!Array.isArray(rawOutput.data)) {
+            console.warn('Invalid data field in tool output:', toolOutput, '- Using dummy data');
+            edges = DUMMY_DATA;
+        } else {
+            console.log('Parsing GPT output (new format with data field):', rawOutput);
+            edges = rawOutput.data;
+        }
+    } else if (Array.isArray(toolOutput)) {
+        // Legacy format: direct array
+        console.log('Parsing GPT output (legacy format - direct array):', toolOutput);
         edges = toolOutput as GPTOutput;
+    } else {
+        console.warn('Invalid tool output format:', toolOutput, '- Using dummy data for demonstration');
+        edges = DUMMY_DATA;
     }
     const nodesMap = new Map<string, NodeData>();
     let idUfValue = '';
