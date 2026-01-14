@@ -63,6 +63,119 @@ For code formatting consistency:
 pre-commit install
 ```
 
+## Docker Setup
+
+You can run this project in a Docker container instead of installing dependencies locally. This is useful for consistent environments and easier deployment.
+
+### Prerequisites for Docker
+
+- **Docker** installed on your system
+  - [Install Docker Desktop](https://www.docker.com/products/docker-desktop/) for Mac/Windows
+  - Or install Docker Engine for Linux
+
+### Building the Docker Image
+
+Build the Docker image from the project root:
+
+```bash
+docker build -t openaiwidgets .
+```
+
+This command:
+- Builds a Docker image named `openaiwidgets`
+- Installs Node.js, pnpm, and all dependencies
+- Builds all widgets
+- Prepares the server to serve assets on port 4444
+
+### Running the Docker Container
+
+Run the container and expose port 4444:
+
+```bash
+docker run -p 4444:4444 openaiwidgets
+```
+
+This command:
+- Starts a container from the `openaiwidgets` image
+- Maps port 4444 from the container to port 4444 on your host machine
+- Serves the built widgets at `http://localhost:4444`
+
+### Running in Detached Mode
+
+To run the container in the background:
+
+```bash
+docker run -d -p 4444:4444 --name openaiwidgets-server openaiwidgets
+```
+
+To stop the container:
+
+```bash
+docker stop openaiwidgets-server
+```
+
+To start it again:
+
+```bash
+docker start openaiwidgets-server
+```
+
+To view logs:
+
+```bash
+docker logs openaiwidgets-server
+```
+
+To remove the container:
+
+```bash
+docker rm openaiwidgets-server
+```
+
+### Custom Base URL with Docker
+
+To build with a custom BASE_URL:
+
+```bash
+docker build -t openaiwidgets --build-arg BASE_URL=https://your-domain.com .
+```
+
+**Note:** The current Dockerfile doesn't include build args. To use custom BASE_URL, modify the Dockerfile to accept build arguments, or rebuild inside the container after modifying the BASE_URL environment variable.
+
+### Accessing Widgets with Docker
+
+After running the Docker container, access widgets at:
+
+- **Barplot**: http://localhost:4444/barplot.html
+- **Indexing Dashboard**: http://localhost:4444/indexing_dashboard.html
+- **SNIFA Dashboard**: http://localhost:4444/snifa_dashboard_faltas.html
+- **Reclamación Identifier**: http://localhost:4444/widget_reclamacion_identifier.html
+
+### Using Docker Compose (Alternative)
+
+For an even simpler setup, use Docker Compose:
+
+```bash
+# Start the service
+docker-compose up
+
+# Or run in detached mode
+docker-compose up -d
+
+# Stop the service
+docker-compose down
+
+# View logs
+docker-compose logs -f
+```
+
+Docker Compose automatically handles:
+- Building the image
+- Running the container
+- Port mapping
+- Container naming
+- Restart policy
+
 ## Building the Widgets
 
 The widgets must be built before they can be used. The build process:

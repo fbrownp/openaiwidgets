@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  openaiwidgets:
+    build: .
+    ports:
+      - "4444:4444"
+    container_name: openaiwidgets-server
+    restart: unless-stopped
