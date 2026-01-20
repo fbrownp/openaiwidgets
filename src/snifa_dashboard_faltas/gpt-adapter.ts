@@ -16,6 +16,8 @@ const getUniqueValues = (data: FaltaDataRow[], field: keyof FaltaDataRow): strin
     const value = row[field];
     if (typeof value === 'string') {
       values.add(value);
+    } else if (typeof value === 'number') {
+      values.add(String(value));
     } else if (value === null) {
       values.add('Sin Información');
     }
@@ -71,12 +73,14 @@ export const parseGPTOutput = (rawOutput: any): DashboardData => {
         region: getUniqueValues(data, 'region'),
         categoria_economica: getUniqueValues(data, 'categoria_economica'),
         subcategoria_economica: getUniqueValues(data, 'subcategoria_economica'),
+        ano_inicio: getUniqueValues(data, 'ano_inicio'),
       };
 
       console.log('Generated filters:', {
         regions: availableFilters.region.length,
         categorias: availableFilters.categoria_economica.length,
         subcategorias: availableFilters.subcategoria_economica.length,
+        anosInicio: availableFilters.ano_inicio.length,
         totalCalculated: totalFaltas
       });
 

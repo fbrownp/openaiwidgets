@@ -23,6 +23,31 @@ import { HorizontalStackedBarplot } from './HorizontalStackedBarplot';
 import { useOpenAiGlobal } from '../use-openai-global';
 import { useWidgetState } from '../use-widget-state';
 
+// Icon components - stylish black and white
+const AlertTriangleIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+        <line x1="12" y1="9" x2="12" y2="13" />
+        <line x1="12" y1="17" x2="12.01" y2="17" />
+    </svg>
+);
+
+const BarChart2Icon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="18" y1="20" x2="18" y2="10" />
+        <line x1="12" y1="20" x2="12" y2="4" />
+        <line x1="6" y1="20" x2="6" y2="14" />
+    </svg>
+);
+
+const TargetIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <circle cx="12" cy="12" r="6" />
+        <circle cx="12" cy="12" r="2" />
+    </svg>
+);
+
 // Create default dashboard state
 const createDefaultDashboardState = (): DashboardData => ({
     totalFaltas: 0,
@@ -30,7 +55,8 @@ const createDefaultDashboardState = (): DashboardData => ({
     availableFilters: {
         region: [],
         categoria_economica: [],
-        subcategoria_economica: []
+        subcategoria_economica: [],
+        ano_inicio: []
     }
 });
 
@@ -93,7 +119,8 @@ export const Dashboard: React.FC = () => {
     const [filterState, setFilterState] = useState<DashboardState['filters']>({
         region: [],
         categoria_economica: [],
-        subcategoria_economica: []
+        subcategoria_economica: [],
+        ano_inicio: []
     });
 
     // Handler for expand button - toggle between fullscreen and inline
@@ -167,7 +194,10 @@ export const Dashboard: React.FC = () => {
                         : baseState.availableFilters.categoria_economica,
                     subcategoria_economica: incomingData.availableFilters.subcategoria_economica.length > 0
                         ? incomingData.availableFilters.subcategoria_economica
-                        : baseState.availableFilters.subcategoria_economica
+                        : baseState.availableFilters.subcategoria_economica,
+                    ano_inicio: incomingData.availableFilters.ano_inicio.length > 0
+                        ? incomingData.availableFilters.ano_inicio
+                        : baseState.availableFilters.ano_inicio
                 }
             };
 
@@ -340,6 +370,7 @@ export const Dashboard: React.FC = () => {
         // Region filter - always shows all regions
         configs.push({
             label: 'region',
+            displayLabel: 'Región',
             options: dashboardData.availableFilters.region,
             selectedValues: filterState.region,
             multiSelect: true
@@ -357,6 +388,7 @@ export const Dashboard: React.FC = () => {
 
         configs.push({
             label: 'categoria_economica',
+            displayLabel: 'Categoría Económica',
             options: categoriaEconomicaOptions,
             selectedValues: filterState.categoria_economica,
             multiSelect: true
@@ -380,8 +412,39 @@ export const Dashboard: React.FC = () => {
 
         configs.push({
             label: 'subcategoria_economica',
+            displayLabel: 'Subcategoría Económica',
             options: subcategoriaEconomicaOptions,
             selectedValues: filterState.subcategoria_economica,
+            multiSelect: true
+        });
+
+        // Ano inicio filter - filtered by region, categoria_economica, and subcategoria_economica if selected
+        let dataForAnoInicio = dashboardData.data;
+        if (filterState.region.length > 0) {
+            dataForAnoInicio = dataForAnoInicio.filter(row => {
+                const regionValue = row.region || 'Sin Información';
+                return filterState.region.includes(regionValue);
+            });
+        }
+        if (filterState.categoria_economica.length > 0) {
+            dataForAnoInicio = dataForAnoInicio.filter(row => {
+                const categoriaValue = row.categoria_economica || 'Sin Información';
+                return filterState.categoria_economica.includes(categoriaValue);
+            });
+        }
+        if (filterState.subcategoria_economica.length > 0) {
+            dataForAnoInicio = dataForAnoInicio.filter(row => {
+                const subcategoriaValue = row.subcategoria_economica || 'Sin Información';
+                return filterState.subcategoria_economica.includes(subcategoriaValue);
+            });
+        }
+        const anoInicioOptions = getUniqueValuesFromData(dataForAnoInicio, 'ano_inicio');
+
+        configs.push({
+            label: 'ano_inicio',
+            displayLabel: 'Año Inicio',
+            options: anoInicioOptions,
+            selectedValues: filterState.ano_inicio,
             multiSelect: true
         });
 
@@ -547,7 +610,7 @@ export const Dashboard: React.FC = () => {
                     <WidgetCard
                         title="Cantidad de Casos Totales"
                         value={totalCasos}
-                        icon="⚠️"
+                        icon={<AlertTriangleIcon />}
                         themeColors={themeColors}
                     />
                     <WidgetCard
@@ -555,7 +618,7 @@ export const Dashboard: React.FC = () => {
                         value={mostAffectedSubcomponente.length > 25
                             ? mostAffectedSubcomponente.substring(0, 25) + '...'
                             : mostAffectedSubcomponente}
-                        icon="📊"
+                        icon={<BarChart2Icon />}
                         themeColors={themeColors}
                     />
                     <WidgetCard
@@ -563,7 +626,7 @@ export const Dashboard: React.FC = () => {
                         value={mostAffectedSubtipo.length > 25
                             ? mostAffectedSubtipo.substring(0, 25) + '...'
                             : mostAffectedSubtipo}
-                        icon="🎯"
+                        icon={<TargetIcon />}
                         themeColors={themeColors}
                     />
                 </div>

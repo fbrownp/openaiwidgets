@@ -11,6 +11,40 @@ import { WidgetCard } from './WidgetCard';
 import { useOpenAiGlobal } from '../use-openai-global';
 import { useWidgetState } from '../use-widget-state';
 
+// Icon components - stylish black and white
+const BarChartIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="3" width="7" height="7" />
+        <rect x="14" y="3" width="7" height="7" />
+        <rect x="14" y="14" width="7" height="7" />
+        <rect x="3" y="14" width="7" height="7" />
+    </svg>
+);
+
+const MoneyIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" />
+        <path d="M12 18V6" />
+    </svg>
+);
+
+const BuildingIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="4" y="2" width="16" height="20" rx="2" ry="2" />
+        <path d="M9 22v-4h6v4" />
+        <path d="M8 6h.01" />
+        <path d="M16 6h.01" />
+        <path d="M12 6h.01" />
+        <path d="M12 10h.01" />
+        <path d="M12 14h.01" />
+        <path d="M16 10h.01" />
+        <path d="M16 14h.01" />
+        <path d="M8 10h.01" />
+        <path d="M8 14h.01" />
+    </svg>
+);
+
 const createDefaultDashboardState = (): GPTDashboardData => ({
     activeView: 'proyectos',
     widgets: {
@@ -587,20 +621,20 @@ export function Dashboard() {
                     <WidgetCard
                         title="Total de proyectos"
                         value={calculatedWidgets.totalProjects}
-                        icon="📊"
+                        icon={<BarChartIcon />}
                         themeColors={themeColors}
                     />
                     <WidgetCard
                         title="Suma de inversión"
                         value={calculatedWidgets.totalInvestment}
-                        icon="💰"
+                        icon={<MoneyIcon />}
                         themeColors={themeColors}
                     />
                     <WidgetCard
                         title="Tipología principal"
                         value={calculatedWidgets.topTipology}
                         subtitle={`${calculatedWidgets.topTipologyPercentage}% del total`}
-                        icon="🏭"
+                        icon={<BuildingIcon />}
                         themeColors={themeColors}
                     />
                 </div>

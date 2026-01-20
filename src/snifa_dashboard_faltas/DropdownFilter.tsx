@@ -79,7 +79,7 @@ export const DropdownFilter: React.FC<DropdownFilterProps> = ({
                             e.currentTarget.style.backgroundColor = themeColors.dropdownBg;
                         }}
                     >
-                        {filter.label}
+                        {filter.displayLabel || filter.label}
                         {filter.selectedValues.length > 0 && (
                             <span style={{
                                 backgroundColor: themeColors.purple,

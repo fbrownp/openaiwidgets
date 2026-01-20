@@ -4,7 +4,7 @@ import { WidgetCardProps } from './types';
 export const WidgetCard: React.FC<WidgetCardProps> = ({
     title,
     value,
-    icon = '📊',
+    icon,
     subtitle,
     themeColors
 }) => {

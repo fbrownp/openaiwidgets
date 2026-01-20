@@ -55,7 +55,7 @@ export type BarplotProps = {
 export type WidgetCardProps = {
     title: string;
     value: string | number;
-    icon?: string;
+    icon?: React.ReactNode;
     subtitle?: string;
     themeColors: ThemeColors;
 };

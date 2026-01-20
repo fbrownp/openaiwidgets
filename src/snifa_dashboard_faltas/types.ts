@@ -41,6 +41,7 @@ export interface FaltaDataRow {
   tipo_proceso_sancion: string | null;
   categoria_economica: string | null;
   subcategoria_economica: string | null;
+  ano_inicio: string | number | null;
   cantidad_casos: number;
 }
 
@@ -64,6 +65,7 @@ export interface TimeSeriesData {
 // Filter configuration
 export interface FilterConfig {
   label: string;
+  displayLabel?: string;
   options: string[];
   selectedValues: string[];
   multiSelect: boolean;
@@ -77,6 +79,7 @@ export interface DashboardState {
     region: string[];
     categoria_economica: string[];
     subcategoria_economica: string[];
+    ano_inicio: string[];
   };
 }
 
@@ -89,6 +92,7 @@ export interface GPTFaltasOutput {
     region: string[];
     categoria_economica: string[];
     subcategoria_economica: string[];
+    ano_inicio: string[];
   };
 }
 
@@ -99,11 +103,11 @@ export interface DashboardData {
   availableFilters: DashboardState['filters'];
 }
 
-// Severity colors matching the charts - White-pink to Pink to Purple-white gradient
+// Severity colors matching the barplot colorscale - Purple gradient (light to dark)
 export const GRAVEDAD_COLORS: Record<ClasificacionGravedad, string> = {
-  'Leves': '#FFE5F0',       // White-pink (very light pink)
-  'Graves': '#FF69B4',      // Hot pink
-  'Gravísimas': '#D8BFD8',  // Thistle (purple-white)
+  'Leves': '#e9d5ff',       // Very light purple
+  'Graves': '#a78bfa',      // Medium purple
+  'Gravísimas': '#7c3aed',  // Dark purple (matching barplot purpleDark)
 };
 
 // Severity order for stacking (light to dark)
