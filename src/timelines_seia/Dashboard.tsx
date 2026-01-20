@@ -55,9 +55,8 @@ const createDefaultDashboardState = (): DashboardData => ({
 export const Dashboard: React.FC = () => {
     console.log('Timelines SEIA Dashboard rendering...');
 
-    // Get theme from OpenAI globals
-    const openai = useOpenAiGlobal();
-    const theme = (openai?.theme || DEFAULT_THEME) as Theme;
+    // Theme state - start in dark mode
+    const [theme, setTheme] = useState<Theme>('dark');
     const themeColors = getThemeColors(theme);
 
     // Filter state management
@@ -377,6 +376,10 @@ export const Dashboard: React.FC = () => {
                 }
             }
         },
+        stroke: {
+            colors: [theme === 'dark' ? '#ffffff' : '#000000'],
+            width: 2
+        },
         xaxis: {
             type: 'category',
             categories: boxPlotData.map(d => d.year.toString()),
@@ -496,7 +499,7 @@ export const Dashboard: React.FC = () => {
             }}>
                 {/* Header */}
                 <div style={{
-                    marginBottom: 32
+                    marginBottom: 16
                 }}>
                     <h1 style={{
                         fontSize: 28,
@@ -508,10 +511,55 @@ export const Dashboard: React.FC = () => {
                     </h1>
                     <p style={{
                         fontSize: 14,
-                        color: themeColors.textSecondary
+                        color: themeColors.textSecondary,
+                        marginBottom: 12
                     }}>
                         Análisis de tiempos entre ICSARA y Adenda por año
                     </p>
+
+                    {/* Theme Toggle */}
+                    <div style={{
+                        display: 'flex',
+                        gap: 8,
+                        backgroundColor: themeColors.cardBackground,
+                        padding: 4,
+                        borderRadius: 8,
+                        border: `1px solid ${themeColors.border}`,
+                        width: 'fit-content'
+                    }}>
+                        <button
+                            onClick={() => setTheme('light')}
+                            style={{
+                                padding: '6px 14px',
+                                borderRadius: 6,
+                                border: 'none',
+                                backgroundColor: theme === 'light' ? themeColors.buttonActiveBg : themeColors.buttonBackground,
+                                color: theme === 'light' ? themeColors.buttonActiveText : themeColors.buttonText,
+                                fontSize: 13,
+                                fontWeight: 500,
+                                cursor: 'pointer',
+                                transition: 'all 0.2s'
+                            }}
+                        >
+                            Claro
+                        </button>
+                        <button
+                            onClick={() => setTheme('dark')}
+                            style={{
+                                padding: '6px 14px',
+                                borderRadius: 6,
+                                border: 'none',
+                                backgroundColor: theme === 'dark' ? themeColors.buttonActiveBg : themeColors.buttonBackground,
+                                color: theme === 'dark' ? themeColors.buttonActiveText : themeColors.buttonText,
+                                fontSize: 13,
+                                fontWeight: 500,
+                                cursor: 'pointer',
+                                transition: 'all 0.2s'
+                            }}
+                        >
+                            Oscuro
+                        </button>
+                    </div>
                 </div>
 
                 {/* Filters */}
@@ -531,31 +579,25 @@ export const Dashboard: React.FC = () => {
                     </div>
                 )}
 
-                {/* Timeline Selector and Box Plot Chart */}
-                <div style={{
-                    display: 'flex',
-                    gap: 24,
-                    marginBottom: 24,
-                    minHeight: 550
-                }}>
-                    {/* Timeline Selector - 1/4 width */}
-                    {dashboardData.episodes.length > 0 && (
-                        <div style={{
-                            flex: '0 0 25%',
-                            minWidth: 250
-                        }}>
-                            <TimelineSelector
-                                episodes={convertToEpisodes(dashboardData.episodes)}
-                                selectedEpisode={selectedEpisode}
-                                onEpisodeChange={setSelectedEpisode}
-                                themeColors={themeColors}
-                            />
-                        </div>
-                    )}
-
-                    {/* Box Plot Chart - 3/4 width */}
+                {/* Timeline Selector - Full width, above box plot */}
+                {dashboardData.episodes.length > 0 && (
                     <div style={{
-                        flex: dashboardData.episodes.length > 0 ? '1' : '1 0 100%',
+                        marginBottom: 24
+                    }}>
+                        <TimelineSelector
+                            episodes={convertToEpisodes(dashboardData.episodes)}
+                            selectedEpisode={selectedEpisode}
+                            onEpisodeChange={setSelectedEpisode}
+                            themeColors={themeColors}
+                        />
+                    </div>
+                )}
+
+                {/* Box Plot Chart - Full width */}
+                <div style={{
+                    marginBottom: 24
+                }}>
+                    <div style={{
                         backgroundColor: themeColors.cardBackground,
                         borderRadius: 12,
                         padding: 24,

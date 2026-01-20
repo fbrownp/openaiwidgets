@@ -23,17 +23,14 @@ export const TimelineSelector: React.FC<TimelineSelectorProps> = ({
         <div style={{
             backgroundColor: themeColors.cardBackground,
             borderRadius: 12,
-            padding: '20px 16px',
+            padding: '20px 24px',
             border: `1px solid ${themeColors.cardBorder}`,
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
             boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
         }}>
             {/* Header */}
             <div style={{
-                marginBottom: 24,
-                paddingBottom: 16,
+                marginBottom: 20,
+                paddingBottom: 12,
                 borderBottom: `2px solid ${themeColors.border}`
             }}>
                 <h3 style={{
@@ -57,24 +54,28 @@ export const TimelineSelector: React.FC<TimelineSelectorProps> = ({
                 </h3>
             </div>
 
-            {/* Timeline */}
+            {/* Horizontal Timeline */}
             <div style={{
                 display: 'flex',
-                flexDirection: 'column',
+                flexDirection: 'row',
                 position: 'relative',
-                flex: 1,
-                paddingLeft: 8
+                alignItems: 'center',
+                gap: 0,
+                paddingTop: 8,
+                paddingBottom: 8,
+                overflowX: 'auto'
             }}>
-                {/* Vertical connecting line */}
+                {/* Horizontal connecting line */}
                 {episodes.length > 1 && (
                     <div style={{
                         position: 'absolute',
-                        left: 23,
-                        top: 28,
-                        bottom: 28,
-                        width: 2,
+                        left: 40,
+                        right: 40,
+                        top: '50%',
+                        height: 2,
                         backgroundColor: themeColors.border,
-                        zIndex: 0
+                        zIndex: 0,
+                        transform: 'translateY(-50%)'
                     }}></div>
                 )}
 
@@ -90,7 +91,11 @@ export const TimelineSelector: React.FC<TimelineSelectorProps> = ({
                             key={episode.id}
                             style={{
                                 position: 'relative',
-                                marginBottom: index === episodes.length - 1 ? 0 : 32,
+                                flex: 1,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                minWidth: 180,
                                 zIndex: 1
                             }}
                         >
@@ -99,13 +104,14 @@ export const TimelineSelector: React.FC<TimelineSelectorProps> = ({
                                 style={{
                                     width: '100%',
                                     display: 'flex',
+                                    flexDirection: 'column',
                                     alignItems: 'center',
-                                    gap: 16,
+                                    gap: 12,
                                     padding: 0,
                                     border: 'none',
                                     backgroundColor: 'transparent',
                                     cursor: 'pointer',
-                                    textAlign: 'left',
+                                    textAlign: 'center',
                                     transition: 'all 0.3s ease'
                                 }}
                                 onMouseEnter={(e) => {
@@ -117,7 +123,7 @@ export const TimelineSelector: React.FC<TimelineSelectorProps> = ({
                                     }
                                     if (content && !isSelected) {
                                         content.style.backgroundColor = themeColors.dropdownHover;
-                                        content.style.transform = 'translateX(4px)';
+                                        content.style.transform = 'translateY(-4px)';
                                     }
                                 }}
                                 onMouseLeave={(e) => {
@@ -129,7 +135,7 @@ export const TimelineSelector: React.FC<TimelineSelectorProps> = ({
                                     }
                                     if (content && !isSelected) {
                                         content.style.backgroundColor = 'transparent';
-                                        content.style.transform = 'translateX(0)';
+                                        content.style.transform = 'translateY(0)';
                                     }
                                 }}
                             >
@@ -168,13 +174,13 @@ export const TimelineSelector: React.FC<TimelineSelectorProps> = ({
                                 <div
                                     className="timeline-content"
                                     style={{
-                                        flex: 1,
-                                        padding: '12px 16px',
+                                        width: '100%',
+                                        padding: '10px 12px',
                                         borderRadius: 8,
                                         backgroundColor: isSelected ? `${themeColors.purple}15` : 'transparent',
                                         border: `1px solid ${isSelected ? themeColors.purple : 'transparent'}`,
                                         transition: 'all 0.3s ease',
-                                        transform: isSelected ? 'translateX(4px)' : 'translateX(0)'
+                                        transform: isSelected ? 'translateY(-4px)' : 'translateY(0)'
                                     }}
                                 >
                                     <div style={{
@@ -204,14 +210,14 @@ export const TimelineSelector: React.FC<TimelineSelectorProps> = ({
                             {(isFirst || isLast) && (
                                 <div style={{
                                     position: 'absolute',
-                                    left: -8,
-                                    top: isFirst ? -8 : 'auto',
-                                    bottom: isLast ? -8 : 'auto',
+                                    top: -12,
+                                    left: isFirst ? 0 : 'auto',
+                                    right: isLast ? 0 : 'auto',
                                     fontSize: 10,
                                     fontWeight: 600,
                                     color: themeColors.textSecondary,
                                     backgroundColor: themeColors.cardBackground,
-                                    padding: '2px 6px',
+                                    padding: '2px 8px',
                                     borderRadius: 4,
                                     border: `1px solid ${themeColors.border}`,
                                     textTransform: 'uppercase',
