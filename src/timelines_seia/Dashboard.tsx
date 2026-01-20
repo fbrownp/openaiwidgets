@@ -1,72 +1,220 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Chart from 'react-apexcharts';
 import { ApexOptions } from 'apexcharts';
 import { DropdownFilter } from './DropdownFilter';
-import { parseGPTOutput, buildFilterConfigs } from './gpt-adapter';
-import { placeholderData } from './placeholder-data';
+import { parseGPTOutput } from './gpt-adapter';
 import { getThemeColors, DEFAULT_THEME, Theme } from '../widget_styles/theme';
-import { TimelineDataRow, BoxPlotDataPoint, FilterConfig } from './types';
+import { TimelineDataRow, BoxPlotDataPoint, FilterConfig, DashboardData } from './types';
 import { useOpenAiGlobal } from '../use-openai-global';
 import { useWidgetState } from '../use-widget-state';
 
+// Create default dashboard state
+const createDefaultDashboardState = (): DashboardData => ({
+    data: [],
+    availableFilters: {
+        tipo_ingreso_seia: [],
+        region: [],
+        tipologia: [],
+        etiqueta_inversion: []
+    }
+});
+
 export const Dashboard: React.FC = () => {
+    console.log('Timelines SEIA Dashboard rendering...');
+
     // Get theme from OpenAI globals
     const openai = useOpenAiGlobal();
     const theme = (openai?.theme || DEFAULT_THEME) as Theme;
     const themeColors = getThemeColors(theme);
 
-    // Initialize with placeholder data
-    const [gptData] = useWidgetState(parseGPTOutput(placeholderData));
-    const [filters, setFilters] = useState<FilterConfig[]>([]);
-    const [filteredData, setFilteredData] = useState<TimelineDataRow[]>([]);
+    // Filter state management
+    const [filterState, setFilterState] = useState<{
+        tipo_ingreso_seia: string[];
+        region: string[];
+        tipologia: string[];
+        etiqueta_inversion: string[];
+    }>({
+        tipo_ingreso_seia: [],
+        region: [],
+        tipologia: [],
+        etiqueta_inversion: []
+    });
 
-    // Initialize filters from GPT data
-    useEffect(() => {
-        if (gptData) {
-            const filterConfigs = buildFilterConfigs(gptData);
-            setFilters(filterConfigs);
-        }
-    }, [gptData]);
+    // Hook into OpenAI global state
+    const toolOutput = useOpenAiGlobal('toolOutput') as any;
+    const toolResponseMetadata = useOpenAiGlobal('toolResponseMetadata');
+    const widgetStateFromGlobal = useOpenAiGlobal('widgetState') as DashboardData | null;
 
-    // Apply filters to data
+    // Local widget state management
+    const [dashboardState, setDashboardState] = useWidgetState<DashboardData>(
+        createDefaultDashboardState
+    );
+
+    const lastToolOutputRef = useRef<string>("__tool_output_unset__");
+
+    // Process toolOutput whenever it changes
     useEffect(() => {
-        if (!gptData?.data) {
-            setFilteredData([]);
+        if (toolOutput == null) {
+            console.log('No toolOutput available, using default state');
             return;
         }
 
-        let result = [...gptData.data];
-
-        filters.forEach(filter => {
-            if (filter.selectedValues.length > 0) {
-                const filterKey = {
-                    'Tipo Ingreso SEIA': 'tipo_ingreso_seia',
-                    'Región': 'region',
-                    'Tipología': 'tipologia',
-                    'Etiqueta Inversión': 'etiqueta_inversion'
-                }[filter.label] as keyof TimelineDataRow;
-
-                if (filterKey) {
-                    result = result.filter(row =>
-                        filter.selectedValues.includes(String(row[filterKey]))
-                    );
-                }
+        // Serialize to check if actually changed
+        const serializedToolOutput = (() => {
+            try {
+                return JSON.stringify({ toolOutput, toolResponseMetadata });
+            } catch (error) {
+                console.warn("Unable to serialize toolOutput", error);
+                return "__tool_output_error__";
             }
+        })();
+
+        if (serializedToolOutput === lastToolOutputRef.current) {
+            console.log('toolOutput unchanged, skipping update');
+            return;
+        }
+        lastToolOutputRef.current = serializedToolOutput;
+
+        console.log('Processing new toolOutput:', toolOutput);
+
+        try {
+            // Parse the tool output
+            const incomingData = parseGPTOutput(toolOutput);
+
+            // Merge with existing widgetState (from previous turn)
+            const baseState = widgetStateFromGlobal ?? dashboardState ?? createDefaultDashboardState();
+
+            // Create next state by merging
+            const nextState: DashboardData = {
+                data: incomingData.data.length > 0 ? incomingData.data : baseState.data,
+                availableFilters: {
+                    tipo_ingreso_seia: incomingData.filters.tipo_ingreso_seia.length > 0
+                        ? incomingData.filters.tipo_ingreso_seia
+                        : baseState.availableFilters.tipo_ingreso_seia,
+                    region: incomingData.filters.region.length > 0
+                        ? incomingData.filters.region
+                        : baseState.availableFilters.region,
+                    tipologia: incomingData.filters.tipologia.length > 0
+                        ? incomingData.filters.tipologia
+                        : baseState.availableFilters.tipologia,
+                    etiqueta_inversion: incomingData.filters.etiqueta_inversion.length > 0
+                        ? incomingData.filters.etiqueta_inversion
+                        : baseState.availableFilters.etiqueta_inversion
+                }
+            };
+
+            console.log('Updating dashboard state:', nextState);
+            setDashboardState(nextState);
+        } catch (error) {
+            console.error('Error processing toolOutput:', error);
+        }
+    }, [toolOutput, toolResponseMetadata, widgetStateFromGlobal]);
+
+    const dashboardData = dashboardState ?? createDefaultDashboardState();
+
+    // Build filter configurations
+    const buildFilterConfigs = (): FilterConfig[] => {
+        const configs: FilterConfig[] = [];
+
+        // Tipo Ingreso SEIA filter
+        configs.push({
+            label: 'Tipo Ingreso SEIA',
+            options: dashboardData.availableFilters.tipo_ingreso_seia.map(value => ({
+                label: value,
+                value: value
+            })),
+            selectedValues: filterState.tipo_ingreso_seia,
+            multiSelect: true
         });
 
-        setFilteredData(result);
-    }, [gptData, filters]);
+        // Region filter
+        configs.push({
+            label: 'Región',
+            options: dashboardData.availableFilters.region.map(value => ({
+                label: value,
+                value: value
+            })),
+            selectedValues: filterState.region,
+            multiSelect: true
+        });
+
+        // Tipologia filter
+        configs.push({
+            label: 'Tipología',
+            options: dashboardData.availableFilters.tipologia.map(value => ({
+                label: value,
+                value: value
+            })),
+            selectedValues: filterState.tipologia,
+            multiSelect: true
+        });
+
+        // Etiqueta Inversion filter
+        configs.push({
+            label: 'Etiqueta Inversión',
+            options: dashboardData.availableFilters.etiqueta_inversion.map(value => ({
+                label: value,
+                value: value
+            })),
+            selectedValues: filterState.etiqueta_inversion,
+            multiSelect: true
+        });
+
+        return configs;
+    };
 
     // Handle filter changes
     const handleFilterChange = (filterLabel: string, selectedValues: string[]) => {
-        setFilters(prevFilters =>
-            prevFilters.map(f =>
-                f.label === filterLabel
-                    ? { ...f, selectedValues }
-                    : f
-            )
-        );
+        const filterKey = {
+            'Tipo Ingreso SEIA': 'tipo_ingreso_seia',
+            'Región': 'region',
+            'Tipología': 'tipologia',
+            'Etiqueta Inversión': 'etiqueta_inversion'
+        }[filterLabel] as keyof typeof filterState;
+
+        if (filterKey) {
+            setFilterState(prevState => ({
+                ...prevState,
+                [filterKey]: selectedValues
+            }));
+        }
     };
+
+    // Apply filters to data
+    const filteredData = useMemo(() => {
+        let result = [...dashboardData.data];
+
+        // Apply tipo_ingreso_seia filter
+        if (filterState.tipo_ingreso_seia.length > 0) {
+            result = result.filter(row =>
+                filterState.tipo_ingreso_seia.includes(row.tipo_ingreso_seia)
+            );
+        }
+
+        // Apply region filter
+        if (filterState.region.length > 0) {
+            result = result.filter(row =>
+                filterState.region.includes(row.region)
+            );
+        }
+
+        // Apply tipologia filter
+        if (filterState.tipologia.length > 0) {
+            result = result.filter(row =>
+                filterState.tipologia.includes(row.tipologia)
+            );
+        }
+
+        // Apply etiqueta_inversion filter
+        if (filterState.etiqueta_inversion.length > 0) {
+            result = result.filter(row =>
+                filterState.etiqueta_inversion.includes(row.etiqueta_inversion)
+            );
+        }
+
+        console.log(`Filtered data: ${result.length} records`);
+        return result;
+    }, [dashboardData.data, filterState]);
 
     // Transform data into box plot format grouped by year
     const boxPlotData = useMemo(() => {
@@ -222,6 +370,8 @@ export const Dashboard: React.FC = () => {
         }))
     }];
 
+    const filters = buildFilterConfigs();
+
     return (
         <div style={{
             minHeight: '100vh',
@@ -253,7 +403,7 @@ export const Dashboard: React.FC = () => {
                 </div>
 
                 {/* Filters */}
-                {filters.length > 0 && (
+                {filters.length > 0 && filters.some(f => f.options.length > 0) && (
                     <div style={{
                         backgroundColor: themeColors.cardBackground,
                         borderRadius: 12,
@@ -297,7 +447,9 @@ export const Dashboard: React.FC = () => {
                                 No hay datos disponibles
                             </div>
                             <div style={{ fontSize: 14, marginTop: 8 }}>
-                                Ajusta los filtros para ver los resultados
+                                {dashboardData.data.length === 0
+                                    ? 'Esperando datos de GPT...'
+                                    : 'Ajusta los filtros para ver los resultados'}
                             </div>
                         </div>
                     )}

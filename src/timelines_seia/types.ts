@@ -7,7 +7,7 @@ export interface TimelineDataRow {
     region: string;
     tipologia: string;
     etiqueta_inversion: string;
-    expediente_presentacion: Date;
+    expediente_presentacion: string | Date;
     tiempo_entre_icsara_adenda: number;
 }
 

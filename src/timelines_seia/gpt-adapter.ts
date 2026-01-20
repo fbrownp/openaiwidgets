@@ -37,11 +37,29 @@ function isValidDataRow(row: any): row is GPTDataRow {
 }
 
 /**
+ * Normalize a data row (convert date strings to Date objects, ensure numbers)
+ */
+function normalizeDataRow(row: any): GPTDataRow {
+    return {
+        tipo_ingreso_seia: String(row.tipo_ingreso_seia || ''),
+        region: String(row.region || ''),
+        tipologia: String(row.tipologia || ''),
+        etiqueta_inversion: String(row.etiqueta_inversion || ''),
+        expediente_presentacion: typeof row.expediente_presentacion === 'string'
+            ? row.expediente_presentacion
+            : row.expediente_presentacion instanceof Date
+                ? row.expediente_presentacion.toISOString().split('T')[0]
+                : new Date().toISOString().split('T')[0],
+        tiempo_entre_icsara_adenda: Number(row.tiempo_entre_icsara_adenda || 0)
+    };
+}
+
+/**
  * Parse raw GPT output into dashboard data structure
  */
 export function parseGPTOutput(gptOutput: any): GPTDashboardData {
     try {
-        let rawData: GPTDataRow[] = [];
+        let rawData: any[] = [];
 
         // Handle different input formats
         if (Array.isArray(gptOutput)) {
@@ -63,13 +81,17 @@ export function parseGPTOutput(gptOutput: any): GPTDashboardData {
             return parseGPTOutput(placeholderData);
         }
 
-        // Filter out invalid rows
-        const validData = rawData.filter(isValidDataRow);
+        // Filter out invalid rows and normalize them
+        const validData = rawData
+            .filter(isValidDataRow)
+            .map(normalizeDataRow);
 
         if (validData.length === 0) {
             console.warn('No valid data rows found, using placeholder data');
             return parseGPTOutput(placeholderData);
         }
+
+        console.log(`Parsed ${validData.length} valid data rows`);
 
         // Extract filter values from data
         const filters = {
