@@ -107,6 +107,8 @@ const generatePlaceholderData = (): FaltaDataRow[] => {
 
   const gravedades: Array<'Leves' | 'Graves' | 'Gravísimas'> = ['Leves', 'Graves', 'Gravísimas'];
 
+  const anosInicio = ['2019', '2020', '2021', '2022', '2023', '2024'];
+
   const data: FaltaDataRow[] = [];
 
   // Generate data with varying cantidad_casos
@@ -120,6 +122,7 @@ const generatePlaceholderData = (): FaltaDataRow[] => {
     const instrumentoIdx = Math.floor(Math.random() * instrumentos.length);
     const tipoProcesoIdx = Math.floor(Math.random() * tiposProceso.length);
     const etiquetaIdx = Math.floor(Math.random() * etiquetasTema.length);
+    const anoInicioIdx = Math.floor(Math.random() * anosInicio.length);
 
     // Random cantidad_casos between 1 and 10, with most being 1-3
     const cantidadCasos = Math.random() < 0.7 ? Math.floor(Math.random() * 3) + 1 : Math.floor(Math.random() * 8) + 3;
@@ -134,6 +137,7 @@ const generatePlaceholderData = (): FaltaDataRow[] => {
       tipo_proceso_sancion: tiposProceso[tipoProcesoIdx],
       categoria_economica: categoriasEconomicas[catIdx],
       subcategoria_economica: subcategoriasEconomicas[subcatIdx],
+      ano_inicio: anosInicio[anoInicioIdx],
       cantidad_casos: cantidadCasos,
     });
   }
@@ -168,6 +172,7 @@ export const generatePlaceholderOutput = (): GPTFaltasOutput => {
       region: getUniqueValues(data, 'region'),
       categoria_economica: getUniqueValues(data, 'categoria_economica'),
       subcategoria_economica: getUniqueValues(data, 'subcategoria_economica'),
+      ano_inicio: getUniqueValues(data, 'ano_inicio'),
     },
   };
 };

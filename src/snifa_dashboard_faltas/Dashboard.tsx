@@ -55,7 +55,8 @@ const createDefaultDashboardState = (): DashboardData => ({
     availableFilters: {
         region: [],
         categoria_economica: [],
-        subcategoria_economica: []
+        subcategoria_economica: [],
+        ano_inicio: []
     }
 });
 
@@ -118,7 +119,8 @@ export const Dashboard: React.FC = () => {
     const [filterState, setFilterState] = useState<DashboardState['filters']>({
         region: [],
         categoria_economica: [],
-        subcategoria_economica: []
+        subcategoria_economica: [],
+        ano_inicio: []
     });
 
     // Handler for expand button - toggle between fullscreen and inline
@@ -192,7 +194,10 @@ export const Dashboard: React.FC = () => {
                         : baseState.availableFilters.categoria_economica,
                     subcategoria_economica: incomingData.availableFilters.subcategoria_economica.length > 0
                         ? incomingData.availableFilters.subcategoria_economica
-                        : baseState.availableFilters.subcategoria_economica
+                        : baseState.availableFilters.subcategoria_economica,
+                    ano_inicio: incomingData.availableFilters.ano_inicio.length > 0
+                        ? incomingData.availableFilters.ano_inicio
+                        : baseState.availableFilters.ano_inicio
                 }
             };
 
@@ -410,6 +415,36 @@ export const Dashboard: React.FC = () => {
             displayLabel: 'Subcategoría Económica',
             options: subcategoriaEconomicaOptions,
             selectedValues: filterState.subcategoria_economica,
+            multiSelect: true
+        });
+
+        // Ano inicio filter - filtered by region, categoria_economica, and subcategoria_economica if selected
+        let dataForAnoInicio = dashboardData.data;
+        if (filterState.region.length > 0) {
+            dataForAnoInicio = dataForAnoInicio.filter(row => {
+                const regionValue = row.region || 'Sin Información';
+                return filterState.region.includes(regionValue);
+            });
+        }
+        if (filterState.categoria_economica.length > 0) {
+            dataForAnoInicio = dataForAnoInicio.filter(row => {
+                const categoriaValue = row.categoria_economica || 'Sin Información';
+                return filterState.categoria_economica.includes(categoriaValue);
+            });
+        }
+        if (filterState.subcategoria_economica.length > 0) {
+            dataForAnoInicio = dataForAnoInicio.filter(row => {
+                const subcategoriaValue = row.subcategoria_economica || 'Sin Información';
+                return filterState.subcategoria_economica.includes(subcategoriaValue);
+            });
+        }
+        const anoInicioOptions = getUniqueValuesFromData(dataForAnoInicio, 'ano_inicio');
+
+        configs.push({
+            label: 'ano_inicio',
+            displayLabel: 'Año Inicio',
+            options: anoInicioOptions,
+            selectedValues: filterState.ano_inicio,
             multiSelect: true
         });
 
