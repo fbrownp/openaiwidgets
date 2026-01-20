@@ -9,6 +9,16 @@ import { TimelineDataRow, BoxPlotDataPoint, FilterConfig, DashboardData, Episode
 import { useOpenAiGlobal } from '../use-openai-global';
 import { useWidgetState } from '../use-widget-state';
 
+// Icon component - stylish black and white search/data icon
+const SearchDataIcon = () => (
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="11" cy="11" r="8" />
+        <path d="m21 21-4.35-4.35" />
+        <path d="M11 8v6" />
+        <path d="M8 11h6" />
+    </svg>
+);
+
 /**
  * Format episode ID into human-readable label
  */
@@ -567,14 +577,11 @@ export const Dashboard: React.FC = () => {
                                 padding: 60,
                                 color: themeColors.textSecondary
                             }}>
-                                <div style={{ fontSize: 48, marginBottom: 16 }}>📊</div>
-                                <div style={{ fontSize: 16, fontWeight: 500 }}>
-                                    No hay datos disponibles
+                                <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'center' }}>
+                                    <SearchDataIcon />
                                 </div>
-                                <div style={{ fontSize: 14, marginTop: 8 }}>
-                                    {dashboardData.data.length === 0
-                                        ? 'Esperando datos de GPT...'
-                                        : 'Ajusta los filtros para ver los resultados'}
+                                <div style={{ fontSize: 16, fontWeight: 500 }}>
+                                    Buscando datos disponibles en PIA
                                 </div>
                             </div>
                         )}
