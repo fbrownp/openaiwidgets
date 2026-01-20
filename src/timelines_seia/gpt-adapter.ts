@@ -29,7 +29,7 @@ function isValidDataRow(row: any): row is GPTDataRow {
         typeof row === 'object' &&
         'tipo_ingreso_seia' in row &&
         'region' in row &&
-        'tipologia' in row &&
+        'tipologia_letra' in row &&
         'etiqueta_inversion' in row &&
         'expediente_presentacion' in row &&
         'tiempo_entre_icsara_adenda' in row
@@ -43,7 +43,7 @@ function normalizeDataRow(row: any): GPTDataRow {
     const normalized: GPTDataRow = {
         tipo_ingreso_seia: String(row.tipo_ingreso_seia || ''),
         region: String(row.region || ''),
-        tipologia: String(row.tipologia || ''),
+        tipologia_letra: String(row.tipologia_letra || ''),
         etiqueta_inversion: String(row.etiqueta_inversion || ''),
         expediente_presentacion: typeof row.expediente_presentacion === 'string'
             ? row.expediente_presentacion
@@ -143,7 +143,7 @@ export function parseGPTOutput(gptOutput: any): GPTDashboardData {
         const filters = {
             tipo_ingreso_seia: extractUniqueValues(validData, 'tipo_ingreso_seia'),
             region: extractUniqueValues(validData, 'region'),
-            tipologia: extractUniqueValues(validData, 'tipologia'),
+            tipologia_letra: extractUniqueValues(validData, 'tipologia_letra'),
             etiqueta_inversion: extractUniqueValues(validData, 'etiqueta_inversion')
         };
 
@@ -165,7 +165,7 @@ export function buildFilterConfigs(gptData: GPTDashboardData): any[] {
     const filterLabels = {
         tipo_ingreso_seia: 'Tipo Ingreso SEIA',
         region: 'Región',
-        tipologia: 'Tipología',
+        tipologia_letra: 'Tipología',
         etiqueta_inversion: 'Etiqueta Inversión'
     };
 

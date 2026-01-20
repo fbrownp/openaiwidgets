@@ -5,7 +5,7 @@
 export interface GPTDataRow {
     tipo_ingreso_seia: string;
     region: string;
-    tipologia: string;
+    tipologia_letra: string;
     etiqueta_inversion: string;
     expediente_presentacion: string | Date;
     tiempo_entre_icsara_adenda: number | null;
@@ -25,7 +25,7 @@ export interface GPTDashboardData {
     filters: {
         tipo_ingreso_seia: string[];
         region: string[];
-        tipologia: string[];
+        tipologia_letra: string[];
         etiqueta_inversion: string[];
     };
 }

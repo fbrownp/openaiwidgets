@@ -37,7 +37,7 @@ const createDefaultDashboardState = (): DashboardData => ({
     availableFilters: {
         tipo_ingreso_seia: [],
         region: [],
-        tipologia: [],
+        tipologia_letra: [],
         etiqueta_inversion: []
     }
 });
@@ -54,12 +54,12 @@ export const Dashboard: React.FC = () => {
     const [filterState, setFilterState] = useState<{
         tipo_ingreso_seia: string[];
         region: string[];
-        tipologia: string[];
+        tipologia_letra: string[];
         etiqueta_inversion: string[];
     }>({
         tipo_ingreso_seia: [],
         region: [],
-        tipologia: [],
+        tipologia_letra: [],
         etiqueta_inversion: []
     });
 
@@ -121,9 +121,9 @@ export const Dashboard: React.FC = () => {
                     region: incomingData.filters.region.length > 0
                         ? incomingData.filters.region
                         : baseState.availableFilters.region,
-                    tipologia: incomingData.filters.tipologia.length > 0
-                        ? incomingData.filters.tipologia
-                        : baseState.availableFilters.tipologia,
+                    tipologia_letra: incomingData.filters.tipologia_letra.length > 0
+                        ? incomingData.filters.tipologia_letra
+                        : baseState.availableFilters.tipologia_letra,
                     etiqueta_inversion: incomingData.filters.etiqueta_inversion.length > 0
                         ? incomingData.filters.etiqueta_inversion
                         : baseState.availableFilters.etiqueta_inversion
@@ -188,11 +188,11 @@ export const Dashboard: React.FC = () => {
         // Tipologia filter
         configs.push({
             label: 'Tipología',
-            options: dashboardData.availableFilters.tipologia.map(value => ({
+            options: dashboardData.availableFilters.tipologia_letra.map(value => ({
                 label: value,
                 value: value
             })),
-            selectedValues: filterState.tipologia,
+            selectedValues: filterState.tipologia_letra,
             multiSelect: true
         });
 
@@ -215,7 +215,7 @@ export const Dashboard: React.FC = () => {
         const filterKey = {
             'Tipo Ingreso SEIA': 'tipo_ingreso_seia',
             'Región': 'region',
-            'Tipología': 'tipologia',
+            'Tipología': 'tipologia_letra',
             'Etiqueta Inversión': 'etiqueta_inversion'
         }[filterLabel] as keyof typeof filterState;
 
@@ -245,10 +245,10 @@ export const Dashboard: React.FC = () => {
             );
         }
 
-        // Apply tipologia filter
-        if (filterState.tipologia.length > 0) {
+        // Apply tipologia_letra filter
+        if (filterState.tipologia_letra.length > 0) {
             result = result.filter(row =>
-                filterState.tipologia.includes(row.tipologia)
+                filterState.tipologia_letra.includes(row.tipologia_letra)
             );
         }
 
