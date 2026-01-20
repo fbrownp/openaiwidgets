@@ -4,7 +4,7 @@ import { ThemeColors } from './types';
 interface WidgetCardProps {
     title: string;
     value: string | number;
-    icon?: string;
+    icon?: React.ReactNode;
     subtitle?: string;
     themeColors: ThemeColors;
 }
@@ -12,7 +12,7 @@ interface WidgetCardProps {
 export const WidgetCard: React.FC<WidgetCardProps> = ({
     title,
     value,
-    icon = '📊',
+    icon,
     subtitle,
     themeColors
 }) => {
