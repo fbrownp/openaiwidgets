@@ -41,7 +41,7 @@ export interface FaltaDataRow {
   tipo_proceso_sancion: string | null;
   categoria_economica: string | null;
   subcategoria_economica: string | null;
-  ano_inicio: string | null;
+  ano_inicio: string | number | null;
   cantidad_casos: number;
 }
 

@@ -16,6 +16,8 @@ const getUniqueValues = (data: FaltaDataRow[], field: keyof FaltaDataRow): strin
     const value = row[field];
     if (typeof value === 'string') {
       values.add(value);
+    } else if (typeof value === 'number') {
+      values.add(String(value));
     } else if (value === null) {
       values.add('Sin Información');
     }
