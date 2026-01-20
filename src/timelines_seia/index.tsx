@@ -2,10 +2,17 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Dashboard } from './Dashboard';
 
-const rootElement = document.getElementById('component-root');
+const rootElement = document.getElementById('timelines_seia-root');
 
 if (!rootElement) {
-    throw new Error('Root element not found');
+    throw new Error('Missing timelines_seia-root element');
 }
 
-createRoot(rootElement).render(<Dashboard />);
+console.log('Mounting Timelines SEIA Dashboard...');
+createRoot(rootElement).render(
+    <React.StrictMode>
+        <Dashboard />
+    </React.StrictMode>
+);
+
+export { Dashboard };
