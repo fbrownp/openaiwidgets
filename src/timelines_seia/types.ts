@@ -8,7 +8,14 @@ export interface TimelineDataRow {
     tipologia: string;
     etiqueta_inversion: string;
     expediente_presentacion: string | Date;
-    tiempo_entre_icsara_adenda: number;
+    tiempo_entre_icsara_adenda: number | null;
+    tiempo_entre_icsara_complementario_adenda_complementaria: number | null;
+    [key: string]: string | Date | number | null; // Allow dynamic episode fields
+}
+
+export interface Episode {
+    id: string;
+    label: string;
 }
 
 export interface BoxPlotDataPoint {
@@ -23,6 +30,7 @@ export interface BoxPlotDataPoint {
 
 export interface DashboardData {
     data: TimelineDataRow[];
+    episodes: Episode[];
     availableFilters: {
         tipo_ingreso_seia: string[];
         region: string[];
@@ -46,5 +54,12 @@ export interface FilterConfig {
 export interface DropdownFilterProps {
     filters: FilterConfig[];
     onFilterChange: (filterLabel: string, selectedValues: string[]) => void;
+    themeColors: any;
+}
+
+export interface TimelineSelectorProps {
+    episodes: Episode[];
+    selectedEpisode: string;
+    onEpisodeChange: (episodeId: string) => void;
     themeColors: any;
 }

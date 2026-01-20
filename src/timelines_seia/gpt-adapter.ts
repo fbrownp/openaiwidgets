@@ -40,7 +40,7 @@ function isValidDataRow(row: any): row is GPTDataRow {
  * Normalize a data row (convert date strings to Date objects, ensure numbers)
  */
 function normalizeDataRow(row: any): GPTDataRow {
-    return {
+    const normalized: GPTDataRow = {
         tipo_ingreso_seia: String(row.tipo_ingreso_seia || ''),
         region: String(row.region || ''),
         tipologia: String(row.tipologia || ''),
@@ -50,8 +50,39 @@ function normalizeDataRow(row: any): GPTDataRow {
             : row.expediente_presentacion instanceof Date
                 ? row.expediente_presentacion.toISOString().split('T')[0]
                 : new Date().toISOString().split('T')[0],
-        tiempo_entre_icsara_adenda: Number(row.tiempo_entre_icsara_adenda || 0)
+        tiempo_entre_icsara_adenda: row.tiempo_entre_icsara_adenda != null
+            ? Number(row.tiempo_entre_icsara_adenda)
+            : null,
+        tiempo_entre_icsara_complementario_adenda_complementaria: row.tiempo_entre_icsara_complementario_adenda_complementaria != null
+            ? Number(row.tiempo_entre_icsara_complementario_adenda_complementaria)
+            : null
     };
+
+    // Copy any additional episode fields
+    Object.keys(row).forEach(key => {
+        if (key.startsWith('tiempo_') && !(key in normalized)) {
+            normalized[key] = row[key] != null ? Number(row[key]) : null;
+        }
+    });
+
+    return normalized;
+}
+
+/**
+ * Detect episodes from data by looking for tiempo_* fields
+ */
+function detectEpisodesFromData(data: GPTDataRow[]): string[] {
+    const episodeFields = new Set<string>();
+
+    data.forEach(row => {
+        Object.keys(row).forEach(key => {
+            if (key.startsWith('tiempo_') && typeof row[key] === 'number') {
+                episodeFields.add(key);
+            }
+        });
+    });
+
+    return Array.from(episodeFields).sort();
 }
 
 /**
@@ -93,6 +124,21 @@ export function parseGPTOutput(gptOutput: any): GPTDashboardData {
 
         console.log(`Parsed ${validData.length} valid data rows`);
 
+        // Get episodes from GPT output or detect from data
+        let episodes: string[] = [];
+        if (gptOutput && typeof gptOutput === 'object' && Array.isArray(gptOutput.episodes)) {
+            episodes = gptOutput.episodes;
+            console.log('Using episodes from GPT output:', episodes);
+        } else {
+            episodes = detectEpisodesFromData(validData);
+            console.log('Auto-detected episodes from data:', episodes);
+        }
+
+        // Ensure at least the default episode exists
+        if (episodes.length === 0) {
+            episodes = ['tiempo_entre_icsara_adenda'];
+        }
+
         // Extract filter values from data
         const filters = {
             tipo_ingreso_seia: extractUniqueValues(validData, 'tipo_ingreso_seia'),
@@ -103,6 +149,7 @@ export function parseGPTOutput(gptOutput: any): GPTDashboardData {
 
         return {
             data: validData,
+            episodes,
             filters
         };
     } catch (error) {

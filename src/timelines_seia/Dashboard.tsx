@@ -2,15 +2,38 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Chart from 'react-apexcharts';
 import { ApexOptions } from 'apexcharts';
 import { DropdownFilter } from './DropdownFilter';
+import { TimelineSelector } from './TimelineSelector';
 import { parseGPTOutput } from './gpt-adapter';
 import { getThemeColors, DEFAULT_THEME, Theme } from '../widget_styles/theme';
-import { TimelineDataRow, BoxPlotDataPoint, FilterConfig, DashboardData } from './types';
+import { TimelineDataRow, BoxPlotDataPoint, FilterConfig, DashboardData, Episode } from './types';
 import { useOpenAiGlobal } from '../use-openai-global';
 import { useWidgetState } from '../use-widget-state';
+
+/**
+ * Format episode ID into human-readable label
+ */
+function formatEpisodeLabel(episodeId: string): string {
+    return episodeId
+        .replace(/_/g, ' ')
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+}
+
+/**
+ * Convert episode string IDs to Episode objects
+ */
+function convertToEpisodes(episodeIds: string[]): Episode[] {
+    return episodeIds.map(id => ({
+        id,
+        label: formatEpisodeLabel(id)
+    }));
+}
 
 // Create default dashboard state
 const createDefaultDashboardState = (): DashboardData => ({
     data: [],
+    episodes: [],
     availableFilters: {
         tipo_ingreso_seia: [],
         region: [],
@@ -39,6 +62,9 @@ export const Dashboard: React.FC = () => {
         tipologia: [],
         etiqueta_inversion: []
     });
+
+    // Selected episode state
+    const [selectedEpisode, setSelectedEpisode] = useState<string>('tiempo_entre_icsara_adenda');
 
     // Hook into OpenAI global state
     const toolOutput = useOpenAiGlobal('toolOutput') as any;
@@ -87,6 +113,7 @@ export const Dashboard: React.FC = () => {
             // Create next state by merging
             const nextState: DashboardData = {
                 data: incomingData.data.length > 0 ? incomingData.data : baseState.data,
+                episodes: incomingData.episodes.length > 0 ? incomingData.episodes : baseState.episodes,
                 availableFilters: {
                     tipo_ingreso_seia: incomingData.filters.tipo_ingreso_seia.length > 0
                         ? incomingData.filters.tipo_ingreso_seia
@@ -105,6 +132,12 @@ export const Dashboard: React.FC = () => {
 
             console.log('Updating dashboard state:', nextState);
             setDashboardState(nextState);
+
+            // Update selected episode if new episodes are available and current one doesn't exist
+            if (nextState.episodes.length > 0 && !nextState.episodes.includes(selectedEpisode)) {
+                console.log(`Selected episode ${selectedEpisode} not found, switching to ${nextState.episodes[0]}`);
+                setSelectedEpisode(nextState.episodes[0]);
+            }
         } catch (error) {
             console.error('Error processing toolOutput:', error);
         }
@@ -230,10 +263,16 @@ export const Dashboard: React.FC = () => {
 
             const year = date.getFullYear();
 
-            if (!dataByYear[year]) {
-                dataByYear[year] = [];
+            // Get the value for the selected episode
+            const episodeValue = row[selectedEpisode] as number | null;
+
+            // Only include non-null values
+            if (episodeValue != null && !isNaN(episodeValue)) {
+                if (!dataByYear[year]) {
+                    dataByYear[year] = [];
+                }
+                dataByYear[year].push(episodeValue);
             }
-            dataByYear[year].push(row.tiempo_entre_icsara_adenda);
         });
 
         // Calculate quantiles for each year
@@ -281,7 +320,7 @@ export const Dashboard: React.FC = () => {
             ...calculateQuantiles(dataByYear[year]),
             year
         }));
-    }, [filteredData]);
+    }, [filteredData, selectedEpisode]);
 
     // ApexCharts configuration
     const chartOptions: ApexOptions = {
@@ -334,7 +373,7 @@ export const Dashboard: React.FC = () => {
         },
         yaxis: {
             title: {
-                text: 'Tiempo entre ICSARA y Adenda (días)',
+                text: `${formatEpisodeLabel(selectedEpisode)} (días)`,
                 style: {
                     color: themeColors.text,
                     fontSize: '14px',
@@ -362,7 +401,7 @@ export const Dashboard: React.FC = () => {
     };
 
     const series = [{
-        name: 'Tiempo ICSARA-Adenda',
+        name: formatEpisodeLabel(selectedEpisode),
         type: 'boxPlot',
         data: boxPlotData.map(d => ({
             x: d.year.toString(),
@@ -419,40 +458,64 @@ export const Dashboard: React.FC = () => {
                     </div>
                 )}
 
-                {/* Box Plot Chart */}
+                {/* Timeline Selector and Box Plot Chart */}
                 <div style={{
-                    backgroundColor: themeColors.cardBackground,
-                    borderRadius: 12,
-                    padding: 24,
-                    border: `1px solid ${themeColors.cardBorder}`,
-                    boxShadow: theme === 'dark'
-                        ? '0 1px 3px rgba(0, 0, 0, 0.3)'
-                        : '0 1px 3px rgba(0, 0, 0, 0.1)'
+                    display: 'flex',
+                    gap: 24,
+                    marginBottom: 24,
+                    minHeight: 550
                 }}>
-                    {boxPlotData.length > 0 ? (
-                        <Chart
-                            options={chartOptions}
-                            series={series}
-                            type="boxPlot"
-                            height={500}
-                        />
-                    ) : (
+                    {/* Timeline Selector - 1/4 width */}
+                    {dashboardData.episodes.length > 0 && (
                         <div style={{
-                            textAlign: 'center',
-                            padding: 60,
-                            color: themeColors.textSecondary
+                            flex: '0 0 25%',
+                            minWidth: 250
                         }}>
-                            <div style={{ fontSize: 48, marginBottom: 16 }}>📊</div>
-                            <div style={{ fontSize: 16, fontWeight: 500 }}>
-                                No hay datos disponibles
-                            </div>
-                            <div style={{ fontSize: 14, marginTop: 8 }}>
-                                {dashboardData.data.length === 0
-                                    ? 'Esperando datos de GPT...'
-                                    : 'Ajusta los filtros para ver los resultados'}
-                            </div>
+                            <TimelineSelector
+                                episodes={convertToEpisodes(dashboardData.episodes)}
+                                selectedEpisode={selectedEpisode}
+                                onEpisodeChange={setSelectedEpisode}
+                                themeColors={themeColors}
+                            />
                         </div>
                     )}
+
+                    {/* Box Plot Chart - 3/4 width */}
+                    <div style={{
+                        flex: dashboardData.episodes.length > 0 ? '1' : '1 0 100%',
+                        backgroundColor: themeColors.cardBackground,
+                        borderRadius: 12,
+                        padding: 24,
+                        border: `1px solid ${themeColors.cardBorder}`,
+                        boxShadow: theme === 'dark'
+                            ? '0 1px 3px rgba(0, 0, 0, 0.3)'
+                            : '0 1px 3px rgba(0, 0, 0, 0.1)'
+                    }}>
+                        {boxPlotData.length > 0 ? (
+                            <Chart
+                                options={chartOptions}
+                                series={series}
+                                type="boxPlot"
+                                height={500}
+                            />
+                        ) : (
+                            <div style={{
+                                textAlign: 'center',
+                                padding: 60,
+                                color: themeColors.textSecondary
+                            }}>
+                                <div style={{ fontSize: 48, marginBottom: 16 }}>📊</div>
+                                <div style={{ fontSize: 16, fontWeight: 500 }}>
+                                    No hay datos disponibles
+                                </div>
+                                <div style={{ fontSize: 14, marginTop: 8 }}>
+                                    {dashboardData.data.length === 0
+                                        ? 'Esperando datos de GPT...'
+                                        : 'Ajusta los filtros para ver los resultados'}
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {/* Data Summary */}
@@ -507,7 +570,14 @@ export const Dashboard: React.FC = () => {
                                 fontWeight: 700,
                                 color: themeColors.purple
                             }}>
-                                {(filteredData.reduce((sum, row) => sum + row.tiempo_entre_icsara_adenda, 0) / filteredData.length).toFixed(0)}
+                                {(() => {
+                                    const validValues = filteredData
+                                        .map(row => row[selectedEpisode] as number | null)
+                                        .filter(val => val != null && !isNaN(val)) as number[];
+                                    return validValues.length > 0
+                                        ? (validValues.reduce((sum, val) => sum + val, 0) / validValues.length).toFixed(0)
+                                        : '0';
+                                })()}
                             </div>
                         </div>
 
