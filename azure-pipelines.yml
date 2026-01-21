@@ -5,7 +5,7 @@ variables:
   imageName: rag-widgets
   acrName: dssrepository
   containerAppName: rag-widgets
-  resourceGroup: DptoCambioClimatico
+  resourceGroup: DptoInteligenciaAmbiental
 
 pool:
   vmImage: 'ubuntu-latest'
