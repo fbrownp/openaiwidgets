@@ -31,8 +31,7 @@ function isValidDataRow(row: any): row is GPTDataRow {
         'region' in row &&
         'tipologia_letra' in row &&
         'etiqueta_inversion' in row &&
-        'expediente_presentacion' in row &&
-        'tiempo_entre_icsara_adenda' in row
+        'expediente_presentacion' in row
     );
 }
 
@@ -44,17 +43,50 @@ function normalizeDataRow(row: any): GPTDataRow {
         tipo_ingreso_seia: String(row.tipo_ingreso_seia || ''),
         region: String(row.region || ''),
         tipologia_letra: String(row.tipologia_letra || ''),
+        tipologia: String(row.tipologia || ''),
         etiqueta_inversion: String(row.etiqueta_inversion || ''),
         expediente_presentacion: typeof row.expediente_presentacion === 'string'
             ? row.expediente_presentacion
             : row.expediente_presentacion instanceof Date
                 ? row.expediente_presentacion.toISOString().split('T')[0]
                 : new Date().toISOString().split('T')[0],
+        // Entre Eventos fields
+        tiempo_entre_presentacion_icsara: row.tiempo_entre_presentacion_icsara != null
+            ? Number(row.tiempo_entre_presentacion_icsara)
+            : null,
         tiempo_entre_icsara_adenda: row.tiempo_entre_icsara_adenda != null
             ? Number(row.tiempo_entre_icsara_adenda)
             : null,
+        tiempo_entre_adenda_icsara_complementario: row.tiempo_entre_adenda_icsara_complementario != null
+            ? Number(row.tiempo_entre_adenda_icsara_complementario)
+            : null,
         tiempo_entre_icsara_complementario_adenda_complementaria: row.tiempo_entre_icsara_complementario_adenda_complementaria != null
             ? Number(row.tiempo_entre_icsara_complementario_adenda_complementaria)
+            : null,
+        tiempo_entre_adenda_complementaria_ice: row.tiempo_entre_adenda_complementaria_ice != null
+            ? Number(row.tiempo_entre_adenda_complementaria_ice)
+            : null,
+        tiempo_entre_ice_rca: row.tiempo_entre_ice_rca != null
+            ? Number(row.tiempo_entre_ice_rca)
+            : null,
+        // Total (Hasta) fields
+        tiempo_hasta_presentacion_icsara: row.tiempo_hasta_presentacion_icsara != null
+            ? Number(row.tiempo_hasta_presentacion_icsara)
+            : null,
+        tiempo_hasta_icsara_adenda: row.tiempo_hasta_icsara_adenda != null
+            ? Number(row.tiempo_hasta_icsara_adenda)
+            : null,
+        tiempo_hasta_adenda_icsara_complementario: row.tiempo_hasta_adenda_icsara_complementario != null
+            ? Number(row.tiempo_hasta_adenda_icsara_complementario)
+            : null,
+        tiempo_hasta_icsara_complementario_adenda_complementaria: row.tiempo_hasta_icsara_complementario_adenda_complementaria != null
+            ? Number(row.tiempo_hasta_icsara_complementario_adenda_complementaria)
+            : null,
+        tiempo_hasta_adenda_complementaria_ice: row.tiempo_hasta_adenda_complementaria_ice != null
+            ? Number(row.tiempo_hasta_adenda_complementaria_ice)
+            : null,
+        tiempo_hasta_ice_rca: row.tiempo_hasta_ice_rca != null
+            ? Number(row.tiempo_hasta_ice_rca)
             : null
     };
 
@@ -144,6 +176,7 @@ export function parseGPTOutput(gptOutput: any): GPTDashboardData {
             tipo_ingreso_seia: extractUniqueValues(validData, 'tipo_ingreso_seia'),
             region: extractUniqueValues(validData, 'region'),
             tipologia_letra: extractUniqueValues(validData, 'tipologia_letra'),
+            tipologia: extractUniqueValues(validData, 'tipologia'),
             etiqueta_inversion: extractUniqueValues(validData, 'etiqueta_inversion')
         };
 
@@ -165,7 +198,8 @@ export function buildFilterConfigs(gptData: GPTDashboardData): any[] {
     const filterLabels = {
         tipo_ingreso_seia: 'Tipo Ingreso SEIA',
         region: 'Región',
-        tipologia_letra: 'Tipología',
+        tipologia_letra: 'Letra de Tipología',
+        tipologia: 'Tipología',
         etiqueta_inversion: 'Etiqueta Inversión'
     };
 

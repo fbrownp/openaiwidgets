@@ -40,6 +40,26 @@ function convertToEpisodes(episodeIds: string[]): Episode[] {
     }));
 }
 
+// Episode definitions with hierarchies and labels
+const EPISODE_DEFINITIONS = {
+    entre_eventos: [
+        { id: 'tiempo_entre_presentacion_icsara', label: 'Presentación → ICSARA' },
+        { id: 'tiempo_entre_icsara_adenda', label: 'ICSARA → Adenda' },
+        { id: 'tiempo_entre_adenda_icsara_complementario', label: 'Adenda → ICSARA Complementario' },
+        { id: 'tiempo_entre_icsara_complementario_adenda_complementaria', label: 'ICSARA Complementario → Adenda Complementaria' },
+        { id: 'tiempo_entre_adenda_complementaria_ice', label: 'Adenda Complementaria → ICE' },
+        { id: 'tiempo_entre_ice_rca', label: 'ICE → RCA' }
+    ],
+    total: [
+        { id: 'tiempo_hasta_presentacion_icsara', label: 'Hasta ICSARA' },
+        { id: 'tiempo_hasta_icsara_adenda', label: 'Hasta Adenda' },
+        { id: 'tiempo_hasta_adenda_icsara_complementario', label: 'Hasta ICSARA Complementario' },
+        { id: 'tiempo_hasta_icsara_complementario_adenda_complementaria', label: 'Hasta Adenda Complementaria' },
+        { id: 'tiempo_hasta_adenda_complementaria_ice', label: 'Hasta ICE' },
+        { id: 'tiempo_hasta_ice_rca', label: 'Hasta RCA' }
+    ]
+};
+
 // Create default dashboard state
 const createDefaultDashboardState = (): DashboardData => ({
     data: [],
@@ -48,6 +68,7 @@ const createDefaultDashboardState = (): DashboardData => ({
         tipo_ingreso_seia: [],
         region: [],
         tipologia_letra: [],
+        tipologia: [],
         etiqueta_inversion: []
     }
 });
@@ -59,21 +80,26 @@ export const Dashboard: React.FC = () => {
     const [theme, setTheme] = useState<Theme>('dark');
     const themeColors = getThemeColors(theme);
 
+    // View state - Entre Eventos or Total
+    const [activeView, setActiveView] = useState<'entre_eventos' | 'total'>('entre_eventos');
+
     // Filter state management
     const [filterState, setFilterState] = useState<{
         tipo_ingreso_seia: string[];
         region: string[];
         tipologia_letra: string[];
+        tipologia: string[];
         etiqueta_inversion: string[];
     }>({
         tipo_ingreso_seia: [],
         region: [],
         tipologia_letra: [],
+        tipologia: [],
         etiqueta_inversion: []
     });
 
     // Selected episode state
-    const [selectedEpisode, setSelectedEpisode] = useState<string>('tiempo_entre_icsara_adenda');
+    const [selectedEpisode, setSelectedEpisode] = useState<string>('tiempo_entre_presentacion_icsara');
 
     // Hook into OpenAI global state
     const toolOutput = useOpenAiGlobal('toolOutput') as any;
@@ -133,6 +159,9 @@ export const Dashboard: React.FC = () => {
                     tipologia_letra: incomingData.filters.tipologia_letra.length > 0
                         ? incomingData.filters.tipologia_letra
                         : baseState.availableFilters.tipologia_letra,
+                    tipologia: incomingData.filters.tipologia.length > 0
+                        ? incomingData.filters.tipologia
+                        : baseState.availableFilters.tipologia,
                     etiqueta_inversion: incomingData.filters.etiqueta_inversion.length > 0
                         ? incomingData.filters.etiqueta_inversion
                         : baseState.availableFilters.etiqueta_inversion
@@ -141,18 +170,25 @@ export const Dashboard: React.FC = () => {
 
             console.log('Updating dashboard state:', nextState);
             setDashboardState(nextState);
-
-            // Update selected episode if new episodes are available and current one doesn't exist
-            if (nextState.episodes.length > 0 && !nextState.episodes.includes(selectedEpisode)) {
-                console.log(`Selected episode ${selectedEpisode} not found, switching to ${nextState.episodes[0]}`);
-                setSelectedEpisode(nextState.episodes[0]);
-            }
         } catch (error) {
             console.error('Error processing toolOutput:', error);
         }
     }, [toolOutput, toolResponseMetadata, widgetStateFromGlobal]);
 
     const dashboardData = dashboardState ?? createDefaultDashboardState();
+
+    // Get episodes for the current view
+    const availableEpisodes = useMemo(() => {
+        return EPISODE_DEFINITIONS[activeView];
+    }, [activeView]);
+
+    // Update selected episode when view changes
+    useEffect(() => {
+        const firstEpisode = availableEpisodes[0];
+        if (firstEpisode && selectedEpisode !== firstEpisode.id) {
+            setSelectedEpisode(firstEpisode.id);
+        }
+    }, [activeView]);
 
     // Handler for expand button - toggle between fullscreen and inline
     const handleExpand = async () => {
@@ -194,14 +230,25 @@ export const Dashboard: React.FC = () => {
             multiSelect: true
         });
 
-        // Tipologia filter
+        // Letra de Tipologia filter
         configs.push({
-            label: 'Tipología',
+            label: 'Letra de Tipología',
             options: dashboardData.availableFilters.tipologia_letra.map(value => ({
                 label: value,
                 value: value
             })),
             selectedValues: filterState.tipologia_letra,
+            multiSelect: true
+        });
+
+        // Tipologia filter
+        configs.push({
+            label: 'Tipología',
+            options: dashboardData.availableFilters.tipologia.map(value => ({
+                label: value,
+                value: value
+            })),
+            selectedValues: filterState.tipologia,
             multiSelect: true
         });
 
@@ -224,7 +271,8 @@ export const Dashboard: React.FC = () => {
         const filterKey = {
             'Tipo Ingreso SEIA': 'tipo_ingreso_seia',
             'Región': 'region',
-            'Tipología': 'tipologia_letra',
+            'Letra de Tipología': 'tipologia_letra',
+            'Tipología': 'tipologia',
             'Etiqueta Inversión': 'etiqueta_inversion'
         }[filterLabel] as keyof typeof filterState;
 
@@ -258,6 +306,13 @@ export const Dashboard: React.FC = () => {
         if (filterState.tipologia_letra.length > 0) {
             result = result.filter(row =>
                 filterState.tipologia_letra.includes(row.tipologia_letra)
+            );
+        }
+
+        // Apply tipologia filter
+        if (filterState.tipologia.length > 0) {
+            result = result.filter(row =>
+                filterState.tipologia.includes(row.tipologia)
             );
         }
 
@@ -501,23 +556,77 @@ export const Dashboard: React.FC = () => {
                 <div style={{
                     marginBottom: 16
                 }}>
-                    <h1 style={{
-                        fontSize: 28,
-                        fontWeight: 700,
-                        color: themeColors.text,
-                        marginBottom: 8
-                    }}>
-                        Timelines SEIA
-                    </h1>
-                    <p style={{
-                        fontSize: 14,
-                        color: themeColors.textSecondary,
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        justifyContent: 'space-between',
+                        flexWrap: 'wrap',
+                        gap: 16,
                         marginBottom: 12
                     }}>
-                        Análisis de tiempos entre ICSARA y Adenda por año
-                    </p>
+                        <div>
+                            <h1 style={{
+                                margin: 0,
+                                fontSize: 28,
+                                fontWeight: 700,
+                                color: themeColors.text
+                            }}>
+                                Timelines SEIA
+                            </h1>
+                            <p style={{
+                                margin: '4px 0 0 0',
+                                fontSize: 14,
+                                color: themeColors.textSecondary
+                            }}>
+                                Análisis de tiempos entre eventos del proceso SEIA
+                            </p>
+                        </div>
 
-                    {/* Theme Toggle */}
+                        {/* View Toggle - Right side */}
+                        <div style={{
+                            display: 'flex',
+                            gap: 8,
+                            backgroundColor: themeColors.cardBackground,
+                            padding: 4,
+                            borderRadius: 8,
+                            border: `1px solid ${themeColors.border}`
+                        }}>
+                            <button
+                                onClick={() => setActiveView('entre_eventos')}
+                                style={{
+                                    padding: '8px 16px',
+                                    borderRadius: 6,
+                                    border: 'none',
+                                    backgroundColor: activeView === 'entre_eventos' ? themeColors.buttonActiveBg : themeColors.buttonBackground,
+                                    color: activeView === 'entre_eventos' ? themeColors.buttonActiveText : themeColors.buttonText,
+                                    fontSize: 14,
+                                    fontWeight: 500,
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s'
+                                }}
+                            >
+                                Entre Eventos
+                            </button>
+                            <button
+                                onClick={() => setActiveView('total')}
+                                style={{
+                                    padding: '8px 16px',
+                                    borderRadius: 6,
+                                    border: 'none',
+                                    backgroundColor: activeView === 'total' ? themeColors.buttonActiveBg : themeColors.buttonBackground,
+                                    color: activeView === 'total' ? themeColors.buttonActiveText : themeColors.buttonText,
+                                    fontSize: 14,
+                                    fontWeight: 500,
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s'
+                                }}
+                            >
+                                Total
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Theme Toggle - Below title on left */}
                     <div style={{
                         display: 'flex',
                         gap: 8,
@@ -580,12 +689,12 @@ export const Dashboard: React.FC = () => {
                 )}
 
                 {/* Timeline Selector - Full width, above box plot */}
-                {dashboardData.episodes.length > 0 && (
+                {availableEpisodes.length > 0 && (
                     <div style={{
                         marginBottom: 24
                     }}>
                         <TimelineSelector
-                            episodes={convertToEpisodes(dashboardData.episodes)}
+                            episodes={availableEpisodes}
                             selectedEpisode={selectedEpisode}
                             onEpisodeChange={setSelectedEpisode}
                             themeColors={themeColors}
