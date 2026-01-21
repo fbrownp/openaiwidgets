@@ -1,0 +1,41 @@
+trigger:
+- main
+
+variables:
+  imageName: rag-widgets
+  acrName: dssrepository
+  containerAppName: rag-widgets
+  resourceGroup: DptoCambioClimatico
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: Docker@2
+  displayName: Build & Push Image
+  inputs:
+    containerRegistry: 'ACR-FRONTEND'
+    repository: $(imageName)
+    command: buildAndPush
+    Dockerfile: '**/Dockerfile'
+    tags: |
+      latest
+      $(Build.BuildId)
+
+- task: AzureCLI@2
+  displayName: Deploy to Container Apps
+  inputs:
+    azureSubscription: 'AZURE-CONNECTION'
+    scriptType: bash
+    scriptLocation: inlineScript
+    inlineScript: |
+      set -e
+      set -x
+
+      az extension add --name containerapp --upgrade
+
+      az containerapp update \
+        --name $(containerAppName) \
+        --resource-group $(resourceGroup) \
+        --image $(acrName).azurecr.io/$(imageName):$(Build.BuildId)
+
