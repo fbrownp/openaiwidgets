@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useRef } from 'react';
+import Chart from 'react-apexcharts';
+import { ApexOptions } from 'apexcharts';
 import { DropdownFilter } from './DropdownFilter';
 import { EnhancedBarplot } from './EnhancedBarplot';
 import { buildFilterConfigs, parseGPTOutput } from './gpt-adapter';
@@ -208,8 +210,8 @@ export function Dashboard() {
 
     const data = dashboardState ?? createDefaultDashboardState();
 
-    const [activeView, setActiveView] = React.useState<'proyectos' | 'inversion'>(
-        data.activeView
+    const [activeView, setActiveView] = React.useState<'proyectos' | 'inversion' | 'paginas'>(
+        data.activeView as 'proyectos' | 'inversion' | 'paginas'
     );
     const [selectedMetric, setSelectedMetric] = React.useState<string>(
         activeView === 'proyectos' ? 'cantidad_proyectos' : 'inversion_total'
@@ -217,8 +219,11 @@ export function Dashboard() {
 
     // Update view when data changes
     useEffect(() => {
-        setActiveView(data.activeView);
-        setSelectedMetric(data.activeView === 'proyectos' ? 'cantidad_proyectos' : 'inversion_total');
+        const newView = data.activeView as 'proyectos' | 'inversion' | 'paginas';
+        setActiveView(newView);
+        if (newView !== 'paginas') {
+            setSelectedMetric(newView === 'proyectos' ? 'cantidad_proyectos' : 'inversion_total');
+        }
     }, [data.activeView]);
 
     // Build filter configurations
@@ -334,6 +339,80 @@ export function Dashboard() {
             .sort((a, b) => (b.inversion_total || 0) - (a.inversion_total || 0));
     };
 
+    // Box plot data calculation for Paginas
+    type BoxPlotDataPoint = {
+        year: number;
+        min: number;
+        q1: number;
+        median: number;
+        q3: number;
+        max: number;
+        outliers?: number[];
+    };
+
+    const calculateBoxPlotData = (rows: DataRow[]): BoxPlotDataPoint[] => {
+        // Group data by year
+        const dataByYear: Record<number, number[]> = {};
+
+        rows.forEach(row => {
+            const year = row.ano_presentacion || row.year;
+            const paginas = (row as any).paginas;
+
+            // Only include rows with valid year and paginas values
+            if (year != null && paginas != null && !isNaN(paginas)) {
+                if (!dataByYear[year]) {
+                    dataByYear[year] = [];
+                }
+                dataByYear[year].push(paginas);
+            }
+        });
+
+        // Calculate quantiles for each year
+        const calculateQuantiles = (values: number[]): Omit<BoxPlotDataPoint, 'year'> => {
+            const sorted = [...values].sort((a, b) => a - b);
+            const n = sorted.length;
+
+            const getPercentile = (p: number) => {
+                const index = (p / 100) * (n - 1);
+                const lower = Math.floor(index);
+                const upper = Math.ceil(index);
+                const weight = index - lower;
+                return sorted[lower] * (1 - weight) + sorted[upper] * weight;
+            };
+
+            const q1 = getPercentile(25);
+            const median = getPercentile(50);
+            const q3 = getPercentile(75);
+            const iqr = q3 - q1;
+
+            // Calculate outliers using IQR method
+            const lowerFence = q1 - 1.5 * iqr;
+            const upperFence = q3 + 1.5 * iqr;
+
+            const outliers = sorted.filter(v => v < lowerFence || v > upperFence);
+            const nonOutliers = sorted.filter(v => v >= lowerFence && v <= upperFence);
+
+            const min = nonOutliers.length > 0 ? Math.min(...nonOutliers) : sorted[0];
+            const max = nonOutliers.length > 0 ? Math.max(...nonOutliers) : sorted[n - 1];
+
+            return {
+                min,
+                q1,
+                median,
+                q3,
+                max,
+                outliers: outliers.length > 0 ? outliers : undefined
+            };
+        };
+
+        // Convert to box plot data points
+        const years = Object.keys(dataByYear).map(Number).sort((a, b) => a - b);
+        return years.map(year => ({
+            ...calculateQuantiles(dataByYear[year]),
+            year
+        }));
+    };
+
     // Apply filters and transform data for each chart
     const filteredData = useMemo(
         () => applyFilters(data.data),
@@ -347,6 +426,11 @@ export function Dashboard() {
 
     const filteredRegionData = useMemo(
         () => aggregateByRegion(filteredData),
+        [filteredData]
+    );
+
+    const boxPlotData = useMemo(
+        () => calculateBoxPlotData(filteredData),
         [filteredData]
     );
 
@@ -555,6 +639,24 @@ export function Dashboard() {
                             >
                                 Inversión
                             </button>
+                            <button
+                                onClick={() => {
+                                    setActiveView('paginas');
+                                }}
+                                style={{
+                                    padding: '8px 16px',
+                                    borderRadius: 6,
+                                    border: 'none',
+                                    backgroundColor: activeView === 'paginas' ? themeColors.buttonActiveBg : themeColors.buttonBackground,
+                                    color: activeView === 'paginas' ? themeColors.buttonActiveText : themeColors.buttonText,
+                                    fontSize: 14,
+                                    fontWeight: 500,
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s'
+                                }}
+                            >
+                                Paginas
+                            </button>
                         </div>
                     </div>
 
@@ -645,36 +747,156 @@ export function Dashboard() {
                     gridTemplateColumns: '1fr',
                     gap: 20
                 }}>
-                    {filteredTimeSeriesData.length > 0 && (
-                        <EnhancedBarplot
-                            title={activeView === 'proyectos'
-                                ? "Evolución de Proyectos por Año"
-                                : "Evolución de Inversión por Año"
-                            }
-                            metricOptions={metricOptions}
-                            selectedMetric={selectedMetric}
-                            rows={filteredTimeSeriesData}
-                            onMetricChange={setSelectedMetric}
-                            twoWayPlot={false}
-                            showYAxis={true}
-                            height={280}
-                            themeColors={themeColors}
-                        />
-                    )}
+                    {activeView === 'paginas' ? (
+                        // Box-plot for Paginas tab
+                        <div style={{
+                            backgroundColor: themeColors.cardBackground,
+                            borderRadius: 12,
+                            padding: 24,
+                            border: `1px solid ${themeColors.cardBorder}`,
+                            boxShadow: theme === 'dark'
+                                ? '0 1px 3px rgba(0, 0, 0, 0.3)'
+                                : '0 1px 3px rgba(0, 0, 0, 0.1)'
+                        }}>
+                            {boxPlotData.length > 0 ? (
+                                <Chart
+                                    options={{
+                                        chart: {
+                                            type: 'boxPlot',
+                                            background: 'transparent',
+                                            toolbar: {
+                                                show: true,
+                                                tools: {
+                                                    download: true,
+                                                    zoom: false,
+                                                    zoomin: false,
+                                                    zoomout: false,
+                                                    pan: false,
+                                                    reset: false
+                                                }
+                                            },
+                                            animations: {
+                                                enabled: true
+                                            }
+                                        },
+                                        theme: {
+                                            mode: theme
+                                        },
+                                        plotOptions: {
+                                            boxPlot: {
+                                                colors: {
+                                                    upper: themeColors.purple,
+                                                    lower: themeColors.purpleLight
+                                                }
+                                            }
+                                        },
+                                        stroke: {
+                                            colors: [theme === 'dark' ? '#ffffff' : '#000000'],
+                                            width: 2
+                                        },
+                                        xaxis: {
+                                            type: 'category',
+                                            categories: boxPlotData.map(d => d.year.toString()),
+                                            labels: {
+                                                style: {
+                                                    colors: themeColors.text,
+                                                    fontSize: '12px'
+                                                }
+                                            },
+                                            title: {
+                                                text: 'Año',
+                                                style: {
+                                                    color: themeColors.text,
+                                                    fontSize: '14px',
+                                                    fontWeight: 600
+                                                }
+                                            }
+                                        },
+                                        yaxis: {
+                                            title: {
+                                                text: 'Páginas',
+                                                style: {
+                                                    color: themeColors.text,
+                                                    fontSize: '14px',
+                                                    fontWeight: 600
+                                                }
+                                            },
+                                            labels: {
+                                                style: {
+                                                    colors: themeColors.text,
+                                                    fontSize: '12px'
+                                                }
+                                            }
+                                        },
+                                        grid: {
+                                            borderColor: themeColors.gridLine,
+                                            strokeDashArray: 4
+                                        },
+                                        tooltip: {
+                                            theme: theme,
+                                            y: {
+                                                formatter: (val) => `${val.toFixed(0)} páginas`
+                                            }
+                                        },
+                                        colors: [themeColors.purple]
+                                    } as ApexOptions}
+                                    series={[{
+                                        name: 'Páginas',
+                                        type: 'boxPlot' as const,
+                                        data: boxPlotData.map(d => ({
+                                            x: d.year.toString(),
+                                            y: [d.min, d.q1, d.median, d.q3, d.max]
+                                        }))
+                                    }]}
+                                    type="boxPlot"
+                                    height={500}
+                                />
+                            ) : (
+                                <div style={{
+                                    textAlign: 'center',
+                                    padding: 60,
+                                    color: themeColors.textSecondary
+                                }}>
+                                    <div style={{ fontSize: 16, fontWeight: 500 }}>
+                                        No hay datos de páginas disponibles
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <>
+                            {filteredTimeSeriesData.length > 0 && (
+                                <EnhancedBarplot
+                                    title={activeView === 'proyectos'
+                                        ? "Evolución de Proyectos por Año"
+                                        : "Evolución de Inversión por Año"
+                                    }
+                                    metricOptions={metricOptions}
+                                    selectedMetric={selectedMetric}
+                                    rows={filteredTimeSeriesData}
+                                    onMetricChange={setSelectedMetric}
+                                    twoWayPlot={false}
+                                    showYAxis={true}
+                                    height={280}
+                                    themeColors={themeColors}
+                                />
+                            )}
 
-                    {filteredRegionData.length > 0 && (
-                        <HorizontalBarplot
-                            title={activeView === 'proyectos'
-                                ? "Distribución por Región - Proyectos"
-                                : "Distribución por Región - Inversión"
-                            }
-                            metricOptions={metricOptions}
-                            selectedMetric={selectedMetric}
-                            rows={filteredRegionData}
-                            onMetricChange={setSelectedMetric}
-                            height={280}
-                            themeColors={themeColors}
-                        />
+                            {filteredRegionData.length > 0 && (
+                                <HorizontalBarplot
+                                    title={activeView === 'proyectos'
+                                        ? "Distribución por Región - Proyectos"
+                                        : "Distribución por Región - Inversión"
+                                    }
+                                    metricOptions={metricOptions}
+                                    selectedMetric={selectedMetric}
+                                    rows={filteredRegionData}
+                                    onMetricChange={setSelectedMetric}
+                                    height={280}
+                                    themeColors={themeColors}
+                                />
+                            )}
+                        </>
                     )}
                 </div>
             </div>
